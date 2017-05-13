@@ -1,4 +1,4 @@
-package middleware
+package authz
 
 // This plugin is based on Casbin: an authorization library that supports ACL, RBAC, ABAC
 // View source at:

@@ -1,4 +1,4 @@
-package middleware
+package authz
 
 import (
 	"net/http"
