@@ -2,12 +2,12 @@ package authz
 
 // This plugin is based on Casbin: an authorization library that supports ACL, RBAC, ABAC
 // View source at:
-// https://github.com/hsluoyz/casbin
+// https://github.com/casbin/casbin
 
 import (
 	"net/http"
 
-	"github.com/hsluoyz/casbin"
+	"github.com/casbin/casbin"
 )
 
 // Authz is a middleware that controls the access to the HTTP service, it is based

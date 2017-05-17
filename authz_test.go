@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/hsluoyz/casbin"
+	"github.com/casbin/casbin"
 	"github.com/pressly/chi"
 )
 

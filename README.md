@@ -1,7 +1,7 @@
 authz [![GoDoc](https://godoc.org/github.com/casbin/chi-authz?status.svg)](https://godoc.org/github.com/casbin/chi-authz)
 ======
 
-chi-authz is an authorization middleware for [Chi](https://github.com/pressly/chi), it's based on [https://github.com/hsluoyz/casbin](https://github.com/hsluoyz/casbin).
+chi-authz is an authorization middleware for [Chi](https://github.com/pressly/chi), it's based on [https://github.com/casbin/casbin](https://github.com/casbin/casbin).
 
 ## Installation
 
@@ -16,7 +16,7 @@ import (
 	"net/http"
 
 	"github.com/casbin/chi-authz"
-	"github.com/hsluoyz/casbin"
+	"github.com/casbin/casbin"
 	"github.com/pressly/chi"
 )
 
@@ -37,7 +37,7 @@ func main() {
 
 ## Getting Help
 
-- [casbin](https://github.com/hsluoyz/casbin)
+- [casbin](https://github.com/casbin/casbin)
 
 ## License
 
