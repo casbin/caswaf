@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/casbin/casbin"
-	"github.com/pressly/chi"
+	"github.com/go-chi/chi"
 )
 
 func testAuthzRequest(t *testing.T, router *chi.Mux, user string, path string, method string, code int) {
