@@ -10,7 +10,7 @@ export let CasdoorSdk;
 export function initServerUrl() {
   const hostname = window.location.hostname;
   if (hostname === 'localhost') {
-    ServerUrl = `http://${hostname}:15000`;
+    ServerUrl = `http://${hostname}:17000`;
   }
 }
 

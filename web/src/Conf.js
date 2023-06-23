@@ -6,3 +6,6 @@ export const AuthConfig = {
   organizationName: "casbin",
   redirectPath: "/callback",
 };
+
+export const ForceLanguage = "";
+export const DefaultLanguage = "en";
