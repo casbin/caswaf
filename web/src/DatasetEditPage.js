@@ -1,11 +1,11 @@
 import React from "react";
-import {Button, Card, Col, DatePicker, Input, Row, Select} from 'antd';
+import {Button, Card, Col, DatePicker, Input, Row, Select} from "antd";
 import * as DatasetBackend from "./backend/DatasetBackend";
 import * as Setting from "./Setting";
 import moment from "moment";
 import i18next from "i18next";
 
-const { Option } = Select;
+const {Option} = Select;
 
 class DatasetEditPage extends React.Component {
   constructor(props) {
@@ -17,7 +17,7 @@ class DatasetEditPage extends React.Component {
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getDataset();
   }
 
@@ -40,7 +40,7 @@ class DatasetEditPage extends React.Component {
   updateDatasetField(key, value) {
     value = this.parseDatasetField(key, value);
 
-    let dataset = this.state.dataset;
+    const dataset = this.state.dataset;
     dataset[key] = value;
     this.setState({
       dataset: dataset,
@@ -54,100 +54,100 @@ class DatasetEditPage extends React.Component {
           {i18next.t("dataset:Edit Dataset")}&nbsp;&nbsp;&nbsp;&nbsp;
           <Button type="primary" onClick={this.submitDatasetEdit.bind(this)}>{i18next.t("general:Save")}</Button>
         </div>
-      } style={{marginLeft: '5px'}} type="inner">
-        <Row style={{marginTop: '10px'}} >
-          <Col style={{marginTop: '5px'}} span={2}>
+      } style={{marginLeft: "5px"}} type="inner">
+        <Row style={{marginTop: "10px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("general:Name")}:
           </Col>
           <Col span={22} >
             <Input value={this.state.dataset.name} onChange={e => {
-              this.updateDatasetField('name', e.target.value);
+              this.updateDatasetField("name", e.target.value);
             }} />
           </Col>
         </Row>
-        <Row style={{marginTop: '20px'}} >
-          <Col style={{marginTop: '5px'}} span={2}>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("dataset:Start date")}:
           </Col>
           <Col span={5} >
             <DatePicker defaultValue={moment(this.state.dataset.startDate, "YYYY-MM-DD")} onChange={(time, timeString) => {
-              this.updateDatasetField('startDate', timeString);
+              this.updateDatasetField("startDate", timeString);
             }} />
           </Col>
-          <Col style={{marginTop: '5px'}} span={2}>
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("dataset:End date")}:
           </Col>
           <Col span={10} >
             <DatePicker defaultValue={moment(this.state.dataset.endDate, "YYYY-MM-DD")} onChange={(time, timeString) => {
-              this.updateDatasetField('endDate', timeString);
+              this.updateDatasetField("endDate", timeString);
             }} />
           </Col>
         </Row>
-        <Row style={{marginTop: '20px'}} >
-          <Col style={{marginTop: '5px'}} span={2}>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("dataset:Full name")}:
           </Col>
           <Col span={22} >
             <Input value={this.state.dataset.fullName} onChange={e => {
-              this.updateDatasetField('fullName', e.target.value);
+              this.updateDatasetField("fullName", e.target.value);
             }} />
           </Col>
         </Row>
-        <Row style={{marginTop: '20px'}} >
-          <Col style={{marginTop: '5px'}} span={2}>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("dataset:Organizer")}:
           </Col>
           <Col span={22} >
             <Input value={this.state.dataset.organizer} onChange={e => {
-              this.updateDatasetField('organizer', e.target.value);
+              this.updateDatasetField("organizer", e.target.value);
             }} />
           </Col>
         </Row>
-        <Row style={{marginTop: '20px'}} >
-          <Col style={{marginTop: '5px'}} span={2}>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("dataset:Location")}:
           </Col>
           <Col span={22} >
             <Input value={this.state.dataset.location} onChange={e => {
-              this.updateDatasetField('location', e.target.value);
+              this.updateDatasetField("location", e.target.value);
             }} />
           </Col>
         </Row>
-        <Row style={{marginTop: '20px'}} >
-          <Col style={{marginTop: '5px'}} span={2}>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("dataset:Address")}:
           </Col>
           <Col span={22} >
             <Input value={this.state.dataset.address} onChange={e => {
-              this.updateDatasetField('address', e.target.value);
+              this.updateDatasetField("address", e.target.value);
             }} />
           </Col>
         </Row>
-        <Row style={{marginTop: '20px'}} >
-          <Col style={{marginTop: '5px'}} span={2}>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("general:Status")}:
           </Col>
           <Col span={22} >
-            <Select virtual={false} style={{width: '100%'}} value={this.state.dataset.status} onChange={(value => {this.updateDatasetField('status', value);})}>
+            <Select virtual={false} style={{width: "100%"}} value={this.state.dataset.status} onChange={(value => {this.updateDatasetField("status", value);})}>
               {
                 [
-                  {id: 'Public', name: 'Public (Everyone can see it)'},
-                  {id: 'Hidden', name: 'Hidden (Only yourself can see it)'},
+                  {id: "Public", name: "Public (Everyone can see it)"},
+                  {id: "Hidden", name: "Hidden (Only yourself can see it)"},
                 ].map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)
               }
             </Select>
           </Col>
         </Row>
-        <Row style={{marginTop: '20px'}} >
-          <Col style={{marginTop: '5px'}} span={2}>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("dataset:Carousels")}:
           </Col>
           <Col span={22} >
-            <Select virtual={false} mode="tags" style={{width: '100%'}} placeholder="Please input"
-                    value={this.state.dataset.carousels}
-                    onChange={value => {
-                      this.updateDatasetField('carousels', value);
-                    }}
+            <Select virtual={false} mode="tags" style={{width: "100%"}} placeholder="Please input"
+              value={this.state.dataset.carousels}
+              onChange={value => {
+                this.updateDatasetField("carousels", value);
+              }}
             >
               {
                 this.state.dataset.carousels.map((carousel, index) => <Option key={carousel}>{carousel}</Option>)
@@ -155,60 +155,60 @@ class DatasetEditPage extends React.Component {
             </Select>
           </Col>
         </Row>
-        <Row style={{marginTop: '20px'}} >
-          <Col style={{marginTop: '5px'}} span={2}>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("dataset:Introduction text")}:
           </Col>
           <Col span={22} >
             <Input value={this.state.dataset.introText} onChange={e => {
-              this.updateDatasetField('introText', e.target.value);
+              this.updateDatasetField("introText", e.target.value);
             }} />
           </Col>
         </Row>
-        <Row style={{marginTop: '20px'}} >
-          <Col style={{marginTop: '5px'}} span={2}>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("dataset:Default item")}:
           </Col>
           <Col span={22} >
-            <Select virtual={false} style={{width: '100%'}} value={this.state.dataset.defaultItem} onChange={value => {this.updateDatasetField('defaultItem', value);}}>
+            <Select virtual={false} style={{width: "100%"}} value={this.state.dataset.defaultItem} onChange={value => {this.updateDatasetField("defaultItem", value);}}>
               {
                 this.state.dataset.treeItems.filter(treeItem => treeItem.children.length === 0).map((treeItem, index) => <Option key={treeItem.title}>{`${treeItem.title} | ${treeItem.titleEn}`}</Option>)
               }
             </Select>
           </Col>
         </Row>
-        <Row style={{marginTop: '20px'}} >
-          <Col style={{marginTop: '5px'}} span={2}>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("dataset:Language")}:
           </Col>
           <Col span={22} >
-            <Select virtual={false} style={{width: '100%'}} value={this.state.dataset.language} onChange={(value => {this.updateDatasetField('language', value);})}>
+            <Select virtual={false} style={{width: "100%"}} value={this.state.dataset.language} onChange={(value => {this.updateDatasetField("language", value);})}>
               {
                 [
-                  {id: 'zh', name: 'zh'},
-                  {id: 'en', name: 'en'},
+                  {id: "zh", name: "zh"},
+                  {id: "en", name: "en"},
                 ].map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)
               }
             </Select>
           </Col>
         </Row>
       </Card>
-    )
+    );
   }
 
   submitDatasetEdit() {
-    let dataset = Setting.deepCopy(this.state.dataset);
+    const dataset = Setting.deepCopy(this.state.dataset);
     DatasetBackend.updateDataset(this.state.dataset.owner, this.state.datasetName, dataset)
       .then((res) => {
         if (res) {
-          Setting.showMessage("success", `Successfully saved`);
+          Setting.showMessage("success", "Successfully saved");
           this.setState({
             datasetName: this.state.dataset.name,
           });
           this.props.history.push(`/datasets/${this.state.dataset.name}`);
         } else {
-          Setting.showMessage("error", `failed to save: server side failure`);
-          this.updateDatasetField('name', this.state.datasetName);
+          Setting.showMessage("error", "failed to save: server side failure");
+          this.updateDatasetField("name", this.state.datasetName);
         }
       })
       .catch(error => {

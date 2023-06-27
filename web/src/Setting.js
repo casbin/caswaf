@@ -4,12 +4,12 @@ import i18next from "i18next";
 import moment from "moment";
 import Sdk from "casdoor-js-sdk";
 
-export let ServerUrl = '';
+export let ServerUrl = "";
 export let CasdoorSdk;
 
 export function initServerUrl() {
   const hostname = window.location.hostname;
-  if (hostname === 'localhost') {
+  if (hostname === "localhost") {
     ServerUrl = `http://${hostname}:17000`;
   }
 }
@@ -61,7 +61,7 @@ export function myParseInt(i) {
 
 export function openLink(link) {
   // this.props.history.push(link);
-  const w = window.open('about:blank');
+  const w = window.open("about:blank");
   w.location.href = link;
 }
 
@@ -122,8 +122,8 @@ export function getFormattedDate(date) {
     return null;
   }
 
-  date = date.replace('T', ' ');
-  date = date.replace('+08:00', ' ');
+  date = date.replace("T", " ");
+  date = date.replace("+08:00", " ");
   return date;
 }
 
@@ -132,10 +132,10 @@ export function getFormattedDateShort(date) {
 }
 
 export function getShortName(s) {
-  return s.split('/').slice(-1)[0];
+  return s.split("/").slice(-1)[0];
 }
 
-export function getShortText(s, maxLength=35) {
+export function getShortText(s, maxLength = 35) {
   if (s.length > maxLength) {
     return `${s.slice(0, maxLength)}...`;
   } else {
@@ -147,7 +147,7 @@ function getRandomInt(s) {
   let hash = 0;
   if (s.length !== 0) {
     for (let i = 0; i < s.length; i++) {
-      let char = s.charCodeAt(i);
+      const char = s.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
       hash = hash & hash;
     }
@@ -157,7 +157,7 @@ function getRandomInt(s) {
 }
 
 export function getAvatarColor(s) {
-  const colorList = ['#f56a00', '#7265e6', '#ffbf00', '#00a2ae'];
+  const colorList = ["#f56a00", "#7265e6", "#ffbf00", "#00a2ae"];
   let random = getRandomInt(s);
   if (random < 0) {
     random = -random;
@@ -183,7 +183,6 @@ export function changeLanguage(language) {
 }
 
 export function changeMomentLanguage(lng) {
-  return;
   if (lng === "zh") {
     moment.locale("zh", {
       relativeTime: {

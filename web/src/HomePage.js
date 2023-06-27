@@ -13,7 +13,7 @@ class HomePage extends React.Component {
       <div>
         hello
       </div>
-    )
+    );
   }
 }
 
