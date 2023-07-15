@@ -64,6 +64,12 @@ func UpdateCert(id string, cert *Cert) bool {
 		return false
 	}
 
+	if cert.Certificate != "" {
+		cert.ExpireTime = getCertExpireTime(cert.Certificate)
+	} else {
+		cert.ExpireTime = ""
+	}
+
 	_, err := adapter.engine.ID(core.PK{owner, name}).AllCols().Update(cert)
 	if err != nil {
 		panic(err)

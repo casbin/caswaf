@@ -112,7 +112,7 @@ class CertEditPage extends React.Component {
             {i18next.t("cert:Expire time")}:
           </Col>
           <Col span={22} >
-            <Input value={this.state.cert.expireTime} onChange={e => {
+            <Input disabled={true} value={Setting.getFormattedDate(this.state.cert.expireTime)} onChange={e => {
               this.updateCertField("expireTime", e.target.value);
             }} />
           </Col>

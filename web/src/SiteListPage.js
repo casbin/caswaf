@@ -145,6 +145,13 @@ class SiteListPage extends React.Component {
         key: "sslCert",
         width: "180px",
         sorter: (a, b) => a.sslCert.localeCompare(b.sslCert),
+        render: (text, record, index) => {
+          return (
+            <Link to={`/certs/${text}`}>
+              {text}
+            </Link>
+          );
+        },
       },
       {
         title: i18next.t("general:Action"),
