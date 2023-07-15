@@ -143,6 +143,10 @@ export function getShortText(s, maxLength = 35) {
   }
 }
 
+export function getRandomName() {
+  return Math.random().toString(36).slice(-6);
+}
+
 function getRandomInt(s) {
   let hash = 0;
   if (s.length !== 0) {
