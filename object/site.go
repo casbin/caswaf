@@ -67,6 +67,8 @@ func UpdateSite(id string, site *Site) bool {
 		panic(err)
 	}
 
+	refreshSiteMap()
+
 	//return affected != 0
 	return true
 }
@@ -77,6 +79,10 @@ func AddSite(site *Site) bool {
 		panic(err)
 	}
 
+	if affected != 0 {
+		refreshSiteMap()
+	}
+
 	return affected != 0
 }
 
@@ -84,6 +90,10 @@ func DeleteSite(site *Site) bool {
 	affected, err := adapter.engine.ID(core.PK{site.Owner, site.Name}).Delete(&Site{})
 	if err != nil {
 		panic(err)
+	}
+
+	if affected != 0 {
+		refreshSiteMap()
 	}
 
 	return affected != 0
