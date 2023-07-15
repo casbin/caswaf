@@ -7,8 +7,10 @@
     "@craco/craco": "6.4.5",
     "antd": "4.15.5",
     "casdoor-js-sdk": "^0.2.7",
-    "copy-to-clipboard": "^3.3.1",
+    "copy-to-clipboard": "^3.3.3",
     "craco-less": "2.0.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "file-saver": "^2.0.5",
     "i18next": "^19.8.9",
     "moment": "^2.29.1",
     "react": "17.0.2",
@@ -16,8 +18,7 @@
     "react-dom": "17.0.2",
     "react-i18next": "^11.8.7",
     "react-router-dom": "5.1.2",
-    "react-scripts": "5.0.1",
-    "eslint-plugin-unused-imports": "^2.0.0"
+    "react-scripts": "5.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.18.13",

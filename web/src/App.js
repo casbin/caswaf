@@ -12,6 +12,8 @@ import DatasetListPage from "./DatasetListPage";
 import DatasetEditPage from "./DatasetEditPage";
 import SiteListPage from "./SiteListPage";
 import SiteEditPage from "./SiteEditPage";
+import CertListPage from "./CertListPage";
+import CertEditPage from "./CertEditPage";
 import SigninPage from "./SigninPage";
 import i18next from "i18next";
 import SelectLanguageBox from "./SelectLanguageBox";
@@ -57,6 +59,8 @@ class App extends Component {
       this.setState({selectedMenuKey: "/datasets"});
     } else if (uri.includes("/sites")) {
       this.setState({selectedMenuKey: "/sites"});
+    } else if (uri.includes("/certs")) {
+      this.setState({selectedMenuKey: "/certs"});
     } else {
       this.setState({selectedMenuKey: "null"});
     }
@@ -237,6 +241,13 @@ class App extends Component {
         </Link>
       </Menu.Item>
     );
+    res.push(
+      <Menu.Item key="/certs">
+        <Link to="/certs">
+          {i18next.t("general:Certs")}
+        </Link>
+      </Menu.Item>
+    );
 
     return res;
   }
@@ -294,6 +305,8 @@ class App extends Component {
           <Route exact path="/datasets/:datasetName" render={(props) => this.renderSigninIfNotSignedIn(<DatasetEditPage account={this.state.account} {...props} />)} />
           <Route exact path="/sites" render={(props) => this.renderSigninIfNotSignedIn(<SiteListPage account={this.state.account} {...props} />)} />
           <Route exact path="/sites/:siteName" render={(props) => this.renderSigninIfNotSignedIn(<SiteEditPage account={this.state.account} {...props} />)} />
+          <Route exact path="/certs" render={(props) => this.renderSigninIfNotSignedIn(<CertListPage account={this.state.account} {...props} />)} />
+          <Route exact path="/certs/:certName" render={(props) => this.renderSigninIfNotSignedIn(<CertEditPage account={this.state.account} {...props} />)} />
         </Switch>
       </div>
     );
