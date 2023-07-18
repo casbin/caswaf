@@ -1,6 +1,7 @@
 import React from "react";
 import {Button, Card, Col, Input, Row, Select} from "antd";
 import * as SiteBackend from "./backend/SiteBackend";
+import * as CertBackend from "./backend/CertBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
 
@@ -13,11 +14,13 @@ class SiteEditPage extends React.Component {
       classes: props,
       siteName: props.match.params.siteName,
       site: null,
+      certs: null,
     };
   }
 
   UNSAFE_componentWillMount() {
     this.getSite();
+    this.getCerts();
   }
 
   getSite() {
@@ -25,6 +28,15 @@ class SiteEditPage extends React.Component {
       .then((site) => {
         this.setState({
           site: site,
+        });
+      });
+  }
+
+  getCerts() {
+    CertBackend.getCerts(this.props.account.name)
+      .then((res) => {
+        this.setState({
+          certs: res,
         });
       });
   }
@@ -115,9 +127,13 @@ class SiteEditPage extends React.Component {
             {i18next.t("site:SSL cert")}:
           </Col>
           <Col span={22} >
-            <Input value={this.state.site.sslCert} onChange={e => {
-              this.updateSiteField("sslCert", e.target.value);
-            }} />
+            <Select virtual={false} style={{width: "100%"}} value={this.state.site.sslCert} onChange={(value => {
+              this.updateSiteField("sslCert", value);
+            })}>
+              {
+                this.state.certs?.map((cert, index) => <Option key={index} value={cert.name}>{cert.name}</Option>)
+              }
+            </Select>
           </Col>
         </Row>
       </Card>
