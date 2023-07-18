@@ -10,6 +10,10 @@ func refreshSiteMap() {
 	sites := GetGlobalSites()
 	for _, site := range sites {
 		if _, ok := siteMap[site.Domain]; !ok {
+			if site.SslCert != "" {
+				site.SslCertObj = getCert("admin", site.SslCert)
+			}
+
 			siteMap[site.Domain] = site
 		}
 	}

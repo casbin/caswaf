@@ -15,6 +15,8 @@ type Site struct {
 	Host    string `xorm:"varchar(100)" json:"host"`
 	SslMode string `xorm:"varchar(100)" json:"sslMode"`
 	SslCert string `xorm:"varchar(100)" json:"sslCert"`
+
+	SslCertObj *Cert `xorm:"-" json:"sslCertObj"`
 }
 
 func GetGlobalSites() []*Site {
