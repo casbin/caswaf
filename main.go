@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego/plugins/cors"
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/routers"
+	"github.com/casbin/caswaf/service"
 )
 
 func main() {
@@ -28,6 +29,8 @@ func main() {
 	beego.BConfig.WebConfig.Session.SessionProvider = "file"
 	beego.BConfig.WebConfig.Session.SessionProviderConfig = "./tmp"
 	beego.BConfig.WebConfig.Session.SessionGCMaxLifetime = 3600 * 24 * 365
+
+	service.Start()
 
 	beego.Run()
 }
