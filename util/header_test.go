@@ -12,20 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const CracoLessPlugin = require('craco-less');
+package util
 
-module.exports = {
-  plugins: [
-    {
-      plugin: CracoLessPlugin,
-      options: {
-        lessLoaderOptions: {
-          lessOptions: {
-            modifyVars: {"@primary-color": "rgb(89,54,213)", "@border-radius-base": "5px"},
-            javascriptEnabled: true,
-          },
-        },
-      },
-    },
-  ],
-};
+import "testing"
+
+func TestUpdateAllHeaders(t *testing.T) {
+	updateAllHeaders()
+}
