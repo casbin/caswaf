@@ -21,6 +21,8 @@ func InitSiteMap() {
 }
 
 func refreshSiteMap() {
+	siteMap = map[string]*Site{}
+
 	sites := GetGlobalSites()
 	for _, site := range sites {
 		if _, ok := siteMap[site.Domain]; !ok {
