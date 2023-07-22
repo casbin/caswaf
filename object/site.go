@@ -30,6 +30,13 @@ type Site struct {
 	SslMode string `xorm:"varchar(100)" json:"sslMode"`
 	SslCert string `xorm:"varchar(100)" json:"sslCert"`
 
+	CasdoorEndpoint     string `xorm:"varchar(100)" json:"casdoorEndpoint"`
+	CasdoorClientId     string `xorm:"varchar(100)" json:"casdoorClientId"`
+	CasdoorClientSecret string `xorm:"varchar(100)" json:"casdoorClientSecret"`
+	CasdoorCertificate  string `xorm:"mediumtext" json:"casdoorCertificate"`
+	CasdoorOrganization string `xorm:"varchar(100)" json:"casdoorOrganization"`
+	CasdoorApplication  string `xorm:"varchar(100)" json:"casdoorApplication"`
+
 	SslCertObj *Cert `xorm:"-" json:"sslCertObj"`
 }
 

@@ -168,6 +168,20 @@ class SiteListPage extends React.Component {
         },
       },
       {
+        title: i18next.t("site:Casdoor endpoint"),
+        dataIndex: "casdoorEndpoint",
+        key: "casdoorEndpoint",
+        width: "200px",
+        sorter: (a, b) => a.host.localeCompare(b.host),
+        render: (text, record, index) => {
+          return (
+            <a target="_blank" rel="noreferrer" href={text}>
+              {text}
+            </a>
+          );
+        },
+      },
+      {
         title: i18next.t("general:Action"),
         dataIndex: "action",
         key: "action",
