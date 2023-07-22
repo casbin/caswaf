@@ -15,6 +15,7 @@
 package service
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
@@ -24,7 +25,7 @@ import (
 	"github.com/casbin/caswaf/object"
 )
 
-func ForwardHandler(targetURL string, writer http.ResponseWriter, request *http.Request) {
+func forwardHandler(targetURL string, writer http.ResponseWriter, request *http.Request) {
 	u, err := url.Parse(targetURL)
 	if nil != err {
 		log.Println(err)
@@ -41,28 +42,61 @@ func ForwardHandler(targetURL string, writer http.ResponseWriter, request *http.
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("port :80 receive request:", r.URL.Path)
-
 	site := object.GetSiteByDomain(r.Host)
 	if site == nil {
 		// cache miss
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	//fmt.Println("site.Domain:", site.Domain)
-	//fmt.Println("site.Host:", site.Host)
 
-	// forward to target
-	ForwardHandler(site.Host+r.URL.Path, w, r)
+	if site.SslMode == "HTTPS Only" {
+		// This domain only supports https but receive http request, redirect to https
+		if r.TLS == nil {
+			safetyURL := fmt.Sprintf("https://%s%s", r.Host, r.URL.Path)
+
+			http.Redirect(w, r, safetyURL, http.StatusMovedPermanently)
+		}
+	}
+
+	forwardHandler(site.Host+r.URL.Path, w, r)
+}
+
+func getCertificateForDomain(domain string) (*tls.Certificate, error) {
+	site := object.GetSiteByDomain(domain)
+	tlsCert, certErr := tls.X509KeyPair([]byte(site.SslCertObj.Certificate), []byte(site.SslCertObj.PrivateKey))
+
+	return &tlsCert, certErr
 }
 
 func Start() {
-	fmt.Println("listening port 80")
+	http.HandleFunc("/", handleRequest)
 
 	go func() {
-		http.HandleFunc("/", handleRequest)
-
 		err := http.ListenAndServe(":80", nil)
+		if err != nil {
+			panic(err)
+		}
+	}()
+
+	go func() {
+		server := &http.Server{
+			Addr:      ":443",
+			TLSConfig: &tls.Config{},
+		}
+
+		// start https server and set how to get certificate
+		server.TLSConfig.GetCertificate = func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
+			domain := info.ServerName
+			cert, err := getCertificateForDomain(domain)
+
+			if err != nil {
+				return nil, err
+			}
+
+			return cert, nil
+		}
+
+		err := server.ListenAndServeTLS("", "")
 		if err != nil {
 			panic(err)
 		}
