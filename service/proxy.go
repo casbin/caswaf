@@ -25,20 +25,48 @@ import (
 	"github.com/casbin/caswaf/object"
 )
 
-func forwardHandler(targetURL string, writer http.ResponseWriter, request *http.Request) {
-	u, err := url.Parse(targetURL)
+func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.Request) {
+	target, err := url.Parse(targetUrl)
+
 	if nil != err {
 		log.Println(err)
 		return
 	}
 
-	proxy := httputil.ReverseProxy{
-		Director: func(request *http.Request) {
-			request.URL = u
-		},
+	proxy := httputil.NewSingleHostReverseProxy(target)
+	proxy.Director = func(r *http.Request) {
+		r.URL = target
 	}
 
 	proxy.ServeHTTP(writer, request)
+}
+
+func redirectToHttps(w http.ResponseWriter, r *http.Request) {
+	safetyUrl := fmt.Sprintf("https://%s%s", r.Host, r.RequestURI)
+
+	w.Header().Set("Location", safetyUrl)
+	w.WriteHeader(http.StatusMovedPermanently)
+
+	html := `
+				<!DOCTYPE html>
+				<html>
+				<head>
+					<title>301 Moved Permanently</title>
+				</head>
+				<body>
+					<center>
+						<h1>301 Moved Permanently to </h1>
+					</center>
+					<hr>
+					<center>caswaf</center>
+				</body>
+				</html>
+			`
+	_, err := fmt.Fprint(w, html)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
@@ -52,13 +80,12 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	if site.SslMode == "HTTPS Only" {
 		// This domain only supports https but receive http request, redirect to https
 		if r.TLS == nil {
-			safetyURL := fmt.Sprintf("https://%s%s", r.Host, r.URL.Path)
-
-			http.Redirect(w, r, safetyURL, http.StatusMovedPermanently)
+			redirectToHttps(w, r)
 		}
 	}
 
-	forwardHandler(site.Host+r.URL.Path, w, r)
+	targetUrl := fmt.Sprintf("%s%s", site.Host, r.RequestURI)
+	forwardHandler(targetUrl, w, r)
 }
 
 func getCertificateForDomain(domain string) (*tls.Certificate, error) {
