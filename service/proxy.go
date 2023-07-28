@@ -17,7 +17,7 @@ package service
 import (
 	"crypto/tls"
 	"fmt"
-	"log"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -29,13 +29,22 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 	target, err := url.Parse(targetUrl)
 
 	if nil != err {
-		log.Println(err)
+		panic(err)
 		return
 	}
 
 	proxy := httputil.NewSingleHostReverseProxy(target)
 	proxy.Director = func(r *http.Request) {
 		r.URL = target
+
+		if clientIP, _, err := net.SplitHostPort(r.RemoteAddr); err == nil {
+			if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
+				newXff := fmt.Sprintf("%s, %s", xff, clientIP)
+				r.Header.Set("X-Forwarded-For", newXff)
+			} else {
+				r.Header.Set("X-Forwarded-For", clientIP)
+			}
+		}
 	}
 
 	proxy.ServeHTTP(writer, request)
