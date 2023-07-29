@@ -14,7 +14,12 @@
 
 package service
 
-import "net/url"
+import (
+	"crypto/tls"
+	"net/url"
+
+	"github.com/casbin/caswaf/object"
+)
 
 func joinPath(a string, b string) string {
 	res, err := url.JoinPath(a, b)
@@ -23,4 +28,11 @@ func joinPath(a string, b string) string {
 	}
 
 	return res
+}
+
+func getCertificateForDomain(domain string) (*tls.Certificate, error) {
+	site := object.GetSiteByDomain(domain)
+	tlsCert, certErr := tls.X509KeyPair([]byte(site.SslCertObj.Certificate), []byte(site.SslCertObj.PrivateKey))
+
+	return &tlsCert, certErr
 }

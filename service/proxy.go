@@ -79,23 +79,6 @@ func redirectToHttps(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func oAuthHandler(casdoorClient *casdoorsdk.Client, w http.ResponseWriter, r *http.Request) {
-	callbackUrl := fmt.Sprintf("http://%s/callback", r.Host)
-	signinUrl := casdoorClient.GetSigninUrl(callbackUrl)
-	w.Header().Set("Location", signinUrl)
-
-	w.WriteHeader(http.StatusFound)
-}
-
-func verifyAccessToken(casdoorClient *casdoorsdk.Client, token string) bool {
-	_, err := casdoorClient.ParseJwtToken(token)
-	if err != nil {
-		return false
-	}
-
-	return true
-}
-
 func handleRequest(w http.ResponseWriter, r *http.Request) {
 	site := object.GetSiteByDomain(r.Host)
 	if site == nil {
@@ -120,9 +103,9 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		}
 
 		casdoorClient := casdoorsdk.NewClient(site.CasdoorEndpoint, site.CasdoorClientId, site.CasdoorClientSecret, site.CasdoorCertificate, site.CasdoorOrganization, site.CasdoorApplication)
-		if cookie == nil || !verifyAccessToken(casdoorClient, cookie.Value) {
+		if cookie == nil {
 			// not logged in
-			oAuthHandler(casdoorClient, w, r)
+			redirectToCasdoor(casdoorClient, w, r)
 			return
 		} else {
 			_, err = casdoorClient.ParseJwtToken(cookie.Value)
@@ -135,58 +118,6 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 	targetUrl := joinPath(site.Host, r.RequestURI)
 	forwardHandler(targetUrl, w, r)
-}
-
-func handleAuthCallback(w http.ResponseWriter, r *http.Request) {
-	site := object.GetSiteByDomain(r.Host)
-	if site == nil {
-		fmt.Fprintf(w, "CasWAF error: site not found for host: %s", r.Host)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	code := r.URL.Query().Get("code")
-	state := r.URL.Query().Get("state")
-	if code == "" {
-		fmt.Fprint(w, "CasWAF error: the code should not be empty")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	} else if state == "" {
-		fmt.Fprint(w, "CasWAF error: the state should not be empty")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	casdoorClient := casdoorsdk.NewClient(site.CasdoorEndpoint, site.CasdoorClientId, site.CasdoorClientSecret, site.CasdoorCertificate, site.CasdoorOrganization, site.CasdoorApplication)
-	token, err := casdoorClient.GetOAuthToken(code, state)
-	if err != nil {
-		fmt.Fprintf(w, "CasWAF error: casdoorClient.GetOAuthToken() error: %s", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	cookie := &http.Cookie{
-		Name:  "casdoor_access_token",
-		Value: token.AccessToken,
-		Path:  "/",
-	}
-	http.SetCookie(w, cookie)
-
-	referrerUrl, err := url.Parse(r.Referer())
-	if err != nil {
-		panic(err)
-	}
-
-	targetUrl := fmt.Sprintf("http://%s", joinPath(site.Domain, referrerUrl.Path))
-	w.Header().Set("Location", targetUrl)
-	w.WriteHeader(http.StatusFound)
-}
-
-func getCertificateForDomain(domain string) (*tls.Certificate, error) {
-	site := object.GetSiteByDomain(domain)
-	tlsCert, certErr := tls.X509KeyPair([]byte(site.SslCertObj.Certificate), []byte(site.SslCertObj.PrivateKey))
-
-	return &tlsCert, certErr
 }
 
 func Start() {
