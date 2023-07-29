@@ -24,7 +24,7 @@ import (
 )
 
 func redirectToCasdoor(casdoorClient *casdoorsdk.Client, w http.ResponseWriter, r *http.Request) {
-	callbackUrl := fmt.Sprintf("http://%s/callback", r.Host)
+	callbackUrl := fmt.Sprintf("%s://%s/callback", r.URL.Scheme, r.Host)
 	signinUrl := casdoorClient.GetSigninUrl(callbackUrl)
 	w.Header().Set("Location", signinUrl)
 
@@ -71,7 +71,7 @@ func handleAuthCallback(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	targetUrl := fmt.Sprintf("http://%s", joinPath(site.Domain, referrerUrl.Path))
+	targetUrl := fmt.Sprintf("%s://%s", referrerUrl.Scheme, joinPath(site.Domain, referrerUrl.Path))
 	w.Header().Set("Location", targetUrl)
 	w.WriteHeader(http.StatusFound)
 }
