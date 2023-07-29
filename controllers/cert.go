@@ -21,11 +21,19 @@ import (
 )
 
 func (c *ApiController) GetGlobalCerts() {
+	if c.RequireSignedIn() {
+		return
+	}
+
 	c.Data["json"] = object.GetGlobalCerts()
 	c.ServeJSON()
 }
 
 func (c *ApiController) GetCerts() {
+	if c.RequireSignedIn() {
+		return
+	}
+
 	owner := c.Input().Get("owner")
 
 	c.Data["json"] = object.GetCerts(owner)
@@ -33,6 +41,10 @@ func (c *ApiController) GetCerts() {
 }
 
 func (c *ApiController) GetCert() {
+	if c.RequireSignedIn() {
+		return
+	}
+
 	id := c.Input().Get("id")
 
 	c.Data["json"] = object.GetCert(id)
@@ -40,6 +52,10 @@ func (c *ApiController) GetCert() {
 }
 
 func (c *ApiController) UpdateCert() {
+	if c.RequireSignedIn() {
+		return
+	}
+
 	id := c.Input().Get("id")
 
 	var cert object.Cert
@@ -53,6 +69,10 @@ func (c *ApiController) UpdateCert() {
 }
 
 func (c *ApiController) AddCert() {
+	if c.RequireSignedIn() {
+		return
+	}
+
 	var cert object.Cert
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &cert)
 	if err != nil {
@@ -64,6 +84,10 @@ func (c *ApiController) AddCert() {
 }
 
 func (c *ApiController) DeleteCert() {
+	if c.RequireSignedIn() {
+		return
+	}
+
 	var cert object.Cert
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &cert)
 	if err != nil {

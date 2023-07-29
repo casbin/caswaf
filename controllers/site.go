@@ -21,11 +21,19 @@ import (
 )
 
 func (c *ApiController) GetGlobalSites() {
+	if c.RequireSignedIn() {
+		return
+	}
+
 	c.Data["json"] = object.GetGlobalSites()
 	c.ServeJSON()
 }
 
 func (c *ApiController) GetSites() {
+	if c.RequireSignedIn() {
+		return
+	}
+
 	owner := c.Input().Get("owner")
 
 	c.Data["json"] = object.GetSites(owner)
@@ -33,6 +41,10 @@ func (c *ApiController) GetSites() {
 }
 
 func (c *ApiController) GetSite() {
+	if c.RequireSignedIn() {
+		return
+	}
+
 	id := c.Input().Get("id")
 
 	c.Data["json"] = object.GetSite(id)
@@ -40,6 +52,10 @@ func (c *ApiController) GetSite() {
 }
 
 func (c *ApiController) UpdateSite() {
+	if c.RequireSignedIn() {
+		return
+	}
+
 	id := c.Input().Get("id")
 
 	var site object.Site
@@ -53,6 +69,10 @@ func (c *ApiController) UpdateSite() {
 }
 
 func (c *ApiController) AddSite() {
+	if c.RequireSignedIn() {
+		return
+	}
+
 	var site object.Site
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &site)
 	if err != nil {
@@ -64,6 +84,10 @@ func (c *ApiController) AddSite() {
 }
 
 func (c *ApiController) DeleteSite() {
+	if c.RequireSignedIn() {
+		return
+	}
+
 	var site object.Site
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &site)
 	if err != nil {
