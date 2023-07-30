@@ -53,30 +53,7 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 
 func redirectToHttps(w http.ResponseWriter, r *http.Request) {
 	httpsUrl := fmt.Sprintf("https://%s", joinPath(r.Host, r.RequestURI))
-	w.Header().Set("Location", httpsUrl)
-	w.WriteHeader(http.StatusMovedPermanently)
-
-	html := `
-				<!DOCTYPE html>
-				<html>
-				<head>
-					<title>301 Moved Permanently</title>
-				</head>
-				<body>
-					<center>
-						<h1>301 Moved Permanently to </h1>
-					</center>
-					<hr>
-					<center>caswaf</center>
-				</body>
-				</html>
-			`
-	_, err := fmt.Fprint(w, html)
-	if err != nil {
-		panic(err)
-	}
-
-	return
+	http.Redirect(w, r, httpsUrl, http.StatusMovedPermanently)
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
@@ -98,7 +75,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	if site.CasdoorEndpoint != "" {
 		// handle oAuth proxy
 		cookie, err := r.Cookie("casdoor_access_token")
-		if err != nil {
+		if err != nil && err.Error() != "http: named cookie not present" {
 			panic(err)
 		}
 

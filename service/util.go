@@ -16,17 +16,18 @@ package service
 
 import (
 	"crypto/tls"
-	"net/url"
+	"strings"
 
 	"github.com/casbin/caswaf/object"
 )
 
 func joinPath(a string, b string) string {
-	res, err := url.JoinPath(a, b)
-	if err != nil {
-		panic(err)
+	if strings.HasSuffix(a, "/") && strings.HasPrefix(b, "/") {
+		b = b[1:]
+	} else if !strings.HasSuffix(a, "/") && !strings.HasPrefix(b, "/") {
+		b = "/" + b
 	}
-
+	res := a + b
 	return res
 }
 

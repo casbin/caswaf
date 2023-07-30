@@ -23,12 +23,22 @@ import (
 	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
 
-func redirectToCasdoor(casdoorClient *casdoorsdk.Client, w http.ResponseWriter, r *http.Request) {
-	callbackUrl := fmt.Sprintf("%s://%s/callback", r.URL.Scheme, r.Host)
-	signinUrl := casdoorClient.GetSigninUrl(callbackUrl)
-	w.Header().Set("Location", signinUrl)
+func getSigninUrl(casdoorClient *casdoorsdk.Client, callbackUrl string, originalPath string) string {
+	scope := "read"
+	return fmt.Sprintf("%s/login/oauth/authorize?client_id=%s&response_type=code&redirect_uri=%s&scope=%s&state=%s",
+		casdoorClient.Endpoint, casdoorClient.ClientId, url.QueryEscape(callbackUrl), scope, url.QueryEscape(originalPath))
+}
 
-	w.WriteHeader(http.StatusFound)
+func redirectToCasdoor(casdoorClient *casdoorsdk.Client, w http.ResponseWriter, r *http.Request) {
+	scheme := r.URL.Scheme
+	if scheme == "" {
+		scheme = "http"
+	}
+
+	callbackUrl := fmt.Sprintf("%s://%s/callback", scheme, r.Host)
+	originalPath := r.RequestURI
+	signinUrl := getSigninUrl(casdoorClient, callbackUrl, originalPath)
+	http.Redirect(w, r, signinUrl, http.StatusFound)
 }
 
 func handleAuthCallback(w http.ResponseWriter, r *http.Request) {
@@ -66,12 +76,6 @@ func handleAuthCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, cookie)
 
-	referrerUrl, err := url.Parse(r.Referer())
-	if err != nil {
-		panic(err)
-	}
-
-	targetUrl := fmt.Sprintf("%s://%s", referrerUrl.Scheme, joinPath(site.Domain, referrerUrl.Path))
-	w.Header().Set("Location", targetUrl)
-	w.WriteHeader(http.StatusFound)
+	originalPath := state
+	http.Redirect(w, r, originalPath, http.StatusFound)
 }
