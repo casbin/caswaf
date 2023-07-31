@@ -22,6 +22,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 
+	"github.com/astaxie/beego"
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/util"
 )
@@ -112,8 +113,17 @@ func Start() {
 	http.HandleFunc("/", handleRequest)
 	http.HandleFunc("/callback", handleAuthCallback)
 
+	gatewayEnabled, err := beego.AppConfig.Bool("gatewayEnabled")
+	if err != nil {
+		panic(err)
+	}
+	if !gatewayEnabled {
+		fmt.Printf("CasWAF gateway not enabled (gatewayEnabled == \"false\")\n")
+		return
+	}
+
 	go func() {
-		fmt.Printf("CasWAF data plane running on: http://127.0.0.1:80\n")
+		fmt.Printf("CasWAF gateway running on: http://127.0.0.1:80\n")
 		err := http.ListenAndServe(":80", nil)
 		if err != nil {
 			panic(err)
@@ -121,7 +131,7 @@ func Start() {
 	}()
 
 	go func() {
-		fmt.Printf("CasWAF data plane running on: https://127.0.0.1:443\n")
+		fmt.Printf("CasWAF gateway running on: https://127.0.0.1:443\n")
 		server := &http.Server{
 			Addr:      ":443",
 			TLSConfig: &tls.Config{},
