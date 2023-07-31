@@ -14,7 +14,8 @@
 
 import React from "react";
 import {Link} from "react-router-dom";
-import {Button, Col, Popconfirm, Row, Table} from "antd";
+import {Button, Col, Popconfirm, Row, Table, Tag} from "antd";
+import {CheckCircleOutlined} from "@ant-design/icons";
 import moment from "moment";
 import * as Setting from "./Setting";
 import * as SiteBackend from "./backend/SiteBackend";
@@ -159,6 +160,20 @@ class SiteListPage extends React.Component {
         key: "node",
         width: "150px",
         sorter: (a, b) => a.node.localeCompare(b.node),
+        render: (text, record, index) => {
+          return (
+            <div>
+              {text}
+              {
+                !record.isSelf ? null : (
+                  <Tag style={{marginLeft: "10px"}} icon={<CheckCircleOutlined />} color="success">
+                    {i18next.t("general:Self")}
+                  </Tag>
+                )
+              }
+            </div>
+          );
+        },
       },
       {
         title: i18next.t("site:SSL mode"),

@@ -33,6 +33,7 @@ type Site struct {
 	SslCert  string `xorm:"varchar(100)" json:"sslCert"`
 	PublicIp string `xorm:"varchar(100)" json:"publicIp"`
 	Node     string `xorm:"varchar(100)" json:"node"`
+	IsSelf   bool   `json:"isSelf"`
 
 	CasdoorEndpoint     string `xorm:"varchar(100)" json:"casdoorEndpoint"`
 	CasdoorClientId     string `xorm:"varchar(100)" json:"casdoorClientId"`
@@ -83,7 +84,7 @@ func GetSite(id string) *Site {
 	return getSite(owner, name)
 }
 
-func GetMaskedSite(site *Site) *Site {
+func GetMaskedSite(site *Site, node string) *Site {
 	if site == nil {
 		return nil
 	}
@@ -91,13 +92,16 @@ func GetMaskedSite(site *Site) *Site {
 	if site.PublicIp == "(empty)" {
 		site.PublicIp = ""
 	}
+	if site.Node == node {
+		site.IsSelf = true
+	}
 
 	return site
 }
 
-func GetMaskedSites(sites []*Site) []*Site {
+func GetMaskedSites(sites []*Site, node string) []*Site {
 	for _, site := range sites {
-		site = GetMaskedSite(site)
+		site = GetMaskedSite(site, node)
 	}
 	return sites
 }

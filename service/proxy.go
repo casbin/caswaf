@@ -23,6 +23,7 @@ import (
 	"net/url"
 
 	"github.com/casbin/caswaf/object"
+	"github.com/casbin/caswaf/util"
 	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
 
@@ -65,7 +66,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if site.Node == "" {
-		site.Node = getHostname()
+		site.Node = util.GetHostname()
 		object.UpdateSiteNoRefresh(site.GetId(), site)
 	}
 
