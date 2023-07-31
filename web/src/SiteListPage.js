@@ -174,7 +174,7 @@ class SiteListPage extends React.Component {
         title: i18next.t("site:Node"),
         dataIndex: "node",
         key: "node",
-        width: "150px",
+        width: "180px",
         sorter: (a, b) => a.node.localeCompare(b.node),
         render: (text, record, index) => {
           return (

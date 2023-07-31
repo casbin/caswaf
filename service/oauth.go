@@ -35,7 +35,7 @@ func redirectToCasdoor(casdoorClient *casdoorsdk.Client, w http.ResponseWriter, 
 		scheme = "http"
 	}
 
-	callbackUrl := fmt.Sprintf("%s://%s/callback", scheme, r.Host)
+	callbackUrl := fmt.Sprintf("%s://%s/caswaf-handler", scheme, r.Host)
 	originalPath := r.RequestURI
 	signinUrl := getSigninUrl(casdoorClient, callbackUrl, originalPath)
 	http.Redirect(w, r, signinUrl, http.StatusFound)

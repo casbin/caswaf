@@ -111,7 +111,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 func Start() {
 	http.HandleFunc("/", handleRequest)
-	http.HandleFunc("/callback", handleAuthCallback)
+	http.HandleFunc("/caswaf-handler", handleAuthCallback)
 
 	gatewayEnabled, err := beego.AppConfig.Bool("gatewayEnabled")
 	if err != nil {
