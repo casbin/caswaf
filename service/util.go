@@ -36,6 +36,13 @@ func joinPath(a string, b string) string {
 
 func getCertificateForDomain(domain string) (*tls.Certificate, error) {
 	site := object.GetSiteByDomain(domain)
+	if site == nil {
+		return nil, fmt.Errorf("getCertificateForDomain() error: site not found for domain: [%s]", domain)
+	}
+	if site.SslCertObj == nil {
+		return nil, fmt.Errorf("getCertificateForDomain() error: cert: [%s] not found for site: [%s]", site.SslCert, site.Name)
+	}
+
 	tlsCert, certErr := tls.X509KeyPair([]byte(site.SslCertObj.Certificate), []byte(site.SslCertObj.PrivateKey))
 
 	return &tlsCert, certErr

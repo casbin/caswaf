@@ -15,6 +15,8 @@
 package object
 
 import (
+	"fmt"
+
 	"github.com/casbin/caswaf/util"
 	"xorm.io/core"
 )
@@ -48,6 +50,13 @@ func GetCerts(owner string) []*Cert {
 	err := adapter.engine.Desc("created_time").Find(&certs, &Cert{Owner: owner})
 	if err != nil {
 		panic(err)
+	}
+
+	for _, cert := range certs {
+		if cert.Certificate != "" && cert.ExpireTime == "" {
+			cert.ExpireTime = getCertExpireTime(cert.Certificate)
+			UpdateCert(cert.GetId(), cert)
+		}
 	}
 
 	return certs
@@ -109,4 +118,8 @@ func DeleteCert(cert *Cert) bool {
 	}
 
 	return affected != 0
+}
+
+func (cert *Cert) GetId() string {
+	return fmt.Sprintf("%s/%s", cert.Owner, cert.Name)
 }

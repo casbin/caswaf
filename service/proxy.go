@@ -121,7 +121,7 @@ func Start() {
 	}()
 
 	go func() {
-		fmt.Printf("CasWAF data plane running on: http://127.0.0.1:443\n")
+		fmt.Printf("CasWAF data plane running on: https://127.0.0.1:443\n")
 		server := &http.Server{
 			Addr:      ":443",
 			TLSConfig: &tls.Config{},
@@ -131,7 +131,6 @@ func Start() {
 		server.TLSConfig.GetCertificate = func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
 			domain := info.ServerName
 			cert, err := getCertificateForDomain(domain)
-
 			if err != nil {
 				return nil, err
 			}
