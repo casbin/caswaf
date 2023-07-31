@@ -25,8 +25,8 @@ import (
 
 func main() {
 	object.InitAdapter()
-	object.InitSiteMap()
 	casdoor.InitCasdoorAdapter()
+	object.InitSiteMap()
 
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowOrigins:     []string{"*"},

@@ -61,7 +61,13 @@ func handleAuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	casdoorClient := casdoorsdk.NewClient(site.CasdoorEndpoint, site.CasdoorClientId, site.CasdoorClientSecret, site.CasdoorCertificate, site.CasdoorOrganization, site.CasdoorApplication)
+	casdoorClient, err := getCasdoorClientFromSite(site)
+	if err != nil {
+		fmt.Fprintf(w, "CasWAF error: getCasdoorClientFromSite() error: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	token, err := casdoorClient.GetOAuthToken(code, state)
 	if err != nil {
 		fmt.Fprintf(w, "CasWAF error: casdoorClient.GetOAuthToken() error: %s", err.Error())

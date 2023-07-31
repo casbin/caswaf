@@ -134,7 +134,7 @@ class SiteListPage extends React.Component {
         width: "150px",
         sorter: (a, b) => a.domain.localeCompare(b.domain),
         render: (text, record, index) => {
-          if (record.publicIp === "(empty)") {
+          if (record.publicIp === "") {
             return text;
           }
 

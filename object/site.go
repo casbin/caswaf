@@ -17,6 +17,7 @@ package object
 import (
 	"fmt"
 
+	"github.com/casbin/caswaf/casdoor"
 	"github.com/casbin/caswaf/util"
 	"xorm.io/core"
 )
@@ -35,14 +36,10 @@ type Site struct {
 	Node     string `xorm:"varchar(100)" json:"node"`
 	IsSelf   bool   `json:"isSelf"`
 
-	CasdoorEndpoint     string `xorm:"varchar(100)" json:"casdoorEndpoint"`
-	CasdoorClientId     string `xorm:"varchar(100)" json:"casdoorClientId"`
-	CasdoorClientSecret string `xorm:"varchar(100)" json:"casdoorClientSecret"`
-	CasdoorCertificate  string `xorm:"mediumtext" json:"casdoorCertificate"`
-	CasdoorOrganization string `xorm:"varchar(100)" json:"casdoorOrganization"`
-	CasdoorApplication  string `xorm:"varchar(100)" json:"casdoorApplication"`
+	CasdoorApplication string `xorm:"varchar(100)" json:"casdoorApplication"`
 
-	SslCertObj *Cert `xorm:"-" json:"sslCertObj"`
+	SslCertObj     *Cert                `xorm:"-" json:"sslCertObj"`
+	ApplicationObj *casdoor.Application `xorm:"-" json:"applicationObj"`
 }
 
 func GetGlobalSites() []*Site {

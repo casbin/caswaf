@@ -139,6 +139,9 @@ class CertListPage extends React.Component {
         key: "expireTime",
         width: "180px",
         sorter: (a, b) => a.expireTime.localeCompare(b.expireTime),
+        render: (text, record, index) => {
+          return Setting.getFormattedDate(text);
+        },
       },
       {
         title: i18next.t("cert:Certificate"),

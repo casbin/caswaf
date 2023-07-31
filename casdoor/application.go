@@ -61,6 +61,8 @@ type Application struct {
 	FormOffset           int      `json:"formOffset"`
 	FormSideHtml         string   `xorm:"mediumtext" json:"formSideHtml"`
 	FormBackgroundUrl    string   `xorm:"varchar(200)" json:"formBackgroundUrl"`
+
+	CertObj *Cert `xorm:"-" json:"certObj"`
 }
 
 func GetApplications(owner string) ([]*Application, error) {

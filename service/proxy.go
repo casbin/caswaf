@@ -24,7 +24,6 @@ import (
 
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/util"
-	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
 
 func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.Request) {
@@ -78,14 +77,20 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// oAuth proxy
-	if site.CasdoorEndpoint != "" {
+	if site.CasdoorApplication != "" {
 		// handle oAuth proxy
 		cookie, err := r.Cookie("casdoor_access_token")
 		if err != nil && err.Error() != "http: named cookie not present" {
 			panic(err)
 		}
 
-		casdoorClient := casdoorsdk.NewClient(site.CasdoorEndpoint, site.CasdoorClientId, site.CasdoorClientSecret, site.CasdoorCertificate, site.CasdoorOrganization, site.CasdoorApplication)
+		casdoorClient, err := getCasdoorClientFromSite(site)
+		if err != nil {
+			fmt.Fprintf(w, "CasWAF error: getCasdoorClientFromSite() error: %s", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		if cookie == nil {
 			// not logged in
 			redirectToCasdoor(casdoorClient, w, r)
@@ -108,6 +113,7 @@ func Start() {
 	http.HandleFunc("/callback", handleAuthCallback)
 
 	go func() {
+		fmt.Printf("CasWAF data plane running on: http://127.0.0.1:80\n")
 		err := http.ListenAndServe(":80", nil)
 		if err != nil {
 			panic(err)
@@ -115,6 +121,7 @@ func Start() {
 	}()
 
 	go func() {
+		fmt.Printf("CasWAF data plane running on: http://127.0.0.1:443\n")
 		server := &http.Server{
 			Addr:      ":443",
 			TLSConfig: &tls.Config{},

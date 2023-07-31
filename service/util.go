@@ -16,9 +16,12 @@ package service
 
 import (
 	"crypto/tls"
+	"fmt"
 	"strings"
 
+	"github.com/astaxie/beego"
 	"github.com/casbin/caswaf/object"
+	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
 
 func joinPath(a string, b string) string {
@@ -36,4 +39,26 @@ func getCertificateForDomain(domain string) (*tls.Certificate, error) {
 	tlsCert, certErr := tls.X509KeyPair([]byte(site.SslCertObj.Certificate), []byte(site.SslCertObj.PrivateKey))
 
 	return &tlsCert, certErr
+}
+
+func getCasdoorClientFromSite(site *object.Site) (*casdoorsdk.Client, error) {
+	if site.ApplicationObj == nil {
+		return nil, fmt.Errorf("site.ApplicationObj is empty")
+	}
+
+	casdoorEndpoint := beego.AppConfig.String("casdoorEndpoint")
+	if casdoorEndpoint == "http://localhost:8000" {
+		casdoorEndpoint = "http://localhost:7001"
+	}
+
+	clientId := site.ApplicationObj.ClientId
+	clientSecret := site.ApplicationObj.ClientSecret
+
+	certificate := ""
+	if site.ApplicationObj.CertObj != nil {
+		certificate = site.ApplicationObj.CertObj.Certificate
+	}
+
+	res := casdoorsdk.NewClient(casdoorEndpoint, clientId, clientSecret, certificate, site.ApplicationObj.Organization, site.CasdoorApplication)
+	return res, nil
 }
