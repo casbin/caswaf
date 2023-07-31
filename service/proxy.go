@@ -64,6 +64,11 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if site.Node == "" {
+		site.Node = getHostname()
+		object.UpdateSiteNoRefresh(site.GetId(), site)
+	}
+
 	if site.SslMode == "HTTPS Only" {
 		// This domain only supports https but receive http request, redirect to https
 		if r.TLS == nil {

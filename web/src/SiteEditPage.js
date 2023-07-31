@@ -124,6 +124,26 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("site:Public IP")}:
+          </Col>
+          <Col span={22} >
+            <Input disabled={true} value={this.state.site.publicIp} onChange={e => {
+              this.updateSiteField("publicIp", e.target.value);
+            }} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("site:Node")}:
+          </Col>
+          <Col span={22} >
+            <Input disabled={true} value={this.state.site.node} onChange={e => {
+              this.updateSiteField("node", e.target.value);
+            }} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("site:SSL mode")}:
           </Col>
           <Col span={22} >

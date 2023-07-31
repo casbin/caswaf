@@ -25,7 +25,7 @@ func (c *ApiController) GetGlobalSites() {
 		return
 	}
 
-	c.Data["json"] = object.GetGlobalSites()
+	c.Data["json"] = object.GetMaskedSites(object.GetGlobalSites())
 	c.ServeJSON()
 }
 
@@ -36,7 +36,7 @@ func (c *ApiController) GetSites() {
 
 	owner := c.Input().Get("owner")
 
-	c.Data["json"] = object.GetSites(owner)
+	c.Data["json"] = object.GetMaskedSites(object.GetSites(owner))
 	c.ServeJSON()
 }
 
@@ -47,7 +47,7 @@ func (c *ApiController) GetSite() {
 
 	id := c.Input().Get("id")
 
-	c.Data["json"] = object.GetSite(id)
+	c.Data["json"] = object.GetMaskedSite(object.GetSite(id))
 	c.ServeJSON()
 }
 

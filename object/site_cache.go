@@ -30,6 +30,13 @@ func refreshSiteMap() {
 				site.SslCertObj = getCert("admin", site.SslCert)
 			}
 
+			if site.Domain != "" && site.PublicIp == "" {
+				go func(site *Site) {
+					site.PublicIp = resolveDomainToIp(site.Domain)
+					UpdateSiteNoRefresh(site.GetId(), site)
+				}(site)
+			}
+
 			siteMap[site.Domain] = site
 		}
 	}

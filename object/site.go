@@ -15,6 +15,8 @@
 package object
 
 import (
+	"fmt"
+
 	"github.com/casbin/caswaf/util"
 	"xorm.io/core"
 )
@@ -25,10 +27,12 @@ type Site struct {
 	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
 	DisplayName string `xorm:"varchar(100)" json:"displayName"`
 
-	Domain  string `xorm:"varchar(100)" json:"domain"`
-	Host    string `xorm:"varchar(100)" json:"host"`
-	SslMode string `xorm:"varchar(100)" json:"sslMode"`
-	SslCert string `xorm:"varchar(100)" json:"sslCert"`
+	Domain   string `xorm:"varchar(100)" json:"domain"`
+	Host     string `xorm:"varchar(100)" json:"host"`
+	SslMode  string `xorm:"varchar(100)" json:"sslMode"`
+	SslCert  string `xorm:"varchar(100)" json:"sslCert"`
+	PublicIp string `xorm:"varchar(100)" json:"publicIp"`
+	Node     string `xorm:"varchar(100)" json:"node"`
 
 	CasdoorEndpoint     string `xorm:"varchar(100)" json:"casdoorEndpoint"`
 	CasdoorClientId     string `xorm:"varchar(100)" json:"casdoorClientId"`
@@ -79,6 +83,25 @@ func GetSite(id string) *Site {
 	return getSite(owner, name)
 }
 
+func GetMaskedSite(site *Site) *Site {
+	if site == nil {
+		return nil
+	}
+
+	if site.PublicIp == "(empty)" {
+		site.PublicIp = ""
+	}
+
+	return site
+}
+
+func GetMaskedSites(sites []*Site) []*Site {
+	for _, site := range sites {
+		site = GetMaskedSite(site)
+	}
+	return sites
+}
+
 func UpdateSite(id string, site *Site) bool {
 	owner, name := util.GetOwnerAndNameFromId(id)
 	if getSite(owner, name) == nil {
@@ -91,6 +114,21 @@ func UpdateSite(id string, site *Site) bool {
 	}
 
 	refreshSiteMap()
+
+	//return affected != 0
+	return true
+}
+
+func UpdateSiteNoRefresh(id string, site *Site) bool {
+	owner, name := util.GetOwnerAndNameFromId(id)
+	if getSite(owner, name) == nil {
+		return false
+	}
+
+	_, err := adapter.engine.ID(core.PK{owner, name}).AllCols().Update(site)
+	if err != nil {
+		panic(err)
+	}
 
 	//return affected != 0
 	return true
@@ -120,4 +158,8 @@ func DeleteSite(site *Site) bool {
 	}
 
 	return affected != 0
+}
+
+func (site *Site) GetId() string {
+	return fmt.Sprintf("%s/%s", site.Owner, site.Name)
 }

@@ -12,37 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package service
+package object
 
 import (
-	"crypto/tls"
-	"os"
+	"fmt"
+	"net"
 	"strings"
-
-	"github.com/casbin/caswaf/object"
 )
 
-func joinPath(a string, b string) string {
-	if strings.HasSuffix(a, "/") && strings.HasPrefix(b, "/") {
-		b = b[1:]
-	} else if !strings.HasSuffix(a, "/") && !strings.HasPrefix(b, "/") {
-		b = "/" + b
-	}
-	res := a + b
-	return res
-}
-
-func getCertificateForDomain(domain string) (*tls.Certificate, error) {
-	site := object.GetSiteByDomain(domain)
-	tlsCert, certErr := tls.X509KeyPair([]byte(site.SslCertObj.Certificate), []byte(site.SslCertObj.PrivateKey))
-
-	return &tlsCert, certErr
-}
-
-func getHostname() string {
-	res, err := os.Hostname()
+func resolveDomainToIp(domain string) string {
+	ips, err := net.LookupIP(domain)
 	if err != nil {
-		panic(err)
+		if strings.Contains(err.Error(), "no such host") {
+			return "(empty)"
+		}
+
+		fmt.Printf("resolveDomainToIp() error: %s\n", err.Error())
+		return err.Error()
 	}
-	return res
+
+	for _, ip := range ips {
+		if ipv4 := ip.To4(); ipv4 != nil {
+			return ipv4.String()
+		}
+	}
+	return "(empty)"
 }

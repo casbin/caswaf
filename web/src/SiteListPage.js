@@ -101,16 +101,16 @@ class SiteListPage extends React.Component {
           );
         },
       },
-      {
-        title: i18next.t("general:Create time"),
-        dataIndex: "createdTime",
-        key: "createdTime",
-        width: "180px",
-        sorter: (a, b) => a.createdTime.localeCompare(b.createdTime),
-        render: (text, record, index) => {
-          return Setting.getFormattedDate(text);
-        },
-      },
+      // {
+      //   title: i18next.t("general:Create time"),
+      //   dataIndex: "createdTime",
+      //   key: "createdTime",
+      //   width: "180px",
+      //   sorter: (a, b) => a.createdTime.localeCompare(b.createdTime),
+      //   render: (text, record, index) => {
+      //     return Setting.getFormattedDate(text);
+      //   },
+      // },
       {
         title: i18next.t("general:Display name"),
         dataIndex: "displayName",
@@ -122,7 +122,7 @@ class SiteListPage extends React.Component {
         title: i18next.t("site:Domain"),
         dataIndex: "domain",
         key: "domain",
-        width: "180px",
+        width: "150px",
         sorter: (a, b) => a.domain.localeCompare(b.domain),
         render: (text, record, index) => {
           return (
@@ -145,6 +145,20 @@ class SiteListPage extends React.Component {
             </a>
           );
         },
+      },
+      {
+        title: i18next.t("site:Public IP"),
+        dataIndex: "publicIp",
+        key: "publicIp",
+        width: "150px",
+        sorter: (a, b) => a.publicIp.localeCompare(b.publicIp),
+      },
+      {
+        title: i18next.t("site:Node"),
+        dataIndex: "node",
+        key: "node",
+        width: "150px",
+        sorter: (a, b) => a.node.localeCompare(b.node),
       },
       {
         title: i18next.t("site:SSL mode"),
