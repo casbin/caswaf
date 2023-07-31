@@ -87,6 +87,14 @@ class SiteListPage extends React.Component {
   }
 
   renderTable(sites) {
+    const renderExternalLink = () => {
+      return (
+        <svg style={{marginLeft: "5px"}} width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" className="iconExternalLink_nPIU">
+          <path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path>
+        </svg>
+      );
+    };
+
     const columns = [
       {
         title: i18next.t("general:Name"),
@@ -126,6 +134,10 @@ class SiteListPage extends React.Component {
         width: "150px",
         sorter: (a, b) => a.domain.localeCompare(b.domain),
         render: (text, record, index) => {
+          if (record.publicIp === "(empty)") {
+            return text;
+          }
+
           return (
             <a target="_blank" rel="noreferrer" href={`https://${text}`}>
               {text}
@@ -140,6 +152,10 @@ class SiteListPage extends React.Component {
         width: "180px",
         sorter: (a, b) => a.host.localeCompare(b.host),
         render: (text, record, index) => {
+          if (!record.isSelf) {
+            return text;
+          }
+
           return (
             <a target="_blank" rel="noreferrer" href={text}>
               {text}
@@ -151,7 +167,7 @@ class SiteListPage extends React.Component {
         title: i18next.t("site:Public IP"),
         dataIndex: "publicIp",
         key: "publicIp",
-        width: "150px",
+        width: "120px",
         sorter: (a, b) => a.publicIp.localeCompare(b.publicIp),
       },
       {
@@ -179,14 +195,14 @@ class SiteListPage extends React.Component {
         title: i18next.t("site:SSL mode"),
         dataIndex: "sslMode",
         key: "sslMode",
-        width: "150px",
+        width: "120px",
         sorter: (a, b) => a.sslMode.localeCompare(b.sslMode),
       },
       {
         title: i18next.t("site:SSL cert"),
         dataIndex: "sslCert",
         key: "sslCert",
-        width: "180px",
+        width: "150px",
         sorter: (a, b) => a.sslCert.localeCompare(b.sslCert),
         render: (text, record, index) => {
           return (
@@ -197,15 +213,20 @@ class SiteListPage extends React.Component {
         },
       },
       {
-        title: i18next.t("site:Casdoor endpoint"),
-        dataIndex: "casdoorEndpoint",
-        key: "casdoorEndpoint",
-        width: "200px",
-        sorter: (a, b) => a.host.localeCompare(b.host),
+        title: i18next.t("site:Casdoor app"),
+        dataIndex: "casdoorApplication",
+        key: "casdoorApplication",
+        width: "150px",
+        sorter: (a, b) => a.casdoorApplication.localeCompare(b.casdoorApplication),
         render: (text, record, index) => {
+          if (text === "") {
+            return null;
+          }
+
           return (
-            <a target="_blank" rel="noreferrer" href={text}>
+            <a target="_blank" rel="noreferrer" href={Setting.getMyProfileUrl(this.state.account).replace("/account", `/applications/${this.props.account.owner}/${text}`)}>
               {text}
+              {renderExternalLink()}
             </a>
           );
         },

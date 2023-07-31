@@ -17,11 +17,11 @@ import {Button, Card, Col, Input, Row, Select} from "antd";
 import {LinkOutlined} from "@ant-design/icons";
 import * as SiteBackend from "./backend/SiteBackend";
 import * as CertBackend from "./backend/CertBackend";
+import * as ApplicationBackend from "./backend/ApplicationBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
 
 const {Option} = Select;
-const {TextArea} = Input;
 
 class SiteEditPage extends React.Component {
   constructor(props) {
@@ -31,12 +31,14 @@ class SiteEditPage extends React.Component {
       siteName: props.match.params.siteName,
       site: null,
       certs: null,
+      applications: null,
     };
   }
 
   UNSAFE_componentWillMount() {
     this.getSite();
     this.getCerts();
+    this.getApplications();
   }
 
   getSite() {
@@ -53,6 +55,15 @@ class SiteEditPage extends React.Component {
       .then((res) => {
         this.setState({
           certs: res,
+        });
+      });
+  }
+
+  getApplications() {
+    ApplicationBackend.getApplications(this.props.account.name)
+      .then((res) => {
+        this.setState({
+          applications: res.data,
         });
       });
   }
@@ -174,62 +185,16 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Casdoor endpoint")}:
+            {i18next.t("site:Casdoor app")}:
           </Col>
           <Col span={22} >
-            <Input prefix={<LinkOutlined />} value={this.state.site.casdoorEndpoint} onChange={e => {
-              this.updateSiteField("casdoorEndpoint", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Casdoor client ID")}:
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.site.casdoorClientId} onChange={e => {
-              this.updateSiteField("casdoorClientId", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Casdoor client secret")}:
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.site.casdoorClientSecret} onChange={e => {
-              this.updateSiteField("casdoorClientSecret", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Casdoor certificate")}:
-          </Col>
-          <Col span={22} >
-            <TextArea autoSize={{minRows: 1, maxRows: 30}} value={this.state.site.casdoorCertificate} onChange={e => {
-              this.updateSiteField("casdoorCertificate", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Casdoor organization")}:
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.site.casdoorOrganization} onChange={e => {
-              this.updateSiteField("casdoorOrganization", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Casdoor application")}:
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.site.casdoorApplication} onChange={e => {
-              this.updateSiteField("casdoorApplication", e.target.value);
-            }} />
+            <Select virtual={false} style={{width: "100%"}} value={this.state.site.casdoorApplication} onChange={(value => {
+              this.updateSiteField("casdoorApplication", value);
+            })}>
+              {
+                this.state.applications?.map((application, index) => <Option key={index} value={application.name}>{application.name}</Option>)
+              }
+            </Select>
           </Col>
         </Row>
       </Card>

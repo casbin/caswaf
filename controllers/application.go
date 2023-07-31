@@ -12,28 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package service
+package controllers
 
-import (
-	"crypto/tls"
-	"strings"
+import "github.com/casbin/caswaf/casdoor"
 
-	"github.com/casbin/caswaf/object"
-)
+func (c *ApiController) GetApplications() {
+	owner := c.Input().Get("owner")
 
-func joinPath(a string, b string) string {
-	if strings.HasSuffix(a, "/") && strings.HasPrefix(b, "/") {
-		b = b[1:]
-	} else if !strings.HasSuffix(a, "/") && !strings.HasPrefix(b, "/") {
-		b = "/" + b
+	applications, err := casdoor.GetApplications(owner)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
 	}
-	res := a + b
-	return res
-}
 
-func getCertificateForDomain(domain string) (*tls.Certificate, error) {
-	site := object.GetSiteByDomain(domain)
-	tlsCert, certErr := tls.X509KeyPair([]byte(site.SslCertObj.Certificate), []byte(site.SslCertObj.PrivateKey))
-
-	return &tlsCert, certErr
+	c.ResponseOk(applications)
 }
