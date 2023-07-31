@@ -59,6 +59,13 @@ func GetSites(owner string) []*Site {
 		panic(err)
 	}
 
+	for _, site := range sites {
+		if site.SslCert == "" && site.Domain != "" && (site.SslMode == "HTTPS and HTTP" || site.SslMode == "HTTPS Only") {
+			site.SslCert = getBaseDomain(site.Domain)
+			UpdateSite(site.GetId(), site)
+		}
+	}
+
 	return sites
 }
 

@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"net"
 	"strings"
+
+	"golang.org/x/net/publicsuffix"
 )
 
 func resolveDomainToIp(domain string) string {
@@ -37,4 +39,17 @@ func resolveDomainToIp(domain string) string {
 		}
 	}
 	return "(empty)"
+}
+
+func getBaseDomain(domain string) string {
+	// abc.com -> abc.com
+	// abc.com.it -> abc.com.it
+	// subdomain.abc.io -> abc.io
+	// subdomain.abc.org.us -> abc.org.us
+	baseDomain, err := publicsuffix.EffectiveTLDPlusOne(domain)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return ""
+	}
+	return baseDomain
 }

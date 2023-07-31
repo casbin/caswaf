@@ -174,7 +174,7 @@ class SiteEditPage extends React.Component {
             {i18next.t("site:SSL cert")}:
           </Col>
           <Col span={22} >
-            <Select virtual={false} style={{width: "100%"}} value={this.state.site.sslCert} onChange={(value => {
+            <Select virtual={false} style={{width: "100%"}} showSearch value={this.state.site.sslCert} onChange={(value => {
               this.updateSiteField("sslCert", value);
             })}>
               {
@@ -188,7 +188,7 @@ class SiteEditPage extends React.Component {
             {i18next.t("site:Casdoor app")}:
           </Col>
           <Col span={22} >
-            <Select virtual={false} style={{width: "100%"}} value={this.state.site.casdoorApplication} onChange={(value => {
+            <Select virtual={false} style={{width: "100%"}} showSearch value={this.state.site.casdoorApplication} onChange={(value => {
               this.updateSiteField("casdoorApplication", value);
             })}>
               {

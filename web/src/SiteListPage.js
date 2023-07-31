@@ -53,7 +53,7 @@ class SiteListPage extends React.Component {
       domain: "door.casdoor.com",
       host: "http://localhost:8000",
       sslMode: "HTTP",
-      sslCert: "cert_casdoor.com",
+      sslCert: "",
     };
   }
 
