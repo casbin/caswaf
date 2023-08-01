@@ -12,13 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// create-react-app + IE9
-// https://www.cnblogs.com/xuexia/p/12092768.html
-// react-app-polyfill
-// https://www.npmjs.com/package/react-app-polyfill
-import "react-app-polyfill/ie9";
-import "react-app-polyfill/stable";
-
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
