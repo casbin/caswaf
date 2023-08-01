@@ -96,6 +96,8 @@ func GetMaskedSite(site *Site, node string) *Site {
 	if site.PublicIp == "(empty)" {
 		site.PublicIp = ""
 	}
+
+	site.IsSelf = false
 	if site.Node == node {
 		site.IsSelf = true
 	}
