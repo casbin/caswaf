@@ -1,26 +1,33 @@
-name: Node.js CI
+name: CI
 
 on:
-  pull_request
+  - push
+  - pull_request
 
 jobs:
-  deploy:
 
+  test:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [ 16.x ]
-
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
         with:
-          node-version: ${{ matrix.node-version }}
+          go-version: 1.18
 
-      - name: Install dependencies
-        run: yarn install
+      - uses: actions/checkout@v2
+      - name: Run tests
+        run: go test -v ./...
 
-      - name: Build website
-        run: yarn build --locale en
+  semantic-release:
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+      - name: Run semantic-release
+        if: github.repository == 'casbin/caswaf' && github.event_name == 'push'
+        run: |
+          npm install --save-dev semantic-release@17.2.4
+          npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

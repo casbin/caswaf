@@ -30,11 +30,13 @@
   },
   "scripts": {
     "start": "set PORT=16001 && craco start",
-    "build": "del build.zip 2>nul && set \"GENERATE_SOURCEMAP=false\" && set \"SKIP_PREFLIGHT_CHECK=true\" && craco build && 360zip.exe -ar build %cd%/build.zip || ECHO.",
+    "build": "craco build",
     "test": "craco test",
     "eject": "craco eject",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "fix": "eslint --fix 'src/**/*.{js,jsx,ts,tsx}'"
+    "preinstall": "node -e \"if (process.env.npm_execpath.indexOf('yarn') === -1) throw new Error('Use yarn for installing: https://yarnpkg.com/en/docs/install')\"",
+    "fix": "eslint --fix src/**/*.{js,jsx,ts,tsx}",
+    "lint:css": "stylelint src/**/*.{css,less} --fix"
   },
   "eslintConfig": {
     "extends": [
