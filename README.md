@@ -83,7 +83,7 @@ After creating an organization and an application for CasWAF in a Casdoor, you n
 
 #### Setup your WAF to enable some third-party login platform
 
-  CasWAF uses Casdoor to manage members. If you want to log in with oauth, you should see [casdoor oauth configuration](https://casdoor.org/docs/provider/OAuth).
+  CasWAF uses Casdoor to manage members. If you want to log in with oauth, you should see [casdoor oauth configuration](https://casdoor.org/docs/provider/oauth/overview).
 
 #### OSS, Mail, and SMS services
 
