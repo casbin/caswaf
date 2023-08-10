@@ -19,6 +19,7 @@ import (
 
 	"github.com/astaxie/beego"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/xorm-io/core"
 	"xorm.io/xorm"
 )
 
@@ -37,6 +38,9 @@ func InitCasdoorAdapter() {
 	}
 
 	adapter = NewAdapter(beego.AppConfig.String("driverName"), beego.AppConfig.String("dataSourceName"), beego.AppConfig.String("casdoorDbName"))
+	tableNamePrefix := beego.AppConfig.String("casdoorTableNamePrefix")
+	tbMapper := core.NewPrefixMapper(core.SnakeMapper{}, tableNamePrefix)
+	adapter.Engine.SetTableMapper(tbMapper)
 }
 
 // Adapter represents the MySQL adapter for policy storage.
