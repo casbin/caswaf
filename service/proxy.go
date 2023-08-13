@@ -40,7 +40,7 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 		r.URL = target
 
 		if clientIP, _, err := net.SplitHostPort(r.RemoteAddr); err == nil {
-			if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
+			if xff := r.Header.Get("X-Forwarded-For"); xff != "" && xff != clientIP {
 				newXff := fmt.Sprintf("%s, %s", xff, clientIP)
 				r.Header.Set("X-Forwarded-For", newXff)
 			} else {
