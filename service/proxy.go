@@ -64,10 +64,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 	site := object.GetSiteByDomain(r.Host)
 	if site == nil {
-		msg := fmt.Sprintf("CasWAF error: site not found for host: %s", r.Host)
-		fmt.Println(msg)
-		fmt.Fprintf(w, msg)
-		w.WriteHeader(http.StatusInternalServerError)
+		responseError(w, "CasWAF error: site not found for host: %s", r.Host)
 		return
 	}
 
@@ -93,10 +90,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 		casdoorClient, err := getCasdoorClientFromSite(site)
 		if err != nil {
-			msg := fmt.Sprintf("CasWAF error: getCasdoorClientFromSite() error: %s", err.Error())
-			fmt.Println(msg)
-			fmt.Fprintf(w, msg)
-			w.WriteHeader(http.StatusInternalServerError)
+			responseError(w, "CasWAF error: getCasdoorClientFromSite() error: %s", err.Error())
 			return
 		}
 
@@ -107,10 +101,8 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		} else {
 			_, err = casdoorClient.ParseJwtToken(cookie.Value)
 			if err != nil {
-				msg := fmt.Sprintf("CasWAF error: casdoorClient.ParseJwtToken() error: %s", err.Error())
-				fmt.Println(msg)
-				fmt.Fprintf(w, msg)
-				w.WriteHeader(http.StatusInternalServerError)
+				responseError(w, "CasWAF error: casdoorClient.ParseJwtToken() error: %s", err.Error())
+				return
 			}
 		}
 	}

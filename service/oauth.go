@@ -44,44 +44,29 @@ func redirectToCasdoor(casdoorClient *casdoorsdk.Client, w http.ResponseWriter, 
 func handleAuthCallback(w http.ResponseWriter, r *http.Request) {
 	site := object.GetSiteByDomain(r.Host)
 	if site == nil {
-		msg := fmt.Sprintf("CasWAF error: site not found for host: %s", r.Host)
-		fmt.Println(msg)
-		fmt.Fprintf(w, msg)
-		w.WriteHeader(http.StatusInternalServerError)
+		responseError(w, "CasWAF error: site not found for host: %s", r.Host)
 		return
 	}
 
 	code := r.URL.Query().Get("code")
 	state := r.URL.Query().Get("state")
 	if code == "" {
-		msg := fmt.Sprintf("CasWAF error: the code should not be empty")
-		fmt.Println(msg)
-		fmt.Fprintf(w, msg)
-		w.WriteHeader(http.StatusInternalServerError)
+		responseError(w, "CasWAF error: the code should not be empty")
 		return
 	} else if state == "" {
-		msg := fmt.Sprintf("CasWAF error: the state should not be empty")
-		fmt.Println(msg)
-		fmt.Fprintf(w, msg)
-		w.WriteHeader(http.StatusInternalServerError)
+		responseError(w, "CasWAF error: the state should not be empty")
 		return
 	}
 
 	casdoorClient, err := getCasdoorClientFromSite(site)
 	if err != nil {
-		msg := fmt.Sprintf("CasWAF error: getCasdoorClientFromSite() error: %s", err.Error())
-		fmt.Println(msg)
-		fmt.Fprintf(w, msg)
-		w.WriteHeader(http.StatusInternalServerError)
+		responseError(w, "CasWAF error: getCasdoorClientFromSite() error: %s", err.Error())
 		return
 	}
 
 	token, err := casdoorClient.GetOAuthToken(code, state)
 	if err != nil {
-		msg := fmt.Sprintf("CasWAF error: casdoorClient.GetOAuthToken() error: %s", err.Error())
-		fmt.Println(msg)
-		fmt.Fprintf(w, msg)
-		w.WriteHeader(http.StatusInternalServerError)
+		responseError(w, "CasWAF error: casdoorClient.GetOAuthToken() error: %s", err.Error())
 		return
 	}
 

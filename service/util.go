@@ -17,6 +17,7 @@ package service
 import (
 	"crypto/tls"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/astaxie/beego"
@@ -32,6 +33,17 @@ func joinPath(a string, b string) string {
 	}
 	res := a + b
 	return res
+}
+
+func responseError(w http.ResponseWriter, format string, a ...interface{}) {
+	w.WriteHeader(http.StatusInternalServerError)
+
+	msg := fmt.Sprintf(format, a)
+	fmt.Println(msg)
+	_, err := fmt.Fprintf(w, msg)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func getCertificateForDomain(domain string) (*tls.Certificate, error) {
