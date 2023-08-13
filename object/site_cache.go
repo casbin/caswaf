@@ -14,7 +14,7 @@
 
 package object
 
-import "github.com/casbin/caswaf/casdoor"
+import "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 
 var siteMap = map[string]*Site{}
 
@@ -22,28 +22,28 @@ func InitSiteMap() {
 	refreshSiteMap()
 }
 
-func getCertMap() map[string]*casdoor.Cert {
-	certs, err := casdoor.GetCerts("admin")
+func getCertMap() map[string]*casdoorsdk.Cert {
+	certs, err := casdoorsdk.GetCerts()
 	if err != nil {
 		panic(err)
 	}
 
-	res := map[string]*casdoor.Cert{}
+	res := map[string]*casdoorsdk.Cert{}
 	for _, cert := range certs {
 		res[cert.Name] = cert
 	}
 	return res
 }
 
-func getApplicationMap() map[string]*casdoor.Application {
+func getApplicationMap() map[string]*casdoorsdk.Application {
 	certMap := getCertMap()
 
-	applications, err := casdoor.GetApplications("admin")
+	applications, err := casdoorsdk.GetOrganizationApplications()
 	if err != nil {
 		panic(err)
 	}
 
-	res := map[string]*casdoor.Application{}
+	res := map[string]*casdoorsdk.Application{}
 	for _, application := range applications {
 		if application.Cert != "" {
 			if cert, ok := certMap[application.Cert]; ok {

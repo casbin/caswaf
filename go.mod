@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/astaxie/beego v1.12.3
-	github.com/casdoor/casdoor-go-sdk v0.27.0
+	github.com/casdoor/casdoor-go-sdk v0.28.4
 	github.com/go-sql-driver/mysql v1.6.0
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
 	xorm.io/core v0.7.3
@@ -29,7 +29,6 @@ require (
 	github.com/prometheus/procfs v0.1.3 // indirect
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
-	github.com/xorm-io/core v0.7.4 // indirect
 	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e // indirect
 	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c // indirect
 	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect

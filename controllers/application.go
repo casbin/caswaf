@@ -14,12 +14,10 @@
 
 package controllers
 
-import "github.com/casbin/caswaf/casdoor"
+import "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 
 func (c *ApiController) GetApplications() {
-	owner := c.Input().Get("owner")
-
-	applications, err := casdoor.GetApplications(owner)
+	applications, err := casdoorsdk.GetOrganizationApplications()
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
