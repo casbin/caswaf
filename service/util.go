@@ -38,7 +38,7 @@ func joinPath(a string, b string) string {
 func responseError(w http.ResponseWriter, format string, a ...interface{}) {
 	w.WriteHeader(http.StatusInternalServerError)
 
-	msg := fmt.Sprintf(format, a)
+	msg := fmt.Sprintf(format, a...)
 	fmt.Println(msg)
 	_, err := fmt.Fprintf(w, msg)
 	if err != nil {

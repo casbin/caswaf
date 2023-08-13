@@ -21,6 +21,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 
 	"github.com/astaxie/beego"
 	"github.com/casbin/caswaf/object"
@@ -60,7 +61,9 @@ func redirectToHttps(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("handleRequest: %s\t%s\t%s\t%s\n", r.RemoteAddr, r.Method, r.Host, r.RequestURI)
+	if !strings.Contains(r.UserAgent(), "Uptime-Kuma") {
+		fmt.Printf("handleRequest: %s\t%s\t%s\t%s\t%s\n", r.RemoteAddr, r.Method, r.Host, r.RequestURI, r.UserAgent())
+	}
 
 	site := object.GetSiteByDomain(r.Host)
 	if site == nil {
