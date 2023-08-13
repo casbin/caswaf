@@ -42,10 +42,10 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 		if clientIP, _, err := net.SplitHostPort(r.RemoteAddr); err == nil {
 			if xff := r.Header.Get("X-Forwarded-For"); xff != "" && xff != clientIP {
 				newXff := fmt.Sprintf("%s, %s", xff, clientIP)
-				r.Header.Set("X-Forwarded-For", newXff)
+				//r.Header.Set("X-Forwarded-For", newXff)
 				r.Header.Set("X-Real-Ip", newXff)
 			} else {
-				r.Header.Set("X-Forwarded-For", clientIP)
+				//r.Header.Set("X-Forwarded-For", clientIP)
 				r.Header.Set("X-Real-Ip", clientIP)
 			}
 		}
@@ -60,6 +60,8 @@ func redirectToHttps(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("handleRequest: %s\t%s\t%s\t%s\n", r.RemoteAddr, r.Method, r.Host, r.RequestURI)
+
 	site := object.GetSiteByDomain(r.Host)
 	if site == nil {
 		msg := fmt.Sprintf("CasWAF error: site not found for host: %s", r.Host)
