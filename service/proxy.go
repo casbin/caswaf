@@ -43,8 +43,10 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 			if xff := r.Header.Get("X-Forwarded-For"); xff != "" && xff != clientIP {
 				newXff := fmt.Sprintf("%s, %s", xff, clientIP)
 				r.Header.Set("X-Forwarded-For", newXff)
+				r.Header.Set("X-Real-Ip", newXff)
 			} else {
 				r.Header.Set("X-Forwarded-For", clientIP)
+				r.Header.Set("X-Real-Ip", clientIP)
 			}
 		}
 	}
