@@ -222,3 +222,10 @@ export function changeMomentLanguage(lng) {
     });
   }
 }
+
+export function isResponseDenied(data) {
+  if (data.msg === "Unauthorized operation" || data.msg === "未授权的操作") {
+    return true;
+  }
+  return false;
+}

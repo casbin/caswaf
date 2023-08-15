@@ -18,6 +18,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	"github.com/casbin/caswaf/util"
 )
@@ -40,4 +41,19 @@ func TransparentStatic(ctx *context.Context) {
 	} else {
 		http.ServeFile(ctx.ResponseWriter, ctx.Request, "web/build/index.html")
 	}
+}
+
+func ApiFilter(ctx *context.Context) {
+	if beego.AppConfig.DefaultBool("isDemoMode", false) && !isAllowedInDemoMode(ctx.Request.Method, ctx.Request.URL.Path) {
+		denyRequest(ctx)
+	}
+}
+
+func isAllowedInDemoMode(method string, urlPath string) bool {
+	if method == "POST" {
+		return urlPath == "/api/signin" || urlPath == "/api/signout"
+	}
+
+	// If method equals GET
+	return true
 }

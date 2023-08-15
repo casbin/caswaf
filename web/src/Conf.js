@@ -21,5 +21,7 @@ export const AuthConfig = {
   redirectPath: "/callback",
 };
 
+export const IsDemoMode = false;
+
 export const ForceLanguage = "";
 export const DefaultLanguage = "en";
