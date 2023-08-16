@@ -61,10 +61,14 @@ class CertListPage extends React.Component {
     const newCert = this.newCert();
     CertBackend.addCert(newCert)
       .then((res) => {
-        Setting.showMessage("success", "Cert added successfully");
-        this.setState({
-          certs: Setting.prependRow(this.state.certs, newCert),
-        });
+        if (res.status === "error") {
+          Setting.showMessage("error", `Failed to add: ${res.msg}`);
+        } else {
+          Setting.showMessage("success", "Cert added successfully");
+          this.setState({
+            certs: Setting.prependRow(this.state.certs, newCert),
+          });
+        }
       }
       )
       .catch(error => {
@@ -75,10 +79,14 @@ class CertListPage extends React.Component {
   deleteCert(i) {
     CertBackend.deleteCert(this.state.certs[i])
       .then((res) => {
-        Setting.showMessage("success", "Cert deleted successfully");
-        this.setState({
-          certs: Setting.deleteRow(this.state.certs, i),
-        });
+        if (res.status === "error") {
+          Setting.showMessage("error", `Failed to delete: ${res.msg}`);
+        } else {
+          Setting.showMessage("success", "Cert deleted successfully");
+          this.setState({
+            certs: Setting.deleteRow(this.state.certs, i),
+          });
+        }
       }
       )
       .catch(error => {

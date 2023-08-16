@@ -205,15 +205,15 @@ class SiteEditPage extends React.Component {
     const site = Setting.deepCopy(this.state.site);
     SiteBackend.updateSite(this.state.site.owner, this.state.siteName, site)
       .then((res) => {
-        if (res) {
+        if (res.status === "error") {
+          Setting.showMessage("error", `Failed to save: ${res.msg}`);
+          this.updateSiteField("name", this.state.siteName);
+        } else {
           Setting.showMessage("success", "Successfully saved");
           this.setState({
             siteName: this.state.site.name,
           });
           this.props.history.push(`/sites/${this.state.site.name}`);
-        } else {
-          Setting.showMessage("error", "failed to save: server side failure");
-          this.updateSiteField("name", this.state.siteName);
         }
       })
       .catch(error => {

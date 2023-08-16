@@ -61,10 +61,14 @@ class SiteListPage extends React.Component {
     const newSite = this.newSite();
     SiteBackend.addSite(newSite)
       .then((res) => {
-        Setting.showMessage("success", "Site added successfully");
-        this.setState({
-          sites: Setting.prependRow(this.state.sites, newSite),
-        });
+        if (res.status === "error") {
+          Setting.showMessage("error", `Failed to add: ${res.msg}`);
+        } else {
+          Setting.showMessage("success", "Site added successfully");
+          this.setState({
+            sites: Setting.prependRow(this.state.sites, newSite),
+          });
+        }
       }
       )
       .catch(error => {
@@ -75,10 +79,14 @@ class SiteListPage extends React.Component {
   deleteSite(i) {
     SiteBackend.deleteSite(this.state.sites[i])
       .then((res) => {
-        Setting.showMessage("success", "Site deleted successfully");
-        this.setState({
-          sites: Setting.deleteRow(this.state.sites, i),
-        });
+        if (res.status === "error") {
+          Setting.showMessage("error", `Failed to delete: ${res.msg}`);
+        } else {
+          Setting.showMessage("success", "Site deleted successfully");
+          this.setState({
+            sites: Setting.deleteRow(this.state.sites, i),
+          });
+        }
       }
       )
       .catch(error => {

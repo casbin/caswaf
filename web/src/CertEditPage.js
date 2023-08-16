@@ -186,15 +186,15 @@ class CertEditPage extends React.Component {
     const cert = Setting.deepCopy(this.state.cert);
     CertBackend.updateCert(this.state.cert.owner, this.state.certName, cert)
       .then((res) => {
-        if (res) {
+        if (res.status === "error") {
+          Setting.showMessage("error", `Failed to save: ${res.msg}`);
+          this.updateCertField("name", this.state.certName);
+        } else {
           Setting.showMessage("success", "Successfully saved");
           this.setState({
             certName: this.state.cert.name,
           });
           this.props.history.push(`/certs/${this.state.cert.name}`);
-        } else {
-          Setting.showMessage("error", "failed to save: server side failure");
-          this.updateCertField("name", this.state.certName);
         }
       })
       .catch(error => {
