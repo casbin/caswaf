@@ -31,11 +31,17 @@ import (
 	"xorm.io/xorm"
 )
 
-var ormer *Ormer
-var createDatabase = true
+var (
+	ormer                   *Ormer = nil
+	isCreateDatabaseDefined        = false
+	createDatabase                 = true
+)
 
-func init() {
-	createDatabase = getCreateDatabaseFlag()
+func InitFlag() {
+	if !isCreateDatabaseDefined {
+		isCreateDatabaseDefined = true
+		createDatabase = getCreateDatabaseFlag()
+	}
 }
 
 func getCreateDatabaseFlag() bool {

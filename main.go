@@ -23,6 +23,7 @@ import (
 )
 
 func main() {
+	object.InitFlag()
 	object.InitAdapter()
 	object.CreateTables()
 	object.InitSiteMap()
