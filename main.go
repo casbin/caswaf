@@ -24,6 +24,7 @@ import (
 
 func main() {
 	object.InitAdapter()
+	object.CreateTables()
 	object.InitSiteMap()
 
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{

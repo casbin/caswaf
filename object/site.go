@@ -44,7 +44,7 @@ type Site struct {
 
 func GetGlobalSites() []*Site {
 	sites := []*Site{}
-	err := adapter.engine.Asc("owner").Desc("created_time").Find(&sites)
+	err := ormer.Engine.Asc("owner").Desc("created_time").Find(&sites)
 	if err != nil {
 		panic(err)
 	}
@@ -54,7 +54,7 @@ func GetGlobalSites() []*Site {
 
 func GetSites(owner string) []*Site {
 	sites := []*Site{}
-	err := adapter.engine.Desc("created_time").Find(&sites, &Site{Owner: owner})
+	err := ormer.Engine.Desc("created_time").Find(&sites, &Site{Owner: owner})
 	if err != nil {
 		panic(err)
 	}
@@ -71,7 +71,7 @@ func GetSites(owner string) []*Site {
 
 func getSite(owner string, name string) *Site {
 	site := Site{Owner: owner, Name: name}
-	existed, err := adapter.engine.Get(&site)
+	existed, err := ormer.Engine.Get(&site)
 	if err != nil {
 		panic(err)
 	}
@@ -118,7 +118,7 @@ func UpdateSite(id string, site *Site) bool {
 		return false
 	}
 
-	_, err := adapter.engine.ID(core.PK{owner, name}).AllCols().Update(site)
+	_, err := ormer.Engine.ID(core.PK{owner, name}).AllCols().Update(site)
 	if err != nil {
 		panic(err)
 	}
@@ -135,7 +135,7 @@ func UpdateSiteNoRefresh(id string, site *Site) bool {
 		return false
 	}
 
-	_, err := adapter.engine.ID(core.PK{owner, name}).AllCols().Update(site)
+	_, err := ormer.Engine.ID(core.PK{owner, name}).AllCols().Update(site)
 	if err != nil {
 		panic(err)
 	}
@@ -145,7 +145,7 @@ func UpdateSiteNoRefresh(id string, site *Site) bool {
 }
 
 func AddSite(site *Site) bool {
-	affected, err := adapter.engine.Insert(site)
+	affected, err := ormer.Engine.Insert(site)
 	if err != nil {
 		panic(err)
 	}
@@ -158,7 +158,7 @@ func AddSite(site *Site) bool {
 }
 
 func DeleteSite(site *Site) bool {
-	affected, err := adapter.engine.ID(core.PK{site.Owner, site.Name}).Delete(&Site{})
+	affected, err := ormer.Engine.ID(core.PK{site.Owner, site.Name}).Delete(&Site{})
 	if err != nil {
 		panic(err)
 	}

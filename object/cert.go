@@ -37,7 +37,7 @@ type Cert struct {
 
 func GetGlobalCerts() []*Cert {
 	certs := []*Cert{}
-	err := adapter.engine.Asc("owner").Desc("created_time").Find(&certs)
+	err := ormer.Engine.Asc("owner").Desc("created_time").Find(&certs)
 	if err != nil {
 		panic(err)
 	}
@@ -47,7 +47,7 @@ func GetGlobalCerts() []*Cert {
 
 func GetCerts(owner string) []*Cert {
 	certs := []*Cert{}
-	err := adapter.engine.Desc("created_time").Find(&certs, &Cert{Owner: owner})
+	err := ormer.Engine.Desc("created_time").Find(&certs, &Cert{Owner: owner})
 	if err != nil {
 		panic(err)
 	}
@@ -64,7 +64,7 @@ func GetCerts(owner string) []*Cert {
 
 func getCert(owner string, name string) *Cert {
 	cert := Cert{Owner: owner, Name: name}
-	existed, err := adapter.engine.Get(&cert)
+	existed, err := ormer.Engine.Get(&cert)
 	if err != nil {
 		panic(err)
 	}
@@ -93,7 +93,7 @@ func UpdateCert(id string, cert *Cert) bool {
 		cert.ExpireTime = ""
 	}
 
-	_, err := adapter.engine.ID(core.PK{owner, name}).AllCols().Update(cert)
+	_, err := ormer.Engine.ID(core.PK{owner, name}).AllCols().Update(cert)
 	if err != nil {
 		panic(err)
 	}
@@ -103,7 +103,7 @@ func UpdateCert(id string, cert *Cert) bool {
 }
 
 func AddCert(cert *Cert) bool {
-	affected, err := adapter.engine.Insert(cert)
+	affected, err := ormer.Engine.Insert(cert)
 	if err != nil {
 		panic(err)
 	}
@@ -112,7 +112,7 @@ func AddCert(cert *Cert) bool {
 }
 
 func DeleteCert(cert *Cert) bool {
-	affected, err := adapter.engine.ID(core.PK{cert.Owner, cert.Name}).Delete(&Cert{})
+	affected, err := ormer.Engine.ID(core.PK{cert.Owner, cert.Name}).Delete(&Cert{})
 	if err != nil {
 		panic(err)
 	}
