@@ -23,7 +23,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/astaxie/beego"
+	"github.com/beego/beego"
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/util"
 )

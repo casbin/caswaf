@@ -3,7 +3,7 @@ module github.com/casbin/caswaf
 go 1.17
 
 require (
-	github.com/astaxie/beego v1.12.3
+	github.com/beego/beego v1.12.12
 	github.com/casdoor/casdoor-go-sdk v0.28.4
 	github.com/go-sql-driver/mysql v1.6.0
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110

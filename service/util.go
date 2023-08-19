@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/astaxie/beego"
+	"github.com/beego/beego"
 	"github.com/casbin/caswaf/object"
 	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )

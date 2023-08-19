@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"github.com/astaxie/beego/context"
+	"github.com/beego/beego/context"
 	"github.com/casbin/caswaf/controllers"
 )
 

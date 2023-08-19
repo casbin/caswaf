@@ -18,8 +18,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/context"
+	"github.com/beego/beego"
+	"github.com/beego/beego/context"
 	"github.com/casbin/caswaf/util"
 )
 
