@@ -206,6 +206,7 @@ class SiteEditPage extends React.Component {
             <NodeTable
               title={"Nodes"}
               table={this.state.site.nodes}
+              siteName={this.state.site.name}
               onUpdateTable={(value) => {this.updateSiteField("nodes", value);}}
             />
           </Col>
@@ -227,6 +228,7 @@ class SiteEditPage extends React.Component {
             siteName: this.state.site.name,
           });
           this.props.history.push(`/sites/${this.state.site.name}`);
+          this.getSite();
         }
       })
       .catch(error => {

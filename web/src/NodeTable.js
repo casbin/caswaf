@@ -88,11 +88,26 @@ class NodeTable extends React.Component {
         key: "version",
         width: "300px",
         render: (text, record, index) => {
+          if (text === "") {
+            return null;
+          }
+
+          const versionInfo = JSON.parse(text);
+          const link = versionInfo?.version !== "" ? `${Setting.getRepoUrl(this.props.siteName)}/releases/tag/${versionInfo?.version}` : "";
+          let versionText = versionInfo?.version !== "" ? versionInfo?.version : "Unknown version";
+          if (versionInfo?.commitOffset > 0) {
+            versionText += ` (ahead+${versionInfo?.commitOffset})`;
+          }
+
           return (
-            <Input value={text} onChange={e => {
-              this.updateField(table, index, "version", e.target.value);
-            }} />
+            <a target="_blank" rel="noreferrer" href={link}>{versionText}</a>
           );
+
+          // return (
+          //   <Input value={text} onChange={e => {
+          //     this.updateField(table, index, "version", e.target.value);
+          //   }} />
+          // );
         },
       },
       {
@@ -101,9 +116,11 @@ class NodeTable extends React.Component {
         key: "status",
         width: "150px",
         render: (text, record, index) => {
-          if (record.subStatus === "In Progress") {
+          if (record.status === "") {
+            return null;
+          } else if (record.status === "In Progress") {
             return (
-              <Tag icon={<SyncOutlined spin />} color="processing">{`${text} (${record.subStatus})`}</Tag>
+              <Tag icon={<SyncOutlined spin />} color="processing">{text}</Tag>
             );
           } else if (record.status === "Running") {
             return (
@@ -114,7 +131,7 @@ class NodeTable extends React.Component {
               <Tag icon={<MinusCircleOutlined />} color="error">{text}</Tag>
             );
           } else {
-            return `${text} (${record.subStatus})`;
+            return text;
           }
         },
       },

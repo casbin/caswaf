@@ -58,6 +58,7 @@ class SiteListPage extends React.Component {
       node: "",
       isSelf: false,
       nodes: [],
+      casdoorApplication: "",
     };
   }
 

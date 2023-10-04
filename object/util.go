@@ -153,6 +153,6 @@ func getSiteVersion(siteName string) string {
 		panic(err)
 	}
 
-	res := util.StructToJson(versionInfo)
+	res := util.StructToJsonNoIndent(versionInfo)
 	return res
 }

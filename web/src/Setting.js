@@ -229,3 +229,11 @@ export function isResponseDenied(data) {
   }
   return false;
 }
+
+export function getRepoUrl(name) {
+  if (name === "casdoor") {
+    return "https://github.com/casdoor/casdoor";
+  } else {
+    return `https://github.com/casbin/${name}`;
+  }
+}
