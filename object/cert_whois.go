@@ -18,6 +18,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/casbin/caswaf/proxy"
 	"github.com/likexian/whois"
 	whoisparser "github.com/likexian/whois-parser"
 )
@@ -40,7 +41,15 @@ func getDomainExpireTime(domainName string) string {
 		server = "grs-whois.hichina.com" // com, net, cc, tv
 	}
 
-	data, err := whois.Whois(domainName, server)
+	client := whois.NewClient()
+	if server != "whois.cnnic.cn" && server != "grs-whois.hichina.com" {
+		dialer := proxy.GetProxyDialer()
+		if dialer != nil {
+			client.SetDialer(dialer)
+		}
+	}
+
+	data, err := client.Whois(domainName, server)
 	if err != nil {
 		if !strings.HasSuffix(domainName, ".run") || data == "" {
 			panic(err)

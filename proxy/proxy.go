@@ -73,3 +73,22 @@ func getProxyHttpClient() *http.Client {
 		Transport: tr,
 	}
 }
+
+func GetProxyDialer() *net.Dialer {
+	httpProxy := beego.AppConfig.String("httpProxy")
+	if httpProxy == "" {
+		return nil
+	}
+
+	if !isAddressOpen(httpProxy) {
+		return nil
+	}
+
+	// https://stackoverflow.com/questions/33585587/creating-a-go-socks5-client
+	dialer, err := proxy.SOCKS5("tcp", httpProxy, nil, proxy.Direct)
+	if err != nil {
+		panic(err)
+	}
+
+	return dialer.(*net.Dialer)
+}
