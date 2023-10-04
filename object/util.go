@@ -17,7 +17,9 @@ package object
 import (
 	"fmt"
 	"net"
+	"net/http"
 	"strings"
+	"time"
 
 	"golang.org/x/net/publicsuffix"
 )
@@ -52,4 +54,20 @@ func getBaseDomain(domain string) string {
 		return ""
 	}
 	return baseDomain
+}
+
+func pingUrl(url string) (bool, string) {
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+	resp, err := client.Get(url)
+	if err != nil {
+		return false, err.Error()
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
+		return true, ""
+	}
+	return false, fmt.Sprintf("Status: %s", resp.Status)
 }

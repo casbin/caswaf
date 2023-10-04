@@ -22,19 +22,27 @@ import (
 	"xorm.io/core"
 )
 
+type Node struct {
+	Name    string `json:"name"`
+	Version string `json:"version"`
+	Status  string `json:"status"`
+	Message string `json:"message"`
+}
+
 type Site struct {
 	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
 	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
 	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
 	DisplayName string `xorm:"varchar(100)" json:"displayName"`
 
-	Domain   string `xorm:"varchar(100)" json:"domain"`
-	Host     string `xorm:"varchar(100)" json:"host"`
-	SslMode  string `xorm:"varchar(100)" json:"sslMode"`
-	SslCert  string `xorm:"varchar(100)" json:"sslCert"`
-	PublicIp string `xorm:"varchar(100)" json:"publicIp"`
-	Node     string `xorm:"varchar(100)" json:"node"`
-	IsSelf   bool   `json:"isSelf"`
+	Domain   string  `xorm:"varchar(100)" json:"domain"`
+	Host     string  `xorm:"varchar(100)" json:"host"`
+	SslMode  string  `xorm:"varchar(100)" json:"sslMode"`
+	SslCert  string  `xorm:"varchar(100)" json:"sslCert"`
+	PublicIp string  `xorm:"varchar(100)" json:"publicIp"`
+	Node     string  `xorm:"varchar(100)" json:"node"`
+	IsSelf   bool    `json:"isSelf"`
+	Nodes    []*Node `json:"nodes"`
 
 	CasdoorApplication string `xorm:"varchar(100)" json:"casdoorApplication"`
 
@@ -124,6 +132,7 @@ func UpdateSite(id string, site *Site) bool {
 	}
 
 	refreshSiteMap()
+	site.checkNodes()
 
 	//return affected != 0
 	return true
@@ -172,4 +181,29 @@ func DeleteSite(site *Site) bool {
 
 func (site *Site) GetId() string {
 	return fmt.Sprintf("%s/%s", site.Owner, site.Name)
+}
+
+func (site *Site) checkNodes() {
+	hostname := util.GetHostname()
+	for i, node := range site.Nodes {
+		if node.Name != hostname {
+			continue
+		}
+
+		if site.Host == "" {
+			continue
+		}
+
+		ok, msg := pingUrl(site.Host)
+		status := "Running"
+		if !ok {
+			status = "Stopped"
+		}
+
+		if node.Status != status || node.Message != msg {
+			site.Nodes[i].Status = status
+			site.Nodes[i].Message = msg
+			UpdateSite(site.GetId(), site)
+		}
+	}
 }

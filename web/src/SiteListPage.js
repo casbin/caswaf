@@ -54,6 +54,10 @@ class SiteListPage extends React.Component {
       host: "http://localhost:8000",
       sslMode: "HTTP",
       sslCert: "",
+      publicIp: "",
+      node: "",
+      isSelf: false,
+      nodes: [],
     };
   }
 

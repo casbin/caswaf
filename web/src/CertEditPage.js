@@ -84,16 +84,6 @@ class CertEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("general:Display name")}:
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.cert.displayName} onChange={e => {
-              this.updateCertField("displayName", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("cert:Type")}:
           </Col>
           <Col span={22} >

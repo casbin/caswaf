@@ -20,6 +20,7 @@ import * as CertBackend from "./backend/CertBackend";
 import * as ApplicationBackend from "./backend/ApplicationBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
+import NodeTable from "./NodeTable";
 
 const {Option} = Select;
 
@@ -195,6 +196,18 @@ class SiteEditPage extends React.Component {
                 this.state.applications?.map((application, index) => <Option key={index} value={application.name}>{application.name}</Option>)
               }
             </Select>
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
+            Nodes:
+          </Col>
+          <Col span={22} >
+            <NodeTable
+              title={"Nodes"}
+              table={this.state.site.nodes}
+              onUpdateTable={(value) => {this.updateSiteField("nodes", value);}}
+            />
           </Col>
         </Row>
       </Card>
