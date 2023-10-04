@@ -87,6 +87,25 @@ func GetCert(id string) *Cert {
 	return getCert(owner, name)
 }
 
+func GetMaskedCert(cert *Cert) *Cert {
+	if cert == nil {
+		return nil
+	}
+
+	if cert.AccessSecret != "" {
+		cert.AccessSecret = "***"
+	}
+
+	return cert
+}
+
+func GetMaskedCerts(certs []*Cert) []*Cert {
+	for _, cert := range certs {
+		cert = GetMaskedCert(cert)
+	}
+	return certs
+}
+
 func UpdateCert(id string, cert *Cert) bool {
 	owner, name := util.GetOwnerAndNameFromId(id)
 	if getCert(owner, name) == nil {

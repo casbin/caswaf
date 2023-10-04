@@ -25,7 +25,7 @@ func (c *ApiController) GetGlobalCerts() {
 		return
 	}
 
-	c.Data["json"] = object.GetGlobalCerts()
+	c.Data["json"] = object.GetMaskedCerts(object.GetGlobalCerts())
 	c.ServeJSON()
 }
 
@@ -36,7 +36,7 @@ func (c *ApiController) GetCerts() {
 
 	owner := c.Input().Get("owner")
 
-	c.Data["json"] = object.GetCerts(owner)
+	c.Data["json"] = object.GetMaskedCerts(object.GetCerts(owner))
 	c.ServeJSON()
 }
 
@@ -47,7 +47,7 @@ func (c *ApiController) GetCert() {
 
 	id := c.Input().Get("id")
 
-	c.Data["json"] = object.GetCert(id)
+	c.Data["json"] = object.GetMaskedCert(object.GetCert(id))
 	c.ServeJSON()
 }
 
