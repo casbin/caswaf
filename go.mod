@@ -9,7 +9,9 @@ require (
 	github.com/denisenkom/go-mssqldb v0.10.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/lib/pq v1.10.2
-	golang.org/x/net v0.0.0-20210614182718-04defd469f4e
+	github.com/likexian/whois v1.15.1
+	github.com/likexian/whois-parser v1.24.9
+	golang.org/x/net v0.14.0
 	modernc.org/sqlite v1.11.2
 	xorm.io/core v0.7.3
 	xorm.io/xorm v1.2.5
@@ -30,6 +32,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
+	github.com/likexian/gokit v0.25.13 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/miekg/dns v1.1.43 // indirect
@@ -46,13 +49,12 @@ require (
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/urfave/cli v1.22.5 // indirect
-	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e // indirect
-	golang.org/x/mod v0.3.0 // indirect
+	golang.org/x/crypto v0.12.0 // indirect
+	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c // indirect
-	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
-	golang.org/x/text v0.3.6 // indirect
-	golang.org/x/tools v0.0.0-20201124115921-2c860bdd6e78 // indirect
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	golang.org/x/sys v0.11.0 // indirect
+	golang.org/x/text v0.12.0 // indirect
+	golang.org/x/tools v0.6.0 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
