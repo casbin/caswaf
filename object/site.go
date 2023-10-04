@@ -200,9 +200,12 @@ func (site *Site) checkNodes() {
 			status = "Stopped"
 		}
 
-		if node.Status != status || node.Message != msg {
+		version := getSiteVersion(site.Name)
+
+		if node.Status != status || node.Message != msg || node.Version != version {
 			site.Nodes[i].Status = status
 			site.Nodes[i].Message = msg
+			site.Nodes[i].Version = version
 			UpdateSite(site.GetId(), site)
 		}
 	}

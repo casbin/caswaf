@@ -18,9 +18,15 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/beego/beego"
+	"github.com/casbin/caswaf/util"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"golang.org/x/net/publicsuffix"
 )
 
@@ -70,4 +76,83 @@ func pingUrl(url string) (bool, string) {
 		return true, ""
 	}
 	return false, fmt.Sprintf("Status: %s", resp.Status)
+}
+
+type VersionInfo struct {
+	Version      string `json:"version"`
+	CommitId     string `json:"commitId"`
+	CommitOffset int    `json:"commitOffset"`
+}
+
+func getVersionInfo(path string) (*VersionInfo, error) {
+	res := &VersionInfo{
+		Version:      "",
+		CommitId:     "",
+		CommitOffset: -1,
+	}
+
+	r, err := git.PlainOpen(path)
+	if err != nil {
+		return res, err
+	}
+	ref, err := r.Head()
+	if err != nil {
+		return res, err
+	}
+	tags, err := r.Tags()
+	if err != nil {
+		return res, err
+	}
+	tagMap := make(map[plumbing.Hash]string)
+	err = tags.ForEach(func(t *plumbing.Reference) error {
+		// This technique should work for both lightweight and annotated tags.
+		revHash, err := r.ResolveRevision(plumbing.Revision(t.Name()))
+		if err != nil {
+			return err
+		}
+		tagMap[*revHash] = t.Name().Short()
+		return nil
+	})
+	if err != nil {
+		return res, err
+	}
+
+	cIter, err := r.Log(&git.LogOptions{From: ref.Hash()})
+
+	commitOffset := 0
+	version := ""
+	// iterates over the commits
+	err = cIter.ForEach(func(c *object.Commit) error {
+		tag, ok := tagMap[c.Hash]
+		if ok {
+			if version == "" {
+				version = tag
+			}
+		}
+		if version == "" {
+			commitOffset++
+		}
+		return nil
+	})
+	if err != nil {
+		return res, err
+	}
+
+	res = &VersionInfo{
+		Version:      version,
+		CommitId:     ref.Hash().String(),
+		CommitOffset: commitOffset,
+	}
+	return res, nil
+}
+
+func getSiteVersion(siteName string) string {
+	appDir := beego.AppConfig.String("appDir")
+	versionInfo, err := getVersionInfo(filepath.Join(appDir, siteName))
+	if err != nil {
+		panic(err)
+	}
+
+	res := util.StructToJson(versionInfo)
+	return res
 }
