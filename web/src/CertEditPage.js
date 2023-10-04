@@ -132,6 +132,61 @@ class CertEditPage extends React.Component {
           </Col>
         </Row>
         <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("cert:Domain expire")}:
+          </Col>
+          <Col span={22} >
+            <Input disabled={true} value={Setting.getFormattedDate(this.state.cert.domainExpireTime)} onChange={e => {
+              this.updateCertField("domainExpireTime", e.target.value);
+            }} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("cert:Provider")}:
+          </Col>
+          <Col span={22} >
+            <Select virtual={false} style={{width: "100%"}} value={this.state.cert.provider} onChange={(value => {this.updateCertField("provider", value);})}>
+              {
+                [
+                  {id: "GoDaddy", name: "GoDaddy"},
+                  {id: "Aliyun", name: "Aliyun"},
+                ].map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)
+              }
+            </Select>
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("cert:Account")}:
+          </Col>
+          <Col span={22} >
+            <Input value={this.state.cert.account} onChange={e => {
+              this.updateCertField("account", e.target.value);
+            }} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("cert:Access key")}:
+          </Col>
+          <Col span={22} >
+            <Input value={this.state.cert.accessKey} onChange={e => {
+              this.updateCertField("accessKey", e.target.value);
+            }} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("cert:Access secret")}:
+          </Col>
+          <Col span={22} >
+            <Input value={this.state.cert.accessSecret} onChange={e => {
+              this.updateCertField("accessSecret", e.target.value);
+            }} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
             {i18next.t("cert:Certificate")}:
           </Col>

@@ -27,9 +27,15 @@ type Cert struct {
 	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
 	DisplayName string `xorm:"varchar(100)" json:"displayName"`
 
-	Type            string `xorm:"varchar(100)" json:"type"`
-	CryptoAlgorithm string `xorm:"varchar(100)" json:"cryptoAlgorithm"`
-	ExpireTime      string `xorm:"varchar(100)" json:"expireTime"`
+	Type             string `xorm:"varchar(100)" json:"type"`
+	CryptoAlgorithm  string `xorm:"varchar(100)" json:"cryptoAlgorithm"`
+	ExpireTime       string `xorm:"varchar(100)" json:"expireTime"`
+	DomainExpireTime string `xorm:"varchar(100)" json:"domainExpireTime"`
+
+	Provider     string `xorm:"varchar(100)" json:"provider"`
+	Account      string `xorm:"varchar(100)" json:"account"`
+	AccessKey    string `xorm:"varchar(100)" json:"accessKey"`
+	AccessSecret string `xorm:"varchar(100)" json:"accessSecret"`
 
 	Certificate string `xorm:"mediumtext" json:"certificate"`
 	PrivateKey  string `xorm:"mediumtext" json:"privateKey"`

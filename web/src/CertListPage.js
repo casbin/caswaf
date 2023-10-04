@@ -110,47 +110,85 @@ class CertListPage extends React.Component {
           );
         },
       },
-      {
-        title: i18next.t("general:Create time"),
-        dataIndex: "createdTime",
-        key: "createdTime",
-        width: "180px",
-        sorter: (a, b) => a.createdTime.localeCompare(b.createdTime),
-        render: (text, record, index) => {
-          return Setting.getFormattedDate(text);
-        },
-      },
-      {
-        title: i18next.t("general:Display name"),
-        dataIndex: "displayName",
-        key: "displayName",
-        // width: "200px",
-        sorter: (a, b) => a.displayName.localeCompare(b.displayName),
-      },
-      {
-        title: i18next.t("cert:Type"),
-        dataIndex: "type",
-        key: "type",
-        width: "180px",
-        sorter: (a, b) => a.type.localeCompare(b.type),
-      },
-      {
-        title: i18next.t("cert:Crypto algorithm"),
-        dataIndex: "cryptoAlgorithm",
-        key: "cryptoAlgorithm",
-        width: "180px",
-        sorter: (a, b) => a.cryptoAlgorithm.localeCompare(b.cryptoAlgorithm),
-      },
+      // {
+      //   title: i18next.t("general:Create time"),
+      //   dataIndex: "createdTime",
+      //   key: "createdTime",
+      //   width: "150px",
+      //   sorter: (a, b) => a.createdTime.localeCompare(b.createdTime),
+      //   render: (text, record, index) => {
+      //     return Setting.getFormattedDate(text);
+      //   },
+      // },
+      // {
+      //   title: i18next.t("general:Display name"),
+      //   dataIndex: "displayName",
+      //   key: "displayName",
+      //   // width: "200px",
+      //   sorter: (a, b) => a.displayName.localeCompare(b.displayName),
+      // },
+      // {
+      //   title: i18next.t("cert:Type"),
+      //   dataIndex: "type",
+      //   key: "type",
+      //   width: "180px",
+      //   sorter: (a, b) => a.type.localeCompare(b.type),
+      // },
+      // {
+      //   title: i18next.t("cert:Crypto algorithm"),
+      //   dataIndex: "cryptoAlgorithm",
+      //   key: "cryptoAlgorithm",
+      //   width: "180px",
+      //   sorter: (a, b) => a.cryptoAlgorithm.localeCompare(b.cryptoAlgorithm),
+      // },
       {
         title: i18next.t("cert:Expire time"),
         dataIndex: "expireTime",
         key: "expireTime",
-        width: "180px",
+        width: "150px",
         sorter: (a, b) => a.expireTime.localeCompare(b.expireTime),
         render: (text, record, index) => {
           return Setting.getFormattedDate(text);
         },
       },
+      {
+        title: i18next.t("cert:Domain expire"),
+        dataIndex: "domainExpireTime",
+        key: "domainExpireTime",
+        width: "150px",
+        sorter: (a, b) => a.domainExpireTime.localeCompare(b.domainExpireTime),
+        render: (text, record, index) => {
+          return Setting.getFormattedDate(text);
+        },
+      },
+      {
+        title: i18next.t("cert:Provider"),
+        dataIndex: "provider",
+        key: "provider",
+        width: "110px",
+        sorter: (a, b) => a.provider.localeCompare(b.provider),
+      },
+      {
+        title: i18next.t("cert:Account"),
+        dataIndex: "account",
+        key: "account",
+        width: "120px",
+        sorter: (a, b) => a.account.localeCompare(b.account),
+      },
+      // {
+      //   title: i18next.t("cert:Access key"),
+      //   dataIndex: "accessKey",
+      //   key: "accessKey",
+      //   width: "180px",
+      //   sorter: (a, b) => a.accessKey.localeCompare(b.accessKey),
+      // },
+      // {
+      //   title: i18next.t("cert:Access secret"),
+      //   dataIndex: "accessSecret",
+      //   key: "accessSecret",
+      //   width: "180px",
+      //   sorter: (a, b) => a.accessSecret.localeCompare(b.accessSecret),
+      // },
       {
         title: i18next.t("cert:Certificate"),
         dataIndex: "certificate",
@@ -158,7 +196,7 @@ class CertListPage extends React.Component {
         width: "180px",
         sorter: (a, b) => a.certificate.localeCompare(b.certificate),
         render: (text, record, index) => {
-          return Setting.getShortText(text);
+          return Setting.getShortText(text, 70);
         },
       },
       {
@@ -168,7 +206,7 @@ class CertListPage extends React.Component {
         width: "180px",
         sorter: (a, b) => a.privateKey.localeCompare(b.privateKey),
         render: (text, record, index) => {
-          return Setting.getShortText(text);
+          return Setting.getShortText(text, 70);
         },
       },
       {
