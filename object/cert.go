@@ -17,6 +17,7 @@ package object
 import (
 	"fmt"
 
+	"github.com/casbin/caswaf/certificate"
 	"github.com/casbin/caswaf/util"
 	"xorm.io/core"
 )
@@ -147,4 +148,23 @@ func DeleteCert(cert *Cert) bool {
 
 func (cert *Cert) GetId() string {
 	return fmt.Sprintf("%s/%s", cert.Owner, cert.Name)
+}
+
+func RenewCert(cert *Cert) bool {
+	client := certificate.GetAcmeClient(acmeEmail, acmePrivateKey, false)
+
+	var certStr, privateKey string
+	if cert.Provider == "Aliyun" {
+		certStr, privateKey = certificate.ObtainCertificateAli(client, cert.Name, cert.AccessKey, cert.AccessSecret)
+	} else if cert.Provider == "GoDaddy" {
+		certStr, privateKey = certificate.ObtainCertificateGoDaddy(client, cert.Name, cert.AccessKey, cert.AccessSecret)
+	} else {
+		panic(fmt.Errorf("unknown provider: %s", cert.Provider))
+	}
+
+	cert.ExpireTime = getCertExpireTime(certStr)
+	cert.Certificate = certStr
+	cert.PrivateKey = privateKey
+
+	return UpdateCert(cert.GetId(), cert)
 }
