@@ -18,11 +18,10 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/beego/beego"
+	"github.com/casbin/caswaf/run"
 	"github.com/casbin/caswaf/util"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -147,8 +146,8 @@ func getVersionInfo(path string) (*VersionInfo, error) {
 }
 
 func getSiteVersion(siteName string) string {
-	appDir := beego.AppConfig.String("appDir")
-	versionInfo, err := getVersionInfo(filepath.Join(appDir, siteName))
+	path := run.GetSitePath(siteName)
+	versionInfo, err := getVersionInfo(path)
 	if err != nil {
 		panic(err)
 	}
