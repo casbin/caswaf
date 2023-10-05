@@ -44,7 +44,7 @@ class NodeTable extends React.Component {
   }
 
   addRow(table) {
-    const row = {name: `New Node - ${table.length}`, version: "", status: "", subStatus: "", message: ""};
+    const row = {name: `New Node - ${table.length}`, version: "", diff: "", status: "", message: ""};
     if (table === undefined) {
       table = [];
     }
@@ -108,6 +108,22 @@ class NodeTable extends React.Component {
           //     this.updateField(table, index, "version", e.target.value);
           //   }} />
           // );
+        },
+      },
+      {
+        title: "Diff",
+        dataIndex: "diff",
+        key: "diff",
+        render: (text, record, index) => {
+          if (record.status === "") {
+            return null;
+          } else {
+            return (
+              <Tooltip title={Setting.getShortText(text, 500)}>
+                {Setting.getShortText(text)}
+              </Tooltip>
+            );
+          }
         },
       },
       {

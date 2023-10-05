@@ -31,7 +31,7 @@ func createRepo(siteName string) {
 	}
 
 	originalPath := GetSitePath(originalName)
-	patch := gitDiff(originalPath)
+	patch := GitDiff(originalPath)
 
 	gitApply(path, patch)
 }

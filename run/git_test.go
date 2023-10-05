@@ -29,7 +29,7 @@ func TestGitGetDiff(t *testing.T) {
 		panic(err)
 	}
 
-	//diff := gitDiff("F:/github_repos/casdoor")
+	//diff := GitDiff("F:/github_repos/casdoor")
 	//println(diff)
 
 	createRepo("casdoor_test")

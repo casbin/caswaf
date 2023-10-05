@@ -17,6 +17,7 @@ package object
 import (
 	"fmt"
 
+	"github.com/casbin/caswaf/run"
 	"github.com/casbin/caswaf/util"
 	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 	"xorm.io/core"
@@ -25,6 +26,7 @@ import (
 type Node struct {
 	Name    string `json:"name"`
 	Version string `json:"version"`
+	Diff    string `json:"diff"`
 	Status  string `json:"status"`
 	Message string `json:"message"`
 }
@@ -202,10 +204,14 @@ func (site *Site) checkNodes() {
 
 		version := getSiteVersion(site.Name)
 
-		if node.Status != status || node.Message != msg || node.Version != version {
+		path := run.GetSitePath(site.Name)
+		diff := run.GitDiff(path)
+
+		if node.Status != status || node.Message != msg || node.Version != version || node.Diff != diff {
 			site.Nodes[i].Status = status
 			site.Nodes[i].Message = msg
 			site.Nodes[i].Version = version
+			site.Nodes[i].Diff = diff
 			UpdateSite(site.GetId(), site)
 		}
 	}

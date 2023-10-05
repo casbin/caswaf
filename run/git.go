@@ -29,7 +29,7 @@ func gitClone(repoUrl string, path string) {
 	}
 }
 
-func gitDiff(path string) string {
+func GitDiff(path string) string {
 	cmd := exec.Command("git", "diff")
 	cmd.Dir = path
 
