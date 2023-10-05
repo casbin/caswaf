@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from "react";
-import {Button, Card, Col, Input, Row, Select} from "antd";
+import {Button, Card, Col, Input, InputNumber, Row, Select} from "antd";
 import {LinkOutlined} from "@ant-design/icons";
 import * as SiteBackend from "./backend/SiteBackend";
 import * as CertBackend from "./backend/CertBackend";
@@ -131,6 +131,16 @@ class SiteEditPage extends React.Component {
           <Col span={22} >
             <Input prefix={<LinkOutlined />} value={this.state.site.host} onChange={e => {
               this.updateSiteField("host", e.target.value);
+            }} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("site:Port")}:
+          </Col>
+          <Col span={22} >
+            <InputNumber min={0} max={65535} value={this.state.site.port} onChange={value => {
+              this.updateSiteField("port", value);
             }} />
           </Col>
         </Row>

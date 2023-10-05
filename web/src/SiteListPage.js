@@ -14,8 +14,7 @@
 
 import React from "react";
 import {Link} from "react-router-dom";
-import {Button, Col, Popconfirm, Row, Table, Tag} from "antd";
-import {CheckCircleOutlined} from "@ant-design/icons";
+import {Button, Col, Popconfirm, Row, Table} from "antd";
 import moment from "moment";
 import * as Setting from "./Setting";
 import * as SiteBackend from "./backend/SiteBackend";
@@ -165,6 +164,10 @@ class SiteListPage extends React.Component {
         width: "180px",
         sorter: (a, b) => a.host.localeCompare(b.host),
         render: (text, record, index) => {
+          if (text === "") {
+            text = `http://localhost:${record.port}`;
+          }
+
           if (!record.isSelf) {
             return text;
           }
@@ -176,34 +179,34 @@ class SiteListPage extends React.Component {
           );
         },
       },
-      {
-        title: i18next.t("site:Public IP"),
-        dataIndex: "publicIp",
-        key: "publicIp",
-        width: "120px",
-        sorter: (a, b) => a.publicIp.localeCompare(b.publicIp),
-      },
-      {
-        title: i18next.t("site:Node"),
-        dataIndex: "node",
-        key: "node",
-        width: "180px",
-        sorter: (a, b) => a.node.localeCompare(b.node),
-        render: (text, record, index) => {
-          return (
-            <div>
-              {text}
-              {
-                !record.isSelf ? null : (
-                  <Tag style={{marginLeft: "10px"}} icon={<CheckCircleOutlined />} color="success">
-                    {i18next.t("general:Self")}
-                  </Tag>
-                )
-              }
-            </div>
-          );
-        },
-      },
+      // {
+      //   title: i18next.t("site:Public IP"),
+      //   dataIndex: "publicIp",
+      //   key: "publicIp",
+      //   width: "120px",
+      //   sorter: (a, b) => a.publicIp.localeCompare(b.publicIp),
+      // },
+      // {
+      //   title: i18next.t("site:Node"),
+      //   dataIndex: "node",
+      //   key: "node",
+      //   width: "180px",
+      //   sorter: (a, b) => a.node.localeCompare(b.node),
+      //   render: (text, record, index) => {
+      //     return (
+      //       <div>
+      //         {text}
+      //         {
+      //           !record.isSelf ? null : (
+      //             <Tag style={{marginLeft: "10px"}} icon={<CheckCircleOutlined />} color="success">
+      //               {i18next.t("general:Self")}
+      //             </Tag>
+      //           )
+      //         }
+      //       </div>
+      //     );
+      //   },
+      // },
       {
         title: i18next.t("site:SSL mode"),
         dataIndex: "sslMode",

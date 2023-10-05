@@ -110,7 +110,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	targetUrl := joinPath(site.Host, r.RequestURI)
+	targetUrl := joinPath(site.GetHost(), r.RequestURI)
 	forwardHandler(targetUrl, w, r)
 }
 

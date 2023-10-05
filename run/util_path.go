@@ -44,6 +44,11 @@ func GetRepoPath(name string) string {
 	return res
 }
 
+func getCodeAppConfPath(name string) string {
+	appDir := beego.AppConfig.String("appDir")
+	return fmt.Sprintf("%s/%s/conf/app.conf", appDir, name)
+}
+
 func getBatPath(name string) string {
 	return fmt.Sprintf("C:/Users/%s/Desktop/run/%s.bat", username, name)
 }

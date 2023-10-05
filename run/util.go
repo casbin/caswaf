@@ -15,12 +15,14 @@
 package run
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 
+	"github.com/beego/beego"
 	"github.com/casbin/caswaf/util"
 )
 
@@ -30,6 +32,15 @@ func getOriginalName(name string) string {
 		return tokens[0]
 	} else {
 		return name
+	}
+}
+
+func getNameIndex(name string) int {
+	tokens := strings.Split(name, "_")
+	if len(tokens) > 0 {
+		return util.ParseInt(tokens[len(tokens)-1])
+	} else {
+		panic(fmt.Sprintf("getNameIndex() error, name = %s", name))
 	}
 }
 
@@ -48,6 +59,19 @@ func ensureFileFolderExists(path string) {
 			panic(err)
 		}
 	}
+}
+
+func updateAppConfFile(name string, i int) {
+	fmt.Printf("Updating code's app.conf file: [%s]\n", name)
+
+	confPath := getCodeAppConfPath(name)
+	content := util.ReadStringFromPath(confPath)
+	content = strings.ReplaceAll(content, "httpport = 8000", fmt.Sprintf("httpport = %d", 30000+i))
+	content = strings.ReplaceAll(content, "123456", beego.AppConfig.String("dbPass"))
+	content = strings.ReplaceAll(content, "dbName = casdoor", fmt.Sprintf("dbName = casdoor_customer_%d", i))
+	content = strings.ReplaceAll(content, "redisEndpoint =", "redisEndpoint = \"localhost:6379\"")
+	content = strings.ReplaceAll(content, "socks5Proxy = \"127.0.0.1:10808\"", "socks5Proxy =")
+	util.WriteStringToPath(content, confPath)
 }
 
 func updateBatFile(name string) {
@@ -77,4 +101,18 @@ func startProcess(name string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func isProcessActive(name string) bool {
+	windowName := fmt.Sprintf("%s.bat - Shortcut", name)
+	cmd := exec.Command("cmd", "/C", "tasklist", "/v", "|", "findstr", windowName)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		panic(err)
+	}
+
+	res := out.String() != ""
+	return res
 }

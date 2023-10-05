@@ -14,26 +14,32 @@
 
 package run
 
-import "github.com/casbin/caswaf/util"
+import (
+	"strings"
 
-func CreateRepo(siteName string) {
+	"github.com/casbin/caswaf/util"
+)
+
+func CreateRepo(siteName string, needStart bool) {
 	path := GetRepoPath(siteName)
 	if !util.FileExist(path) {
 		originalName := getOriginalName(siteName)
 		repoUrl := getRepoUrl(originalName)
 		gitClone(repoUrl, path)
 
-		if originalName == siteName {
-			return
+		if strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2 {
+			index := getNameIndex(siteName)
+			updateAppConfFile(siteName, index)
+		} else if originalName != siteName {
+			originalPath := GetRepoPath(originalName)
+			patch := GitDiff(originalPath)
+			gitApply(path, patch)
 		}
-
-		originalPath := GetRepoPath(originalName)
-		patch := GitDiff(originalPath)
-
-		gitApply(path, patch)
 	}
 
-	updateBatFile(siteName)
-	updateShortcutFile(siteName)
-	startProcess(siteName)
+	if needStart {
+		updateBatFile(siteName)
+		updateShortcutFile(siteName)
+		startProcess(siteName)
+	}
 }
