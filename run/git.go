@@ -83,14 +83,11 @@ func gitGetLatestCommitHash(path string) string {
 }
 
 func gitPull(path string) bool {
-	fmt.Printf("gitPull(): [%s]\n", path)
-
 	oldHash := gitGetLatestCommitHash(path)
 
 	cmd := exec.Command("git", "pull", "--rebase", "--autostash")
 	cmd.Dir = path
 	out, err := cmd.CombinedOutput()
-	println(out)
 	if err != nil {
 		panic(err)
 	}
@@ -99,6 +96,8 @@ func gitPull(path string) bool {
 	affected := oldHash != newHash
 
 	if affected {
+		fmt.Printf("gitPull(): [%s]\n", path)
+		fmt.Printf("Output: %s\n", string(out))
 		fmt.Printf("Affected: [%s] -> [%s]\n", oldHash, newHash)
 	}
 
