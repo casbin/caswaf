@@ -16,10 +16,17 @@ package util
 
 import "os"
 
-func GetHostname() string {
-	res, err := os.Hostname()
+var hostname = ""
+
+func init() {
+	name, err := os.Hostname()
 	if err != nil {
 		panic(err)
 	}
-	return res
+
+	hostname = name
+}
+
+func GetHostname() string {
+	return hostname
 }

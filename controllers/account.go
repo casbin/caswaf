@@ -18,6 +18,7 @@ import (
 	_ "embed"
 
 	"github.com/beego/beego"
+	"github.com/casbin/caswaf/util"
 	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
 
@@ -70,6 +71,7 @@ func (c *ApiController) GetAccount() {
 	}
 
 	claims := c.GetSessionClaims()
+	hostname := util.GetHostname()
 
-	c.ResponseOk(claims)
+	c.ResponseOk(claims, hostname)
 }
