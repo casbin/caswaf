@@ -19,6 +19,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 func gitClone(repoUrl string, path string) {
@@ -66,11 +67,48 @@ func gitApply(path string, patch string) {
 	}
 }
 
-func gitPull(path string) {
+func gitGetLatestCommitHash(path string) string {
+	cmd := exec.Command("git", "rev-parse", "HEAD")
+	cmd.Dir = path
+	out, err := cmd.Output()
+	if err != nil {
+		panic(err)
+	}
+	return string(out)
+}
+
+func gitPull(path string) bool {
+	oldHash := gitGetLatestCommitHash(path)
+
 	cmd := exec.Command("git", "pull")
 	cmd.Dir = path
 	out, err := cmd.CombinedOutput()
 	println(out)
+	if err != nil {
+		panic(err)
+	}
+
+	newHash := gitGetLatestCommitHash(path)
+	affected := oldHash != newHash
+	return affected
+}
+
+func runCmd(dir, name string, args ...string) error {
+	cmd := exec.Command(name, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Dir = dir
+	return cmd.Run()
+}
+
+func gitWebBuild(path string) {
+	webDir := filepath.Join(path, "web")
+	err := runCmd(webDir, "yarn", "install")
+	if err != nil {
+		panic(err)
+	}
+
+	err = runCmd(webDir, "yarn", "build")
 	if err != nil {
 		panic(err)
 	}

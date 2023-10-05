@@ -34,7 +34,10 @@ func CreateRepo(siteName string, needStart bool, diff string) {
 			gitApply(path, diff)
 		}
 	} else {
-		gitPull(path)
+		affected := gitPull(path)
+		if affected {
+			gitWebBuild(path)
+		}
 	}
 
 	if needStart {
