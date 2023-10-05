@@ -17,6 +17,8 @@ import {CheckCircleOutlined, DeleteOutlined, DownOutlined, MinusCircleOutlined, 
 import {Button, Col, Input, Row, Table, Tag, Tooltip} from "antd";
 import * as Setting from "./Setting";
 
+const {TextArea} = Input;
+
 class NodeTable extends React.Component {
   constructor(props) {
     super(props);
@@ -124,7 +126,11 @@ class NodeTable extends React.Component {
             return null;
           } else {
             return (
-              <Tooltip title={Setting.getShortText(text, 500)}>
+              <Tooltip title={
+                <div style={{width: "800px"}}>
+                  <TextArea autoSize={{minRows: 1, maxRows: 30}} value={text} />
+                </div>
+              }>
                 {Setting.getShortText(text)}
               </Tooltip>
             );
