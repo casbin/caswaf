@@ -12,28 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package run
+package util
 
-import "github.com/casbin/caswaf/util"
+import "time"
 
-func CreateRepo(siteName string) {
-	path := GetRepoPath(siteName)
-	if !util.FileExist(path) {
-		originalName := getOriginalName(siteName)
-		repoUrl := getRepoUrl(originalName)
-		gitClone(repoUrl, path)
-
-		if originalName == siteName {
-			return
-		}
-
-		originalPath := GetRepoPath(originalName)
-		patch := GitDiff(originalPath)
-
-		gitApply(path, patch)
-	}
-
-	updateBatFile(siteName)
-	updateShortcutFile(siteName)
-	startProcess(siteName)
+func GetCurrentTime() string {
+	timestamp := time.Now().Unix()
+	tm := time.Unix(timestamp, 0)
+	return tm.Format(time.RFC3339)
 }

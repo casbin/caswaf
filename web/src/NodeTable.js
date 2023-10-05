@@ -48,6 +48,11 @@ class NodeTable extends React.Component {
     if (table === undefined) {
       table = [];
     }
+
+    if (table.length === 0) {
+      row.name = this.props.account.hostname;
+    }
+
     table = Setting.addRow(table, row);
     this.updateTable(table);
   }

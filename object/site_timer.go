@@ -12,28 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package run
+package object
 
-import "github.com/casbin/caswaf/util"
+import (
+	"fmt"
+	"time"
+)
 
-func CreateRepo(siteName string) {
-	path := GetRepoPath(siteName)
-	if !util.FileExist(path) {
-		originalName := getOriginalName(siteName)
-		repoUrl := getRepoUrl(originalName)
-		gitClone(repoUrl, path)
+var siteUpdateMap = map[string]string{}
 
-		if originalName == siteName {
-			return
+func monitorSites() {
+	sites := GetGlobalSites()
+	for _, site := range sites {
+		updatedTime, ok := siteUpdateMap[site.GetId()]
+		if ok && updatedTime != "" && updatedTime == site.UpdatedTime {
+			continue
 		}
 
-		originalPath := GetRepoPath(originalName)
-		patch := GitDiff(originalPath)
-
-		gitApply(path, patch)
+		site.checkNodes()
+		siteUpdateMap[site.GetId()] = site.UpdatedTime
 	}
+}
 
-	updateBatFile(siteName)
-	updateShortcutFile(siteName)
-	startProcess(siteName)
+func StartMonitorLoop() {
+	fmt.Printf("MonitorLoop Start!\n\n")
+	for {
+		monitorSites()
+		time.Sleep(5 * time.Minute)
+	}
 }

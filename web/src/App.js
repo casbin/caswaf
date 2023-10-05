@@ -98,6 +98,8 @@ class App extends Component {
           this.setLanguage(account);
         }
 
+        account.hostname = res.data2;
+
         this.setState({
           account: account,
         });

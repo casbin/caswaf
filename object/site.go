@@ -35,6 +35,7 @@ type Site struct {
 	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
 	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
 	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
+	UpdatedTime string `xorm:"varchar(100)" json:"updatedTime"`
 	DisplayName string `xorm:"varchar(100)" json:"displayName"`
 
 	Domain   string  `xorm:"varchar(100)" json:"domain"`
@@ -128,6 +129,8 @@ func UpdateSite(id string, site *Site) bool {
 		return false
 	}
 
+	site.UpdatedTime = util.GetCurrentTime()
+
 	_, err := ormer.Engine.ID(core.PK{owner, name}).AllCols().Update(site)
 	if err != nil {
 		panic(err)
@@ -201,6 +204,8 @@ func (site *Site) checkNodes() {
 		if !ok {
 			status = "Stopped"
 		}
+
+		run.CreateRepo(site.Name)
 
 		version := getSiteVersion(site.Name)
 

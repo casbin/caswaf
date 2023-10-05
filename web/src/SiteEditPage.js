@@ -207,6 +207,7 @@ class SiteEditPage extends React.Component {
               title={"Nodes"}
               table={this.state.site.nodes}
               siteName={this.state.site.name}
+              account={this.props.account}
               onUpdateTable={(value) => {this.updateSiteField("nodes", value);}}
             />
           </Col>
