@@ -72,7 +72,7 @@ func ensureFileFolderExists(path string) {
 }
 
 func updateAppConfFile(name string, i int) {
-	fmt.Printf("Updating code's app.conf file: [%s]\n", name)
+	fmt.Printf("updateAppConfFile(): [%s]\n", name)
 
 	confPath := getCodeAppConfPath(name)
 	content := util.ReadStringFromPath(confPath)
@@ -85,7 +85,7 @@ func updateAppConfFile(name string, i int) {
 }
 
 func updateBatFile(name string) {
-	fmt.Printf("Updating BAT file: [%s]\n", name)
+	fmt.Printf("updateBatFile(): [%s]\n", name)
 
 	batPath := getBatPath(name)
 	ensureFileFolderExists(filepath.Dir(batPath))
@@ -94,7 +94,7 @@ func updateBatFile(name string) {
 }
 
 func updateShortcutFile(name string) {
-	fmt.Printf("Updating shortcut file: [%s]\n", name)
+	fmt.Printf("updateShortcutFile(): [%s]\n", name)
 
 	cmd := exec.Command("powershell", fmt.Sprintf("$s=(New-Object -COM WScript.Shell).CreateShortcut('%s');$s.TargetPath='%s';$s.Save()", getShortcutPath(name), getBatPath(name)))
 	err := cmd.Run()
@@ -104,7 +104,7 @@ func updateShortcutFile(name string) {
 }
 
 func startProcess(name string) {
-	fmt.Printf("Starting process: [%s]\n", name)
+	fmt.Printf("startProcess(): [%s]\n", name)
 
 	cmd := exec.Command("cmd", "/C", "start", "", getShortcutPath(name))
 	err := cmd.Run()
@@ -114,7 +114,7 @@ func startProcess(name string) {
 }
 
 func stopProcess(name string) {
-	fmt.Printf("Stopping process: [%s]\n", name)
+	fmt.Printf("stopProcess(): [%s]\n", name)
 
 	windowName := fmt.Sprintf("%s.bat - %s", name, getShortcut())
 	// taskkill /IM "casdoor.bat - Shortcut" /F

@@ -16,6 +16,7 @@ package run
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -23,6 +24,8 @@ import (
 )
 
 func gitClone(repoUrl string, path string) {
+	fmt.Printf("gitClone(): [%s]\n", path)
+
 	cmd := exec.Command("git", "clone", repoUrl, path)
 	err := cmd.Run()
 	if err != nil {
@@ -46,6 +49,8 @@ func GitDiff(path string) string {
 }
 
 func gitApply(path string, patch string) {
+	fmt.Printf("gitApply(): [%s]\n", path)
+
 	tmpFile, err := ioutil.TempFile("", "patch")
 	if err != nil {
 		panic(err)
@@ -78,6 +83,8 @@ func gitGetLatestCommitHash(path string) string {
 }
 
 func gitPull(path string) bool {
+	fmt.Printf("gitPull(): [%s]\n", path)
+
 	oldHash := gitGetLatestCommitHash(path)
 
 	cmd := exec.Command("git", "pull", "--rebase", "--autostash")
@@ -90,6 +97,11 @@ func gitPull(path string) bool {
 
 	newHash := gitGetLatestCommitHash(path)
 	affected := oldHash != newHash
+
+	if affected {
+		fmt.Printf("Affected: [%s] -> [%s]\n", oldHash, newHash)
+	}
+
 	return affected
 }
 
@@ -103,6 +115,8 @@ func runCmd(dir, name string, args ...string) error {
 
 func gitWebBuild(path string) {
 	webDir := filepath.Join(path, "web")
+	fmt.Printf("gitWebBuild(): [%s]\n", webDir)
+
 	err := runCmd(webDir, "yarn", "install")
 	if err != nil {
 		panic(err)
