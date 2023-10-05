@@ -16,17 +16,13 @@ package run
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
-	"github.com/beego/beego"
+	"github.com/casbin/caswaf/util"
 )
-
-func GetSitePath(siteName string) string {
-	appDir := beego.AppConfig.String("appDir")
-	res := filepath.Join(appDir, siteName)
-	return res
-}
 
 func getOriginalName(name string) string {
 	tokens := strings.Split(name, "_")
@@ -42,5 +38,43 @@ func getRepoUrl(name string) string {
 		return "https://github.com/casdoor/casdoor"
 	} else {
 		return fmt.Sprintf("https://github.com/casbin/%s", name)
+	}
+}
+
+func ensureFileFolderExists(path string) {
+	if !util.FileExist(path) {
+		err := os.MkdirAll(path, os.ModePerm)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func updateBatFile(name string) {
+	fmt.Printf("Updating BAT file: [%s]\n", name)
+
+	batPath := getBatPath(name)
+	ensureFileFolderExists(filepath.Dir(batPath))
+	content := fmt.Sprintf("cd %s\ngo run main.go", GetRepoPath(name))
+	util.WriteStringToPath(content, batPath)
+}
+
+func updateShortcutFile(name string) {
+	fmt.Printf("Updating shortcut file: [%s]\n", name)
+
+	cmd := exec.Command("powershell", fmt.Sprintf("$s=(New-Object -COM WScript.Shell).CreateShortcut('%s');$s.TargetPath='%s';$s.Save()", getShortcutPath(name), getBatPath(name)))
+	err := cmd.Run()
+	if err != nil {
+		panic(err)
+	}
+}
+
+func startProcess(name string) {
+	fmt.Printf("Starting process: [%s]\n", name)
+
+	cmd := exec.Command("cmd", "/C", "start", "", getShortcutPath(name))
+	err := cmd.Run()
+	if err != nil {
+		panic(err)
 	}
 }

@@ -17,21 +17,23 @@ package run
 import "github.com/casbin/caswaf/util"
 
 func createRepo(siteName string) {
-	path := GetSitePath(siteName)
-	if util.FileExist(path) {
-		return
+	path := GetRepoPath(siteName)
+	if !util.FileExist(path) {
+		originalName := getOriginalName(siteName)
+		repoUrl := getRepoUrl(originalName)
+		gitClone(repoUrl, path)
+
+		if originalName == siteName {
+			return
+		}
+
+		originalPath := GetRepoPath(originalName)
+		patch := GitDiff(originalPath)
+
+		gitApply(path, patch)
 	}
 
-	originalName := getOriginalName(siteName)
-	repoUrl := getRepoUrl(originalName)
-	gitClone(repoUrl, path)
-
-	if originalName == siteName {
-		return
-	}
-
-	originalPath := GetSitePath(originalName)
-	patch := GitDiff(originalPath)
-
-	gitApply(path, patch)
+	updateBatFile(siteName)
+	updateShortcutFile(siteName)
+	startProcess(siteName)
 }

@@ -204,7 +204,7 @@ func (site *Site) checkNodes() {
 
 		version := getSiteVersion(site.Name)
 
-		path := run.GetSitePath(site.Name)
+		path := run.GetRepoPath(site.Name)
 		diff := run.GitDiff(path)
 
 		if node.Status != status || node.Message != msg || node.Version != version || node.Diff != diff {
