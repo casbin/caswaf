@@ -34,10 +34,13 @@ func monitorSites() {
 	}
 }
 
-func StartMonitorLoop() {
-	fmt.Printf("MonitorLoop Start!\n\n")
-	for {
-		monitorSites()
-		time.Sleep(5 * time.Minute)
-	}
+func StartMonitorSitesLoop() {
+	fmt.Printf("StartMonitorSitesLoop() Start!\n\n")
+	go func() {
+		for {
+			monitorSites()
+			time.Sleep(5 * time.Second)
+		}
+	}()
+
 }

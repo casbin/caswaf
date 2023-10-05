@@ -116,6 +116,16 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("general:Tag")}:
+          </Col>
+          <Col span={22} >
+            <Input value={this.state.site.tag} onChange={e => {
+              this.updateSiteField("tag", e.target.value);
+            }} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("site:Domain")}:
           </Col>
           <Col span={22} >

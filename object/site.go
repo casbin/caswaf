@@ -38,6 +38,7 @@ type Site struct {
 	UpdatedTime string `xorm:"varchar(100)" json:"updatedTime"`
 	DisplayName string `xorm:"varchar(100)" json:"displayName"`
 
+	Tag      string  `xorm:"varchar(100)" json:"tag"`
 	Domain   string  `xorm:"varchar(100)" json:"domain"`
 	Host     string  `xorm:"varchar(100)" json:"host"`
 	Port     int     `json:"port"`
@@ -66,7 +67,7 @@ func GetGlobalSites() []*Site {
 
 func GetSites(owner string) []*Site {
 	sites := []*Site{}
-	err := ormer.Engine.Desc("created_time").Find(&sites, &Site{Owner: owner})
+	err := ormer.Engine.Asc("tag").Asc("name").Desc("created_time").Find(&sites, &Site{Owner: owner})
 	if err != nil {
 		panic(err)
 	}

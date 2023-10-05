@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {message} from "antd";
+import {Tag, message} from "antd";
 import {isMobile as isMobileDevice} from "react-device-detect";
 import i18next from "i18next";
 import moment from "moment";
@@ -181,6 +181,26 @@ export function getAvatarColor(s) {
     random = -random;
   }
   return colorList[random % 4];
+}
+
+export function getTagColor(s) {
+  return "processing";
+}
+
+export function getTags(tags) {
+  const res = [];
+  if (!tags) {
+    return res;
+  }
+
+  tags.forEach((tag, i) => {
+    res.push(
+      <Tag color={getTagColor(tag)}>
+        {tag}
+      </Tag>
+    );
+  });
+  return res;
 }
 
 export function getLanguage() {

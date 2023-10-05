@@ -109,6 +109,13 @@ class SiteListPage extends React.Component {
 
     const columns = [
       {
+        title: i18next.t("general:Tag"),
+        dataIndex: "tag",
+        key: "tag",
+        width: "120px",
+        sorter: (a, b) => a.tag.localeCompare(b.tag),
+      },
+      {
         title: i18next.t("general:Name"),
         dataIndex: "name",
         key: "name",
@@ -161,11 +168,11 @@ class SiteListPage extends React.Component {
         title: i18next.t("site:Host"),
         dataIndex: "host",
         key: "host",
-        width: "180px",
+        width: "110px",
         sorter: (a, b) => a.host.localeCompare(b.host),
         render: (text, record, index) => {
           if (text === "") {
-            text = `http://localhost:${record.port}`;
+            text = `${record.port}`;
           }
 
           if (!record.isSelf) {
@@ -177,6 +184,16 @@ class SiteListPage extends React.Component {
               {text}
             </a>
           );
+        },
+      },
+      {
+        title: i18next.t("site:Nodes"),
+        dataIndex: "nodes",
+        key: "nodes",
+        // width: "200px",
+        sorter: (a, b) => a.nodes.localeCompare(b.nodes),
+        render: (text, record, index) => {
+          return Setting.getTags(record.nodes.map(node => node.name));
         },
       },
       // {
