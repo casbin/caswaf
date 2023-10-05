@@ -15,6 +15,7 @@
 package run
 
 import (
+	"path/filepath"
 	"strings"
 
 	"github.com/casbin/caswaf/util"
@@ -51,6 +52,18 @@ func CreateRepo(siteName string, needStart bool, diff string) int {
 				startProcess(siteName)
 				pid := getPid(siteName)
 				return pid
+			}
+		} else {
+			webIndex := filepath.Join(path, "web/build/index.html")
+			if !util.FileExist(webIndex) {
+				if strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2 {
+					index := getNameIndex(siteName)
+					if index == 0 {
+						gitWebBuild(path)
+					}
+				} else {
+					gitWebBuild(path)
+				}
 			}
 		}
 	}
