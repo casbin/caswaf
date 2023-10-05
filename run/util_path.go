@@ -24,6 +24,7 @@ import (
 )
 
 var username string
+var language string
 
 func init() {
 	usr, err := user.Current()
@@ -36,6 +37,8 @@ func init() {
 	if len(tokens) == 2 {
 		username = tokens[1]
 	}
+
+	language = beego.AppConfig.String("language")
 }
 
 func GetRepoPath(name string) string {
@@ -54,5 +57,5 @@ func getBatPath(name string) string {
 }
 
 func getShortcutPath(name string) string {
-	return fmt.Sprintf("C:/Users/%s/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/%s.bat - Shortcut.lnk", username, name)
+	return fmt.Sprintf("C:/Users/%s/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/%s.bat - %s.lnk", username, name, getShortcut())
 }

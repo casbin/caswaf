@@ -80,7 +80,7 @@ func gitGetLatestCommitHash(path string) string {
 func gitPull(path string) bool {
 	oldHash := gitGetLatestCommitHash(path)
 
-	cmd := exec.Command("git", "pull")
+	cmd := exec.Command("git", "pull", "--rebase", "--autostash")
 	cmd.Dir = path
 	out, err := cmd.CombinedOutput()
 	println(out)

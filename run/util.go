@@ -51,6 +51,14 @@ func getRepoUrl(name string) string {
 	}
 }
 
+func getShortcut() string {
+	res := "Shortcut"
+	if language != "en" {
+		res = "快捷方式"
+	}
+	return res
+}
+
 func ensureFileFolderExists(path string) {
 	if !util.FileExist(path) {
 		err := os.MkdirAll(path, os.ModePerm)
@@ -105,7 +113,7 @@ func startProcess(name string) {
 func stopProcess(name string) {
 	fmt.Printf("Stopping process: [%s]\n", name)
 
-	windowName := fmt.Sprintf("%s.bat - Shortcut", name)
+	windowName := fmt.Sprintf("%s.bat - %s", name, getShortcut())
 	// taskkill /IM "casdoor.bat - Shortcut" /F
 	// taskkill /F /FI "WINDOWTITLE eq casdoor.bat - Shortcut" /T
 	cmd := exec.Command("taskkill", "/F", "/FI", fmt.Sprintf("WINDOWTITLE eq %s", windowName), "/T")

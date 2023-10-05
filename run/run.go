@@ -30,19 +30,30 @@ func CreateRepo(siteName string, needStart bool, diff string) {
 		if strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2 {
 			index := getNameIndex(siteName)
 			updateAppConfFile(siteName, index)
+			if index == 0 {
+				gitWebBuild(path)
+			}
 		} else if diff != "" {
 			gitApply(path, diff)
+
+			gitWebBuild(path)
 		}
+
+		updateBatFile(siteName)
+		updateShortcutFile(siteName)
 	} else {
 		affected := gitPull(path)
 		if affected {
 			gitWebBuild(path)
+
+			if !needStart {
+				stopProcess(siteName)
+				startProcess(siteName)
+			}
 		}
 	}
 
 	if needStart {
-		updateBatFile(siteName)
-		updateShortcutFile(siteName)
 		startProcess(siteName)
 	}
 }
