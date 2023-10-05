@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import {Tag, message} from "antd";
+import React from "react";
 import {isMobile as isMobileDevice} from "react-device-detect";
 import i18next from "i18next";
 import moment from "moment";
@@ -266,4 +267,19 @@ export function getRepoUrl(name) {
   } else {
     return `https://github.com/casbin/${name}`;
   }
+}
+
+export function getVersionInfo(text, siteName) {
+  if (text === "") {
+    return null;
+  }
+
+  const versionInfo = JSON.parse(text);
+  const link = versionInfo?.version !== "" ? `${getRepoUrl(siteName)}/releases/tag/${versionInfo?.version}` : "";
+  let versionText = versionInfo?.version !== "" ? versionInfo?.version : "Unknown version";
+  if (versionInfo?.commitOffset > 0) {
+    versionText += ` (ahead+${versionInfo?.commitOffset})`;
+  }
+
+  return {text: versionText, link: link};
 }

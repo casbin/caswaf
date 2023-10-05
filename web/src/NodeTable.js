@@ -99,15 +99,9 @@ class NodeTable extends React.Component {
             return null;
           }
 
-          const versionInfo = JSON.parse(text);
-          const link = versionInfo?.version !== "" ? `${Setting.getRepoUrl(this.props.siteName)}/releases/tag/${versionInfo?.version}` : "";
-          let versionText = versionInfo?.version !== "" ? versionInfo?.version : "Unknown version";
-          if (versionInfo?.commitOffset > 0) {
-            versionText += ` (ahead+${versionInfo?.commitOffset})`;
-          }
-
+          const versionInfo = Setting.getVersionInfo(text, this.props.siteName);
           return (
-            <a target="_blank" rel="noreferrer" href={link}>{versionText}</a>
+            <a target="_blank" rel="noreferrer" href={versionInfo.link}>{versionInfo.text}</a>
           );
 
           // return (

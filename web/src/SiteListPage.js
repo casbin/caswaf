@@ -14,7 +14,7 @@
 
 import React from "react";
 import {Link} from "react-router-dom";
-import {Button, Col, Popconfirm, Row, Table} from "antd";
+import {Button, Col, Popconfirm, Row, Table, Tag} from "antd";
 import moment from "moment";
 import * as Setting from "./Setting";
 import * as SiteBackend from "./backend/SiteBackend";
@@ -194,7 +194,24 @@ class SiteListPage extends React.Component {
         // width: "200px",
         sorter: (a, b) => a.nodes.localeCompare(b.nodes),
         render: (text, record, index) => {
-          return Setting.getTags(record.nodes.map(node => node.name));
+          return record.nodes.map(node => {
+            const versionInfo = Setting.getVersionInfo(node.version, record.name);
+            if (versionInfo === null) {
+              return (
+                <Tag key={node.name} color={"processing"}>
+                  {node.name}
+                </Tag>
+              );
+            } else {
+              return (
+                <a key={node.name} target="_blank" rel="noreferrer" href={versionInfo.link}>
+                  <Tag color={"processing"}>
+                    {`${node.name} (${versionInfo.text})`}
+                  </Tag>
+                </a>
+              );
+            }
+          });
         },
       },
       // {

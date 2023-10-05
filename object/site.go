@@ -48,7 +48,7 @@ type Site struct {
 	PublicIp string  `xorm:"varchar(100)" json:"publicIp"`
 	Node     string  `xorm:"varchar(100)" json:"node"`
 	IsSelf   bool    `json:"isSelf"`
-	Nodes    []*Node `json:"nodes"`
+	Nodes    []*Node `xorm:"mediumtext" json:"nodes"`
 
 	CasdoorApplication string `xorm:"varchar(100)" json:"casdoorApplication"`
 
