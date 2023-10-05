@@ -250,7 +250,17 @@ export function isResponseDenied(data) {
   return false;
 }
 
+function getOriginalName(name) {
+  const tokens = name.split("_");
+  if (tokens.length > 0) {
+    return tokens[0];
+  } else {
+    return name;
+  }
+}
+
 export function getRepoUrl(name) {
+  name = getOriginalName(name);
   if (name === "casdoor") {
     return "https://github.com/casdoor/casdoor";
   } else {

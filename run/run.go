@@ -33,6 +33,8 @@ func CreateRepo(siteName string, needStart bool, diff string) {
 		} else if diff != "" {
 			gitApply(path, diff)
 		}
+	} else {
+		gitPull(path)
 	}
 
 	if needStart {

@@ -65,3 +65,13 @@ func gitApply(path string, patch string) {
 		panic(err)
 	}
 }
+
+func gitPull(path string) {
+	cmd := exec.Command("git", "pull")
+	cmd.Dir = path
+	out, err := cmd.CombinedOutput()
+	println(out)
+	if err != nil {
+		panic(err)
+	}
+}
