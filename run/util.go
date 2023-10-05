@@ -15,7 +15,6 @@
 package run
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -103,16 +102,15 @@ func startProcess(name string) {
 	}
 }
 
-func isProcessActive(name string) bool {
+func stopProcess(name string) {
+	fmt.Printf("Stopping process: [%s]\n", name)
+
 	windowName := fmt.Sprintf("%s.bat - Shortcut", name)
-	cmd := exec.Command("cmd", "/C", "tasklist", "/v", "|", "findstr", windowName)
-	var out bytes.Buffer
-	cmd.Stdout = &out
+	// taskkill /IM "casdoor.bat - Shortcut" /F
+	// taskkill /F /FI "WINDOWTITLE eq casdoor.bat - Shortcut" /T
+	cmd := exec.Command("taskkill", "/F", "/FI", fmt.Sprintf("WINDOWTITLE eq %s", windowName), "/T")
 	err := cmd.Run()
 	if err != nil {
 		panic(err)
 	}
-
-	res := out.String() != ""
-	return res
 }

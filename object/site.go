@@ -40,6 +40,7 @@ type Site struct {
 
 	Domain   string  `xorm:"varchar(100)" json:"domain"`
 	Host     string  `xorm:"varchar(100)" json:"host"`
+	Port     int     `json:"port"`
 	SslMode  string  `xorm:"varchar(100)" json:"sslMode"`
 	SslCert  string  `xorm:"varchar(100)" json:"sslCert"`
 	PublicIp string  `xorm:"varchar(100)" json:"publicIp"`
@@ -188,6 +189,19 @@ func (site *Site) GetId() string {
 	return fmt.Sprintf("%s/%s", site.Owner, site.Name)
 }
 
+func (site *Site) GetHost() string {
+	if site.Host != "" {
+		return site.Host
+	}
+
+	if site.Port == 0 {
+		return ""
+	}
+
+	res := fmt.Sprintf("http://localhost:%d", site.Port)
+	return res
+}
+
 func (site *Site) checkNodes() {
 	hostname := util.GetHostname()
 	for i, node := range site.Nodes {
@@ -195,28 +209,33 @@ func (site *Site) checkNodes() {
 			continue
 		}
 
-		if site.Host == "" {
+		if site.GetHost() == "" {
 			continue
 		}
 
-		ok, msg := pingUrl(site.Host)
+		ok, msg := pingUrl(site.GetHost())
 		status := "Running"
 		if !ok {
 			status = "Stopped"
 		}
 
-		run.CreateRepo(site.Name)
+		diff := ""
+		if i != 0 {
+			diff = site.Nodes[0].Diff
+		}
+
+		run.CreateRepo(site.Name, !ok, diff)
 
 		version := getSiteVersion(site.Name)
 
 		path := run.GetRepoPath(site.Name)
-		diff := run.GitDiff(path)
+		newDiff := run.GitDiff(path)
 
-		if node.Status != status || node.Message != msg || node.Version != version || node.Diff != diff {
+		if node.Status != status || node.Message != msg || node.Version != version || node.Diff != newDiff {
 			site.Nodes[i].Status = status
 			site.Nodes[i].Message = msg
 			site.Nodes[i].Version = version
-			site.Nodes[i].Diff = diff
+			site.Nodes[i].Diff = newDiff
 			UpdateSite(site.GetId(), site)
 		}
 	}

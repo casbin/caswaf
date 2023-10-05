@@ -20,7 +20,7 @@ import (
 	"github.com/casbin/caswaf/util"
 )
 
-func CreateRepo(siteName string, needStart bool) {
+func CreateRepo(siteName string, needStart bool, diff string) {
 	path := GetRepoPath(siteName)
 	if !util.FileExist(path) {
 		originalName := getOriginalName(siteName)
@@ -30,10 +30,8 @@ func CreateRepo(siteName string, needStart bool) {
 		if strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2 {
 			index := getNameIndex(siteName)
 			updateAppConfFile(siteName, index)
-		} else if originalName != siteName {
-			originalPath := GetRepoPath(originalName)
-			patch := GitDiff(originalPath)
-			gitApply(path, patch)
+		} else if diff != "" {
+			gitApply(path, diff)
 		}
 	}
 
