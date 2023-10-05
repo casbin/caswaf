@@ -15,10 +15,12 @@
 package run
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/beego/beego"
@@ -53,6 +55,7 @@ func getRepoUrl(name string) string {
 
 func getShortcut() string {
 	res := "Shortcut"
+	language := beego.AppConfig.String("language")
 	if language != "en" {
 		res = "快捷方式"
 	}
@@ -121,4 +124,18 @@ func stopProcess(name string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func IsProcessActive(pid int) bool {
+	cmd := exec.Command("tasklist", "/FI", fmt.Sprintf("PID eq %d", pid))
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		return false
+	}
+
+	output := out.String()
+	res := strings.Contains(output, strconv.Itoa(pid))
+	return res
 }

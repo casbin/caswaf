@@ -20,7 +20,7 @@ import (
 	"github.com/casbin/caswaf/util"
 )
 
-func CreateRepo(siteName string, needStart bool, diff string) {
+func CreateRepo(siteName string, needStart bool, diff string) int {
 	path := GetRepoPath(siteName)
 	if !util.FileExist(path) {
 		originalName := getOriginalName(siteName)
@@ -49,11 +49,17 @@ func CreateRepo(siteName string, needStart bool, diff string) {
 			if !needStart {
 				stopProcess(siteName)
 				startProcess(siteName)
+				pid := getPid(siteName)
+				return pid
 			}
 		}
 	}
 
 	if needStart {
 		startProcess(siteName)
+		pid := getPid(siteName)
+		return pid
 	}
+
+	return 0
 }

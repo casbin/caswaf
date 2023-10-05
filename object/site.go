@@ -27,6 +27,7 @@ type Node struct {
 	Name    string `json:"name"`
 	Version string `json:"version"`
 	Diff    string `json:"diff"`
+	Pid     int    `json:"pid"`
 	Status  string `json:"status"`
 	Message string `json:"message"`
 }
@@ -217,6 +218,11 @@ func (site *Site) checkNodes() {
 		ok, msg := pingUrl(site.GetHost())
 		status := "Running"
 		if !ok {
+			if node.Pid > 0 {
+				ok = run.IsProcessActive(node.Pid)
+			}
+		}
+		if !ok {
 			status = "Stopped"
 		}
 
@@ -225,18 +231,22 @@ func (site *Site) checkNodes() {
 			diff = site.Nodes[0].Diff
 		}
 
-		run.CreateRepo(site.Name, !ok, diff)
+		pid := run.CreateRepo(site.Name, !ok, diff)
+		if pid == 0 {
+			pid = node.Pid
+		}
 
 		version := getSiteVersion(site.Name)
 
 		path := run.GetRepoPath(site.Name)
 		newDiff := run.GitDiff(path)
 
-		if node.Status != status || node.Message != msg || node.Version != version || node.Diff != newDiff {
-			site.Nodes[i].Status = status
-			site.Nodes[i].Message = msg
+		if node.Status != status || node.Message != msg || node.Version != version || node.Diff != newDiff || node.Pid != pid {
 			site.Nodes[i].Version = version
 			site.Nodes[i].Diff = newDiff
+			site.Nodes[i].Pid = pid
+			site.Nodes[i].Status = status
+			site.Nodes[i].Message = msg
 			UpdateSite(site.GetId(), site)
 		}
 	}

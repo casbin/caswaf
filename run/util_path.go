@@ -24,7 +24,6 @@ import (
 )
 
 var username string
-var language string
 
 func init() {
 	usr, err := user.Current()
@@ -37,8 +36,6 @@ func init() {
 	if len(tokens) == 2 {
 		username = tokens[1]
 	}
-
-	language = beego.AppConfig.String("language")
 }
 
 func GetRepoPath(name string) string {

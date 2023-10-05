@@ -138,6 +138,19 @@ class NodeTable extends React.Component {
         },
       },
       {
+        title: "Pid",
+        dataIndex: "pid",
+        key: "pid",
+        width: "110px",
+        render: (text, record, index) => {
+          if (text === 0) {
+            return null;
+          } else {
+            return text;
+          }
+        },
+      },
+      {
         title: "Status",
         dataIndex: "status",
         key: "status",
