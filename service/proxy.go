@@ -90,13 +90,13 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if site.Host != r.Host && site.NeedRedirect {
-		redirectToHost(w, r, site.Host)
-	}
-
 	hostNonWww := getHostNonWww(r.Host)
 	if hostNonWww != "" {
 		redirectToHost(w, r, hostNonWww)
+	}
+
+	if site.Domain != r.Host && site.NeedRedirect {
+		redirectToHost(w, r, site.Domain)
 	}
 
 	if site.Node == "" {
