@@ -38,6 +38,7 @@ func StartMonitorSitesLoop() {
 	fmt.Printf("StartMonitorSitesLoop() Start!\n\n")
 	go func() {
 		for {
+			refreshSiteMap()
 			monitorSites()
 			time.Sleep(5 * time.Second)
 		}

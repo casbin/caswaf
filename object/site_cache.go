@@ -14,7 +14,11 @@
 
 package object
 
-import "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
+import (
+	"fmt"
+
+	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
+)
 
 var siteMap = map[string]*Site{}
 
@@ -22,25 +26,28 @@ func InitSiteMap() {
 	refreshSiteMap()
 }
 
-func getCertMap() map[string]*casdoorsdk.Cert {
+func getCertMap() (map[string]*casdoorsdk.Cert, error) {
 	certs, err := casdoorsdk.GetCerts()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	res := map[string]*casdoorsdk.Cert{}
 	for _, cert := range certs {
 		res[cert.Name] = cert
 	}
-	return res
+	return res, nil
 }
 
-func getApplicationMap() map[string]*casdoorsdk.Application {
-	certMap := getCertMap()
+func getApplicationMap() (map[string]*casdoorsdk.Application, error) {
+	certMap, err := getCertMap()
+	if err != nil {
+		return nil, err
+	}
 
 	applications, err := casdoorsdk.GetOrganizationApplications()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	res := map[string]*casdoorsdk.Application{}
@@ -53,13 +60,17 @@ func getApplicationMap() map[string]*casdoorsdk.Application {
 
 		res[application.Name] = application
 	}
-	return res
+	return res, nil
 }
 
 func refreshSiteMap() {
 	siteMap = map[string]*Site{}
 
-	applicationMap := getApplicationMap()
+	applicationMap, err := getApplicationMap()
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	sites := GetGlobalSites()
 	for _, site := range sites {
 		if _, ok := siteMap[site.Domain]; !ok {
@@ -67,9 +78,11 @@ func refreshSiteMap() {
 				site.SslCertObj = getCert("admin", site.SslCert)
 			}
 
-			if site.CasdoorApplication != "" && site.ApplicationObj == nil {
-				if v, ok2 := applicationMap[site.CasdoorApplication]; ok2 {
-					site.ApplicationObj = v
+			if applicationMap != nil {
+				if site.CasdoorApplication != "" && site.ApplicationObj == nil {
+					if v, ok2 := applicationMap[site.CasdoorApplication]; ok2 {
+						site.ApplicationObj = v
+					}
 				}
 			}
 
