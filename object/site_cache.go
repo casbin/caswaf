@@ -69,6 +69,7 @@ func refreshSiteMap() {
 		fmt.Println(err)
 	}
 
+	newSiteMap := map[string]*Site{}
 	sites := GetGlobalSites()
 	for _, site := range sites {
 		if site.SslCert != "" {
@@ -90,13 +91,15 @@ func refreshSiteMap() {
 			}(site)
 		}
 
-		siteMap[site.Domain] = site
+		newSiteMap[site.Domain] = site
 		for _, domain := range site.OtherDomains {
 			if domain != "" {
-				siteMap[domain] = site
+				newSiteMap[domain] = site
 			}
 		}
 	}
+
+	siteMap = newSiteMap
 }
 
 func GetSiteByDomain(domain string) *Site {
