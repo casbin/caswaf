@@ -64,8 +64,6 @@ func getApplicationMap() (map[string]*casdoorsdk.Application, error) {
 }
 
 func refreshSiteMap() {
-	siteMap = map[string]*Site{}
-
 	applicationMap, err := getApplicationMap()
 	if err != nil {
 		fmt.Println(err)
