@@ -50,6 +50,7 @@ class SiteListPage extends React.Component {
       createdTime: moment().format(),
       displayName: `New Site - ${randomName}`,
       domain: "door.casdoor.com",
+      otherDomains: [],
       host: "",
       port: 8000,
       sslMode: "HTTP",
@@ -166,6 +167,24 @@ class SiteListPage extends React.Component {
         },
       },
       {
+        title: i18next.t("site:Other domains"),
+        dataIndex: "otherDomains",
+        key: "otherDomains",
+        width: "120px",
+        sorter: (a, b) => a.otherDomains.localeCompare(b.otherDomains),
+        render: (text, record, index) => {
+          return record.otherDomains.map(domain => {
+            return (
+              <a key={domain} target="_blank" rel="noreferrer" href={`https://${domain}`}>
+                <Tag color={"processing"}>
+                  {domain}
+                </Tag>
+              </a>
+            );
+          });
+        },
+      },
+      {
         title: i18next.t("site:Host"),
         dataIndex: "host",
         key: "host",
@@ -267,7 +286,7 @@ class SiteListPage extends React.Component {
         title: i18next.t("site:Casdoor app"),
         dataIndex: "casdoorApplication",
         key: "casdoorApplication",
-        width: "150px",
+        width: "140px",
         sorter: (a, b) => a.casdoorApplication.localeCompare(b.casdoorApplication),
         render: (text, record, index) => {
           if (text === "") {

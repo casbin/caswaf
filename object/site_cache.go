@@ -71,27 +71,30 @@ func refreshSiteMap() {
 
 	sites := GetGlobalSites()
 	for _, site := range sites {
-		if _, ok := siteMap[site.Domain]; !ok {
-			if site.SslCert != "" {
-				site.SslCertObj = getCert("admin", site.SslCert)
-			}
+		if site.SslCert != "" {
+			site.SslCertObj = getCert("admin", site.SslCert)
+		}
 
-			if applicationMap != nil {
-				if site.CasdoorApplication != "" && site.ApplicationObj == nil {
-					if v, ok2 := applicationMap[site.CasdoorApplication]; ok2 {
-						site.ApplicationObj = v
-					}
+		if applicationMap != nil {
+			if site.CasdoorApplication != "" && site.ApplicationObj == nil {
+				if v, ok2 := applicationMap[site.CasdoorApplication]; ok2 {
+					site.ApplicationObj = v
 				}
 			}
+		}
 
-			if site.Domain != "" && site.PublicIp == "" {
-				go func(site *Site) {
-					site.PublicIp = resolveDomainToIp(site.Domain)
-					UpdateSiteNoRefresh(site.GetId(), site)
-				}(site)
+		if site.Domain != "" && site.PublicIp == "" {
+			go func(site *Site) {
+				site.PublicIp = resolveDomainToIp(site.Domain)
+				UpdateSiteNoRefresh(site.GetId(), site)
+			}(site)
+		}
+
+		siteMap[site.Domain] = site
+		for _, domain := range site.OtherDomains {
+			if domain != "" {
+				siteMap[domain] = site
 			}
-
-			siteMap[site.Domain] = site
 		}
 	}
 }

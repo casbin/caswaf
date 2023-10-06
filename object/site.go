@@ -39,16 +39,17 @@ type Site struct {
 	UpdatedTime string `xorm:"varchar(100)" json:"updatedTime"`
 	DisplayName string `xorm:"varchar(100)" json:"displayName"`
 
-	Tag      string  `xorm:"varchar(100)" json:"tag"`
-	Domain   string  `xorm:"varchar(100)" json:"domain"`
-	Host     string  `xorm:"varchar(100)" json:"host"`
-	Port     int     `json:"port"`
-	SslMode  string  `xorm:"varchar(100)" json:"sslMode"`
-	SslCert  string  `xorm:"varchar(100)" json:"sslCert"`
-	PublicIp string  `xorm:"varchar(100)" json:"publicIp"`
-	Node     string  `xorm:"varchar(100)" json:"node"`
-	IsSelf   bool    `json:"isSelf"`
-	Nodes    []*Node `xorm:"mediumtext" json:"nodes"`
+	Tag          string   `xorm:"varchar(100)" json:"tag"`
+	Domain       string   `xorm:"varchar(100)" json:"domain"`
+	OtherDomains []string `xorm:"varchar(500)" json:"otherDomains"`
+	Host         string   `xorm:"varchar(100)" json:"host"`
+	Port         int      `json:"port"`
+	SslMode      string   `xorm:"varchar(100)" json:"sslMode"`
+	SslCert      string   `xorm:"varchar(100)" json:"sslCert"`
+	PublicIp     string   `xorm:"varchar(100)" json:"publicIp"`
+	Node         string   `xorm:"varchar(100)" json:"node"`
+	IsSelf       bool     `json:"isSelf"`
+	Nodes        []*Node  `xorm:"mediumtext" json:"nodes"`
 
 	CasdoorApplication string `xorm:"varchar(100)" json:"casdoorApplication"`
 
