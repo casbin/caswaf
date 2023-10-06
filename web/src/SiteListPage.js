@@ -51,6 +51,7 @@ class SiteListPage extends React.Component {
       displayName: `New Site - ${randomName}`,
       domain: "door.casdoor.com",
       otherDomains: [],
+      needRedirect: false,
       host: "",
       port: 8000,
       sslMode: "HTTP",
@@ -176,7 +177,7 @@ class SiteListPage extends React.Component {
           return record.otherDomains.map(domain => {
             return (
               <a key={domain} target="_blank" rel="noreferrer" href={`https://${domain}`}>
-                <Tag color={"processing"}>
+                <Tag color={record.needRedirect ? "default" : "processing"}>
                   {domain}
                 </Tag>
               </a>

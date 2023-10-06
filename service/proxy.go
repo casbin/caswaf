@@ -69,7 +69,7 @@ func redirectToHttps(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, targetUrl, http.StatusMovedPermanently)
 }
 
-func redirectToNonWww(w http.ResponseWriter, r *http.Request, host string) {
+func redirectToHost(w http.ResponseWriter, r *http.Request, host string) {
 	protocol := "https"
 	if r.TLS == nil {
 		protocol = "http"
@@ -90,9 +90,13 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if site.Host != r.Host && site.NeedRedirect {
+		redirectToHost(w, r, site.Host)
+	}
+
 	hostNonWww := getHostNonWww(r.Host)
 	if hostNonWww != "" {
-		redirectToNonWww(w, r, hostNonWww)
+		redirectToHost(w, r, hostNonWww)
 	}
 
 	if site.Node == "" {

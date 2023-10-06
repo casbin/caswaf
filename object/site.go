@@ -42,6 +42,7 @@ type Site struct {
 	Tag          string   `xorm:"varchar(100)" json:"tag"`
 	Domain       string   `xorm:"varchar(100)" json:"domain"`
 	OtherDomains []string `xorm:"varchar(500)" json:"otherDomains"`
+	NeedRedirect bool     `json:"needRedirect"`
 	Host         string   `xorm:"varchar(100)" json:"host"`
 	Port         int      `json:"port"`
 	SslMode      string   `xorm:"varchar(100)" json:"sslMode"`

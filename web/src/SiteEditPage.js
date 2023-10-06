@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from "react";
-import {Button, Card, Col, Input, InputNumber, Row, Select} from "antd";
+import {Button, Card, Col, Input, InputNumber, Row, Select, Switch} from "antd";
 import {LinkOutlined} from "@ant-design/icons";
 import * as SiteBackend from "./backend/SiteBackend";
 import * as CertBackend from "./backend/CertBackend";
@@ -144,6 +144,16 @@ class SiteEditPage extends React.Component {
                 this.state.site.otherDomains?.map((item, index) => <Option key={index} value={item}>{item}</Option>)
               }
             </Select>
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("site:Need redirect")}:
+          </Col>
+          <Col span={1} >
+            <Switch checked={this.state.site.needRedirect} onChange={checked => {
+              this.updateSiteField("needRedirect", checked);
+            }} />
           </Col>
         </Row>
         <Row style={{marginTop: "20px"}} >
