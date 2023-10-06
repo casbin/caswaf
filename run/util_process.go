@@ -66,6 +66,8 @@ func getBatNamesFromOutput(output string) map[string]int {
 }
 
 func getPid(name string) int {
+	name = getMappedName(name)
+
 	// wmic process where (name="cmd.exe") get CommandLine, ProcessID
 	cmd := exec.Command("wmic", "process", "where", "name='cmd.exe'", "get", "CommandLine,ProcessID")
 	out, err := cmd.CombinedOutput()

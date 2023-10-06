@@ -15,6 +15,7 @@
 package run
 
 import (
+	"encoding/json"
 	"fmt"
 	"os/user"
 	"path/filepath"
@@ -24,6 +25,7 @@ import (
 )
 
 var username string
+var appMap = map[string]string{}
 
 func init() {
 	usr, err := user.Current()
@@ -38,21 +40,49 @@ func init() {
 	}
 }
 
+func InitAppMap() {
+	res := beego.AppConfig.String("appMap")
+	if res != "" {
+		err := json.Unmarshal([]byte(res), &appMap)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func getMappedName(name string) string {
+	for k, v := range appMap {
+		if v != "cc" {
+			if name == k {
+				return v
+			}
+		} else {
+			name = strings.Replace(name, k, v, 1)
+			return name
+		}
+	}
+	return name
+}
+
 func GetRepoPath(name string) string {
+	name = getMappedName(name)
 	appDir := beego.AppConfig.String("appDir")
 	res := filepath.Join(appDir, name)
 	return res
 }
 
 func getCodeAppConfPath(name string) string {
+	name = getMappedName(name)
 	appDir := beego.AppConfig.String("appDir")
 	return fmt.Sprintf("%s/%s/conf/app.conf", appDir, name)
 }
 
 func getBatPath(name string) string {
+	name = getMappedName(name)
 	return fmt.Sprintf("C:/Users/%s/Desktop/run/%s.bat", username, name)
 }
 
 func getShortcutPath(name string) string {
+	name = getMappedName(name)
 	return fmt.Sprintf("C:/Users/%s/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/%s.bat - %s.lnk", username, name, getShortcut())
 }

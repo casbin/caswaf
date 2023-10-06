@@ -19,6 +19,7 @@ import (
 	"github.com/beego/beego/plugins/cors"
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/routers"
+	"github.com/casbin/caswaf/run"
 	"github.com/casbin/caswaf/service"
 )
 
@@ -27,6 +28,7 @@ func main() {
 	object.InitAdapter()
 	object.CreateTables()
 	object.InitSiteMap()
+	run.InitAppMap()
 	object.StartMonitorSitesLoop()
 
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
