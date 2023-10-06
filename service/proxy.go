@@ -55,14 +55,38 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 	proxy.ServeHTTP(writer, request)
 }
 
+func getHostNonWww(host string) string {
+	res := ""
+	tokens := strings.Split(host, ".")
+	if len(tokens) > 2 && tokens[0] == "www" {
+		res = strings.Join(tokens[1:], ".")
+	}
+	return res
+}
+
 func redirectToHttps(w http.ResponseWriter, r *http.Request) {
-	httpsUrl := fmt.Sprintf("https://%s", joinPath(r.Host, r.RequestURI))
-	http.Redirect(w, r, httpsUrl, http.StatusMovedPermanently)
+	targetUrl := fmt.Sprintf("https://%s", joinPath(r.Host, r.RequestURI))
+	http.Redirect(w, r, targetUrl, http.StatusMovedPermanently)
+}
+
+func redirectToNonWww(w http.ResponseWriter, r *http.Request, host string) {
+	protocol := "https"
+	if r.TLS == nil {
+		protocol = "http"
+	}
+
+	targetUrl := fmt.Sprintf("%s://%s", protocol, joinPath(host, r.RequestURI))
+	http.Redirect(w, r, targetUrl, http.StatusMovedPermanently)
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
 	if !strings.Contains(r.UserAgent(), "Uptime-Kuma") {
 		fmt.Printf("handleRequest: %s\t%s\t%s\t%s\t%s\n", r.RemoteAddr, r.Method, r.Host, r.RequestURI, r.UserAgent())
+	}
+
+	hostNonWww := getHostNonWww(r.Host)
+	if hostNonWww != "" {
+		redirectToNonWww(w, r, hostNonWww)
 	}
 
 	site := object.GetSiteByDomain(r.Host)
