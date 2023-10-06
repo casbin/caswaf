@@ -46,8 +46,18 @@ func responseError(w http.ResponseWriter, format string, a ...interface{}) {
 	}
 }
 
-func getCertificateForDomain(domain string) (*tls.Certificate, error) {
+func getSiteByDomainWithWww(domain string) *object.Site {
+	hostNonWww := getHostNonWww(domain)
+	if hostNonWww != "" {
+		domain = hostNonWww
+	}
+
 	site := object.GetSiteByDomain(domain)
+	return site
+}
+
+func getCertificateForDomain(domain string) (*tls.Certificate, error) {
+	site := getSiteByDomainWithWww(domain)
 	if site == nil {
 		return nil, fmt.Errorf("getCertificateForDomain() error: site not found for domain: [%s]", domain)
 	}

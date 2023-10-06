@@ -19,7 +19,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/casbin/caswaf/object"
 	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
 
@@ -42,7 +41,7 @@ func redirectToCasdoor(casdoorClient *casdoorsdk.Client, w http.ResponseWriter, 
 }
 
 func handleAuthCallback(w http.ResponseWriter, r *http.Request) {
-	site := object.GetSiteByDomain(r.Host)
+	site := getSiteByDomainWithWww(r.Host)
 	if site == nil {
 		responseError(w, "CasWAF error: site not found for host: %s", r.Host)
 		return

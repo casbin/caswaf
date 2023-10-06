@@ -84,15 +84,15 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("handleRequest: %s\t%s\t%s\t%s\t%s\n", r.RemoteAddr, r.Method, r.Host, r.RequestURI, r.UserAgent())
 	}
 
-	hostNonWww := getHostNonWww(r.Host)
-	if hostNonWww != "" {
-		redirectToNonWww(w, r, hostNonWww)
-	}
-
-	site := object.GetSiteByDomain(r.Host)
+	site := getSiteByDomainWithWww(r.Host)
 	if site == nil {
 		responseError(w, "CasWAF error: site not found for host: %s", r.Host)
 		return
+	}
+
+	hostNonWww := getHostNonWww(r.Host)
+	if hostNonWww != "" {
+		redirectToNonWww(w, r, hostNonWww)
 	}
 
 	if site.Node == "" {
