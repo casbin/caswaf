@@ -14,7 +14,7 @@
 
 import React from "react";
 import {Link} from "react-router-dom";
-import {Button, Col, Popconfirm, Row, Table, Tag} from "antd";
+import {Button, Col, Popconfirm, Row, Table, Tag, Tooltip} from "antd";
 import moment from "moment";
 import * as Setting from "./Setting";
 import * as SiteBackend from "./backend/SiteBackend";
@@ -216,19 +216,33 @@ class SiteListPage extends React.Component {
         render: (text, record, index) => {
           return record.nodes.map(node => {
             const versionInfo = Setting.getVersionInfo(node.version, record.name);
-            if (versionInfo === null) {
-              return (
-                <Tag key={node.name} color={"processing"}>
-                  {node.name}
-                </Tag>
-              );
+            const color = node.message === "" ? "processing" : "error";
+
+            const getTag = () => {
+              if (versionInfo === null) {
+                return (
+                  <Tag key={node.name} color={color}>
+                    {node.name}
+                  </Tag>
+                );
+              } else {
+                return (
+                  <a key={node.name} target="_blank" rel="noreferrer" href={versionInfo.link}>
+                    <Tag color={color}>
+                      {`${node.name} (${versionInfo.text})`}
+                    </Tag>
+                  </a>
+                );
+              }
+            };
+
+            if (node.message === "") {
+              return getTag();
             } else {
               return (
-                <a key={node.name} target="_blank" rel="noreferrer" href={versionInfo.link}>
-                  <Tag color={"processing"}>
-                    {`${node.name} (${versionInfo.text})`}
-                  </Tag>
-                </a>
+                <Tooltip key={node.name} title={node.message}>
+                  {getTag()}
+                </Tooltip>
               );
             }
           });
