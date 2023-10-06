@@ -56,7 +56,10 @@ func getMappedName(name string) string {
 			if name == k {
 				return v
 			}
-		} else {
+		}
+	}
+	for k, v := range appMap {
+		if v == "cc" {
 			name = strings.Replace(name, k, v, 1)
 			return name
 		}
