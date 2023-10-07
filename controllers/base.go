@@ -37,6 +37,16 @@ func GetUserName(user *casdoorsdk.User) string {
 	return user.Name
 }
 
+func wrapActionResponse(affected bool, e ...error) *Response {
+	if len(e) != 0 && e[0] != nil {
+		return &Response{Status: "error", Msg: e[0].Error()}
+	} else if affected {
+		return &Response{Status: "ok", Msg: "", Data: "Affected"}
+	} else {
+		return &Response{Status: "ok", Msg: "", Data: "Unaffected"}
+	}
+}
+
 func (c *ApiController) GetSessionClaims() *casdoorsdk.Claims {
 	s := c.GetSession("user")
 	if s == nil {

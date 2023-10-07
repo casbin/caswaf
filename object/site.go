@@ -58,48 +58,50 @@ type Site struct {
 	ApplicationObj *casdoorsdk.Application `xorm:"-" json:"applicationObj"`
 }
 
-func GetGlobalSites() []*Site {
+func GetGlobalSites() ([]*Site, error) {
 	sites := []*Site{}
 	err := ormer.Engine.Asc("owner").Desc("created_time").Find(&sites)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return sites
+	return sites, nil
 }
 
-func GetSites(owner string) []*Site {
+func GetSites(owner string) ([]*Site, error) {
 	sites := []*Site{}
 	err := ormer.Engine.Asc("tag").Asc("name").Desc("created_time").Find(&sites, &Site{Owner: owner})
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	for _, site := range sites {
 		if site.SslCert == "" && site.Domain != "" && (site.SslMode == "HTTPS and HTTP" || site.SslMode == "HTTPS Only") {
 			site.SslCert = getBaseDomain(site.Domain)
-			UpdateSite(site.GetId(), site)
+			_, err := UpdateSite(site.GetId(), site)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	return sites
+	return sites, nil
 }
 
-func getSite(owner string, name string) *Site {
+func getSite(owner string, name string) (*Site, error) {
 	site := Site{Owner: owner, Name: name}
 	existed, err := ormer.Engine.Get(&site)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if existed {
-		return &site
-	} else {
-		return nil
+		return &site, nil
 	}
+	return nil, nil
 }
 
-func GetSite(id string) *Site {
+func GetSite(id string) (*Site, error) {
 	owner, name := util.GetOwnerAndNameFromId(id)
 	return getSite(owner, name)
 }
@@ -128,65 +130,77 @@ func GetMaskedSites(sites []*Site, node string) []*Site {
 	return sites
 }
 
-func UpdateSite(id string, site *Site) bool {
+func UpdateSite(id string, site *Site) (bool, error) {
 	owner, name := util.GetOwnerAndNameFromId(id)
-	if getSite(owner, name) == nil {
-		return false
+	if s, err := getSite(owner, name); err != nil {
+		return false, err
+	} else if s == nil {
+		return false, nil
 	}
 
 	site.UpdatedTime = util.GetCurrentTime()
 
 	_, err := ormer.Engine.ID(core.PK{owner, name}).AllCols().Update(site)
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
-	refreshSiteMap()
+	err = refreshSiteMap()
+	if err != nil {
+		return false, err
+	}
+
 	site.checkNodes()
 
-	//return affected != 0
-	return true
+	return true, nil
 }
 
-func UpdateSiteNoRefresh(id string, site *Site) bool {
+func UpdateSiteNoRefresh(id string, site *Site) (bool, error) {
 	owner, name := util.GetOwnerAndNameFromId(id)
-	if getSite(owner, name) == nil {
-		return false
+	if s, err := getSite(owner, name); err != nil {
+		return false, err
+	} else if s == nil {
+		return false, nil
 	}
 
 	_, err := ormer.Engine.ID(core.PK{owner, name}).AllCols().Update(site)
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
-	//return affected != 0
-	return true
+	return true, nil
 }
 
-func AddSite(site *Site) bool {
+func AddSite(site *Site) (bool, error) {
 	affected, err := ormer.Engine.Insert(site)
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
 	if affected != 0 {
-		refreshSiteMap()
+		err = refreshSiteMap()
+		if err != nil {
+			return false, err
+		}
 	}
 
-	return affected != 0
+	return affected != 0, nil
 }
 
-func DeleteSite(site *Site) bool {
+func DeleteSite(site *Site) (bool, error) {
 	affected, err := ormer.Engine.ID(core.PK{site.Owner, site.Name}).Delete(&Site{})
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
 	if affected != 0 {
-		refreshSiteMap()
+		err = refreshSiteMap()
+		if err != nil {
+			return false, err
+		}
 	}
 
-	return affected != 0
+	return affected != 0, nil
 }
 
 func (site *Site) GetId() string {

@@ -21,8 +21,12 @@ import (
 
 var siteUpdateMap = map[string]string{}
 
-func monitorSites() {
-	sites := GetGlobalSites()
+func monitorSites() error {
+	sites, err := GetGlobalSites()
+	if err != nil {
+		return err
+	}
+
 	for _, site := range sites {
 		updatedTime, ok := siteUpdateMap[site.GetId()]
 		if ok && updatedTime != "" && updatedTime == site.UpdatedTime {
@@ -32,14 +36,26 @@ func monitorSites() {
 		site.checkNodes()
 		siteUpdateMap[site.GetId()] = site.UpdatedTime
 	}
+
+	return err
 }
 
 func StartMonitorSitesLoop() {
 	fmt.Printf("StartMonitorSitesLoop() Start!\n\n")
 	go func() {
 		for {
-			refreshSiteMap()
-			monitorSites()
+			err := refreshSiteMap()
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			err = monitorSites()
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
 			time.Sleep(5 * time.Second)
 		}
 	}()

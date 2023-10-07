@@ -36,9 +36,13 @@ class CertListPage extends React.Component {
   getCerts() {
     CertBackend.getCerts(this.props.account.name)
       .then((res) => {
-        this.setState({
-          certs: res,
-        });
+        if (res.status === "ok") {
+          this.setState({
+            certs: res.data,
+          });
+        } else {
+          Setting.showMessage("error", `Failed to get certs: ${res.msg}`);
+        }
       });
   }
 

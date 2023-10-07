@@ -36,9 +36,13 @@ class SiteListPage extends React.Component {
   getSites() {
     SiteBackend.getSites(this.props.account.name)
       .then((res) => {
-        this.setState({
-          sites: res,
-        });
+        if (res.status === "ok") {
+          this.setState({
+            sites: res.data,
+          });
+        } else {
+          Setting.showMessage("error", `Failed to get sites: ${res.msg}`);
+        }
       });
   }
 

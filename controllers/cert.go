@@ -25,8 +25,13 @@ func (c *ApiController) GetGlobalCerts() {
 		return
 	}
 
-	c.Data["json"] = object.GetMaskedCerts(object.GetGlobalCerts())
-	c.ServeJSON()
+	certs, err := object.GetGlobalCerts()
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(object.GetMaskedCerts(certs))
 }
 
 func (c *ApiController) GetCerts() {
@@ -35,9 +40,13 @@ func (c *ApiController) GetCerts() {
 	}
 
 	owner := c.Input().Get("owner")
+	certs, err := object.GetCerts(owner)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
 
-	c.Data["json"] = object.GetMaskedCerts(object.GetCerts(owner))
-	c.ServeJSON()
+	c.ResponseOk(object.GetMaskedCerts(certs))
 }
 
 func (c *ApiController) GetCert() {
@@ -46,9 +55,13 @@ func (c *ApiController) GetCert() {
 	}
 
 	id := c.Input().Get("id")
+	cert, err := object.GetCert(id)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
 
-	c.Data["json"] = object.GetMaskedCert(object.GetCert(id))
-	c.ServeJSON()
+	c.ResponseOk(object.GetMaskedCert(cert))
 }
 
 func (c *ApiController) UpdateCert() {
@@ -61,10 +74,11 @@ func (c *ApiController) UpdateCert() {
 	var cert object.Cert
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &cert)
 	if err != nil {
-		panic(err)
+		c.ResponseError(err.Error())
+		return
 	}
 
-	c.Data["json"] = object.UpdateCert(id, &cert)
+	c.Data["json"] = wrapActionResponse(object.UpdateCert(id, &cert))
 	c.ServeJSON()
 }
 
@@ -76,10 +90,11 @@ func (c *ApiController) AddCert() {
 	var cert object.Cert
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &cert)
 	if err != nil {
-		panic(err)
+		c.ResponseError(err.Error())
+		return
 	}
 
-	c.Data["json"] = object.AddCert(&cert)
+	c.Data["json"] = wrapActionResponse(object.AddCert(&cert))
 	c.ServeJSON()
 }
 
@@ -91,9 +106,10 @@ func (c *ApiController) DeleteCert() {
 	var cert object.Cert
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &cert)
 	if err != nil {
-		panic(err)
+		c.ResponseError(err.Error())
+		return
 	}
 
-	c.Data["json"] = object.DeleteCert(&cert)
+	c.Data["json"] = wrapActionResponse(object.DeleteCert(&cert))
 	c.ServeJSON()
 }

@@ -23,7 +23,10 @@ import (
 var siteMap = map[string]*Site{}
 
 func InitSiteMap() {
-	refreshSiteMap()
+	err := refreshSiteMap()
+	if err != nil {
+		panic(err)
+	}
 }
 
 func getCertMap() (map[string]*casdoorsdk.Cert, error) {
@@ -63,17 +66,24 @@ func getApplicationMap() (map[string]*casdoorsdk.Application, error) {
 	return res, nil
 }
 
-func refreshSiteMap() {
+func refreshSiteMap() error {
 	applicationMap, err := getApplicationMap()
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	newSiteMap := map[string]*Site{}
-	sites := GetGlobalSites()
+	sites, err := GetGlobalSites()
+	if err != nil {
+		return err
+	}
+
 	for _, site := range sites {
 		if site.SslCert != "" {
-			site.SslCertObj = getCert("admin", site.SslCert)
+			site.SslCertObj, err = getCert("admin", site.SslCert)
+			if err != nil {
+				return err
+			}
 		}
 
 		if applicationMap != nil {
@@ -100,6 +110,7 @@ func refreshSiteMap() {
 	}
 
 	siteMap = newSiteMap
+	return nil
 }
 
 func GetSiteByDomain(domain string) *Site {

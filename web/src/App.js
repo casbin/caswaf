@@ -96,9 +96,8 @@ class App extends Component {
         const account = res.data;
         if (account !== null) {
           this.setLanguage(account);
+          account.hostname = res.data2;
         }
-
-        account.hostname = res.data2;
 
         this.setState({
           account: account,

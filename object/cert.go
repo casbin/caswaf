@@ -42,48 +42,46 @@ type Cert struct {
 	PrivateKey  string `xorm:"mediumtext" json:"privateKey"`
 }
 
-func GetGlobalCerts() []*Cert {
+func GetGlobalCerts() ([]*Cert, error) {
 	certs := []*Cert{}
 	err := ormer.Engine.Asc("owner").Desc("created_time").Find(&certs)
-	if err != nil {
-		panic(err)
-	}
-
-	return certs
+	return certs, err
 }
 
-func GetCerts(owner string) []*Cert {
+func GetCerts(owner string) ([]*Cert, error) {
 	certs := []*Cert{}
 	err := ormer.Engine.Desc("created_time").Find(&certs, &Cert{Owner: owner})
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	for _, cert := range certs {
 		if cert.Certificate != "" && cert.ExpireTime == "" {
 			cert.ExpireTime = getCertExpireTime(cert.Certificate)
-			UpdateCert(cert.GetId(), cert)
+			if _, err := UpdateCert(cert.GetId(), cert); err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	return certs
+	return certs, nil
 }
 
-func getCert(owner string, name string) *Cert {
+func getCert(owner string, name string) (*Cert, error) {
 	cert := Cert{Owner: owner, Name: name}
 	existed, err := ormer.Engine.Get(&cert)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if existed {
-		return &cert
+		return &cert, nil
 	} else {
-		return nil
+		return nil, nil
 	}
 }
 
-func GetCert(id string) *Cert {
+func GetCert(id string) (*Cert, error) {
 	owner, name := util.GetOwnerAndNameFromId(id)
 	return getCert(owner, name)
 }
@@ -107,10 +105,10 @@ func GetMaskedCerts(certs []*Cert) []*Cert {
 	return certs
 }
 
-func UpdateCert(id string, cert *Cert) bool {
+func UpdateCert(id string, cert *Cert) (bool, error) {
 	owner, name := util.GetOwnerAndNameFromId(id)
-	if getCert(owner, name) == nil {
-		return false
+	if c, err := getCert(owner, name); err != nil || c == nil {
+		return false, err
 	}
 
 	if cert.Certificate != "" {
@@ -121,36 +119,35 @@ func UpdateCert(id string, cert *Cert) bool {
 
 	_, err := ormer.Engine.ID(core.PK{owner, name}).AllCols().Update(cert)
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
-	//return affected != 0
-	return true
+	return true, nil
 }
 
-func AddCert(cert *Cert) bool {
+func AddCert(cert *Cert) (bool, error) {
 	affected, err := ormer.Engine.Insert(cert)
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
-	return affected != 0
+	return affected != 0, nil
 }
 
-func DeleteCert(cert *Cert) bool {
+func DeleteCert(cert *Cert) (bool, error) {
 	affected, err := ormer.Engine.ID(core.PK{cert.Owner, cert.Name}).Delete(&Cert{})
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
-	return affected != 0
+	return affected != 0, nil
 }
 
 func (cert *Cert) GetId() string {
 	return fmt.Sprintf("%s/%s", cert.Owner, cert.Name)
 }
 
-func RenewCert(cert *Cert) bool {
+func RenewCert(cert *Cert) (bool, error) {
 	client := certificate.GetAcmeClient(acmeEmail, acmePrivateKey, false)
 
 	var certStr, privateKey string
@@ -159,7 +156,7 @@ func RenewCert(cert *Cert) bool {
 	} else if cert.Provider == "GoDaddy" {
 		certStr, privateKey = certificate.ObtainCertificateGoDaddy(client, cert.Name, cert.AccessKey, cert.AccessSecret)
 	} else {
-		panic(fmt.Errorf("unknown provider: %s", cert.Provider))
+		return false, fmt.Errorf("unknown provider: %s", cert.Provider)
 	}
 
 	cert.ExpireTime = getCertExpireTime(certStr)

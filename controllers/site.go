@@ -26,8 +26,13 @@ func (c *ApiController) GetGlobalSites() {
 		return
 	}
 
-	c.Data["json"] = object.GetMaskedSites(object.GetGlobalSites(), util.GetHostname())
-	c.ServeJSON()
+	sites, err := object.GetGlobalSites()
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(object.GetMaskedSites(sites, util.GetHostname()))
 }
 
 func (c *ApiController) GetSites() {
@@ -37,8 +42,13 @@ func (c *ApiController) GetSites() {
 
 	owner := c.Input().Get("owner")
 
-	c.Data["json"] = object.GetMaskedSites(object.GetSites(owner), util.GetHostname())
-	c.ServeJSON()
+	sites, err := object.GetSites(owner)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(object.GetMaskedSites(sites, util.GetHostname()))
 }
 
 func (c *ApiController) GetSite() {
@@ -48,8 +58,13 @@ func (c *ApiController) GetSite() {
 
 	id := c.Input().Get("id")
 
-	c.Data["json"] = object.GetMaskedSite(object.GetSite(id), util.GetHostname())
-	c.ServeJSON()
+	site, err := object.GetSite(id)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(object.GetMaskedSite(site, util.GetHostname()))
 }
 
 func (c *ApiController) UpdateSite() {
@@ -62,10 +77,11 @@ func (c *ApiController) UpdateSite() {
 	var site object.Site
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &site)
 	if err != nil {
-		panic(err)
+		c.ResponseError(err.Error())
+		return
 	}
 
-	c.Data["json"] = object.UpdateSite(id, &site)
+	c.Data["json"] = wrapActionResponse(object.UpdateSite(id, &site))
 	c.ServeJSON()
 }
 
@@ -77,10 +93,11 @@ func (c *ApiController) AddSite() {
 	var site object.Site
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &site)
 	if err != nil {
-		panic(err)
+		c.ResponseError(err.Error())
+		return
 	}
 
-	c.Data["json"] = object.AddSite(&site)
+	c.Data["json"] = wrapActionResponse(object.AddSite(&site))
 	c.ServeJSON()
 }
 
@@ -92,9 +109,10 @@ func (c *ApiController) DeleteSite() {
 	var site object.Site
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &site)
 	if err != nil {
-		panic(err)
+		c.ResponseError(err.Error())
+		return
 	}
 
-	c.Data["json"] = object.DeleteSite(&site)
+	c.Data["json"] = wrapActionResponse(object.DeleteSite(&site))
 	c.ServeJSON()
 }

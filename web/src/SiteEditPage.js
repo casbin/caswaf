@@ -44,28 +44,40 @@ class SiteEditPage extends React.Component {
 
   getSite() {
     SiteBackend.getSite(this.props.account.name, this.state.siteName)
-      .then((site) => {
-        this.setState({
-          site: site,
-        });
+      .then((res) => {
+        if (res.status === "ok") {
+          this.setState({
+            site: res.data,
+          });
+        } else {
+          Setting.showMessage("error", `Failed to get site: ${res.msg}`);
+        }
       });
   }
 
   getCerts() {
     CertBackend.getCerts(this.props.account.name)
       .then((res) => {
-        this.setState({
-          certs: res,
-        });
+        if (res.status === "ok") {
+          this.setState({
+            certs: res.data,
+          });
+        } else {
+          Setting.showMessage("error", `Failed to get certs: ${res.msg}`);
+        }
       });
   }
 
   getApplications() {
     ApplicationBackend.getApplications(this.props.account.name)
       .then((res) => {
-        this.setState({
-          applications: res.data,
-        });
+        if (res.status === "ok") {
+          this.setState({
+            applications: res.data,
+          });
+        } else {
+          Setting.showMessage("error", `Failed to get applications: ${res.msg}`);
+        }
       });
   }
 
