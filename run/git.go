@@ -23,17 +23,14 @@ import (
 	"path/filepath"
 )
 
-func gitClone(repoUrl string, path string) {
+func gitClone(repoUrl string, path string) error {
 	fmt.Printf("gitClone(): [%s]\n", path)
 
 	cmd := exec.Command("git", "clone", repoUrl, path)
-	err := cmd.Run()
-	if err != nil {
-		panic(err)
-	}
+	return cmd.Run()
 }
 
-func GitDiff(path string) string {
+func GitDiff(path string) (string, error) {
 	cmd := exec.Command("git", "diff")
 	cmd.Dir = path
 
@@ -45,54 +42,62 @@ func GitDiff(path string) string {
 		panic(err)
 	}
 
-	return out.String()
+	return out.String(), nil
 }
 
-func gitApply(path string, patch string) {
+func gitApply(path string, patch string) error {
 	fmt.Printf("gitApply(): [%s]\n", path)
 
 	tmpFile, err := ioutil.TempFile("", "patch")
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer os.Remove(tmpFile.Name())
 
-	if _, err = tmpFile.WriteString(patch); err != nil {
-		panic(err)
+	_, err = tmpFile.WriteString(patch)
+	if err != nil {
+		return err
 	}
-	if err = tmpFile.Close(); err != nil {
-		panic(err)
+
+	err = tmpFile.Close()
+	if err != nil {
+		return err
 	}
 
 	cmd := exec.Command("git", "apply", tmpFile.Name())
 	cmd.Dir = path
-	err = cmd.Run()
-	if err != nil {
-		panic(err)
-	}
+	return cmd.Run()
 }
 
-func gitGetLatestCommitHash(path string) string {
+func gitGetLatestCommitHash(path string) (string, error) {
 	cmd := exec.Command("git", "rev-parse", "HEAD")
 	cmd.Dir = path
 	out, err := cmd.Output()
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return string(out)
+
+	return string(out), nil
 }
 
-func gitPull(path string) bool {
-	oldHash := gitGetLatestCommitHash(path)
+func gitPull(path string) (bool, error) {
+	oldHash, err := gitGetLatestCommitHash(path)
+	if err != nil {
+		return false, err
+	}
 
 	cmd := exec.Command("git", "pull", "--rebase", "--autostash")
 	cmd.Dir = path
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
-	newHash := gitGetLatestCommitHash(path)
+	newHash, err := gitGetLatestCommitHash(path)
+	if err != nil {
+		return false, err
+	}
+
 	affected := oldHash != newHash
 
 	if affected {
@@ -101,7 +106,7 @@ func gitPull(path string) bool {
 		fmt.Printf("Affected: [%s] -> [%s]\n", oldHash, newHash)
 	}
 
-	return affected
+	return affected, nil
 }
 
 func runCmd(dir, name string, args ...string) error {
@@ -112,17 +117,14 @@ func runCmd(dir, name string, args ...string) error {
 	return cmd.Run()
 }
 
-func gitWebBuild(path string) {
+func gitWebBuild(path string) error {
 	webDir := filepath.Join(path, "web")
 	fmt.Printf("gitWebBuild(): [%s]\n", webDir)
 
 	err := runCmd(webDir, "yarn", "install")
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	err = runCmd(webDir, "yarn", "build")
-	if err != nil {
-		panic(err)
-	}
+	return runCmd(webDir, "yarn", "build")
 }

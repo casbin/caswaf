@@ -45,12 +45,14 @@ func (c *ApiController) Signin() {
 
 	token, err := casdoorsdk.GetOAuthToken(code, state)
 	if err != nil {
-		panic(err)
+		c.ResponseError(err.Error())
+		return
 	}
 
 	claims, err := casdoorsdk.ParseJwtToken(token.AccessToken)
 	if err != nil {
-		panic(err)
+		c.ResponseError(err.Error())
+		return
 	}
 
 	claims.AccessToken = token.AccessToken

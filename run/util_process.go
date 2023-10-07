@@ -65,21 +65,21 @@ func getBatNamesFromOutput(output string) map[string]int {
 	return batNameMap
 }
 
-func getPid(name string) int {
+func getPid(name string) (int, error) {
 	name = getMappedName(name)
 
 	// wmic process where (name="cmd.exe") get CommandLine, ProcessID
 	cmd := exec.Command("wmic", "process", "where", "name='cmd.exe'", "get", "CommandLine,ProcessID")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 
 	batNameMap := getBatNamesFromOutput(string(out))
 	pid, ok := batNameMap[name]
 	if ok {
-		return pid
+		return pid, nil
 	} else {
-		panic(fmt.Sprintf("getBatNamesFromOutput() error, name = %s, batNameMap = %v", name, batNameMap))
+		return 0, fmt.Errorf("getBatNamesFromOutput() error, name = %s, batNameMap = %v", name, batNameMap)
 	}
 }

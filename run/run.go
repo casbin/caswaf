@@ -21,37 +21,75 @@ import (
 	"github.com/casbin/caswaf/util"
 )
 
-func CreateRepo(siteName string, needStart bool, diff string) int {
+func CreateRepo(siteName string, needStart bool, diff string) (int, error) {
 	path := GetRepoPath(siteName)
 	if !util.FileExist(path) {
 		originalName := getOriginalName(siteName)
 		repoUrl := getRepoUrl(originalName)
-		gitClone(repoUrl, path)
+		err := gitClone(repoUrl, path)
+		if err != nil {
+			return 0, err
+		}
 
 		if strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2 {
 			index := getNameIndex(siteName)
 			updateAppConfFile(siteName, index)
 			if index == 0 {
-				gitWebBuild(path)
+				err = gitWebBuild(path)
+				if err != nil {
+					return 0, err
+				}
 			}
 		} else if diff != "" {
-			gitApply(path, diff)
+			err = gitApply(path, diff)
+			if err != nil {
+				return 0, err
+			}
 
-			gitWebBuild(path)
+			err = gitWebBuild(path)
+			if err != nil {
+				return 0, err
+			}
 		}
 
-		updateBatFile(siteName)
-		updateShortcutFile(siteName)
+		err = updateBatFile(siteName)
+		if err != nil {
+			return 0, err
+		}
+
+		err = updateShortcutFile(siteName)
+		if err != nil {
+			return 0, err
+		}
 	} else {
-		affected := gitPull(path)
+		affected, err := gitPull(path)
+		if err != nil {
+			return 0, err
+		}
 		if affected {
-			gitWebBuild(path)
+			err = gitWebBuild(path)
+			if err != nil {
+				return 0, err
+			}
 
 			if !needStart {
-				stopProcess(siteName)
-				startProcess(siteName)
-				pid := getPid(siteName)
-				return pid
+				err = stopProcess(siteName)
+				if err != nil {
+					return 0, err
+				}
+
+				err = startProcess(siteName)
+				if err != nil {
+					return 0, err
+				}
+
+				var pid int
+				pid, err = getPid(siteName)
+				if err != nil {
+					return 0, err
+				}
+
+				return pid, nil
 			}
 		} else {
 			webIndex := filepath.Join(path, "web/build/index.html")
@@ -59,20 +97,34 @@ func CreateRepo(siteName string, needStart bool, diff string) int {
 				if strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2 {
 					index := getNameIndex(siteName)
 					if index == 0 {
-						gitWebBuild(path)
+						err = gitWebBuild(path)
+						if err != nil {
+							return 0, err
+						}
 					}
 				} else {
-					gitWebBuild(path)
+					err = gitWebBuild(path)
+					if err != nil {
+						return 0, err
+					}
 				}
 			}
 		}
 	}
 
 	if needStart {
-		startProcess(siteName)
-		pid := getPid(siteName)
-		return pid
+		err := startProcess(siteName)
+		if err != nil {
+			return 0, err
+		}
+
+		pid, err := getPid(siteName)
+		if err != nil {
+			return 0, err
+		}
+
+		return pid, nil
 	}
 
-	return 0
+	return 0, nil
 }

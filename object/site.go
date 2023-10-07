@@ -77,8 +77,12 @@ func GetSites(owner string) ([]*Site, error) {
 
 	for _, site := range sites {
 		if site.SslCert == "" && site.Domain != "" && (site.SslMode == "HTTPS and HTTP" || site.SslMode == "HTTPS Only") {
-			site.SslCert = getBaseDomain(site.Domain)
-			_, err := UpdateSite(site.GetId(), site)
+			site.SslCert, err = getBaseDomain(site.Domain)
+			if err != nil {
+				return nil, err
+			}
+
+			_, err = UpdateSite(site.GetId(), site)
 			if err != nil {
 				return nil, err
 			}
@@ -220,7 +224,7 @@ func (site *Site) GetHost() string {
 	return res
 }
 
-func (site *Site) checkNodes() {
+func (site *Site) checkNodes() error {
 	hostname := util.GetHostname()
 	for i, node := range site.Nodes {
 		if node.Name != hostname {
@@ -247,15 +251,25 @@ func (site *Site) checkNodes() {
 			diff = site.Nodes[0].Diff
 		}
 
-		pid := run.CreateRepo(site.Name, !ok, diff)
+		pid, err := run.CreateRepo(site.Name, !ok, diff)
+		if err != nil {
+			return err
+		}
+
 		if pid == 0 {
 			pid = node.Pid
 		}
 
-		version := getSiteVersion(site.Name)
+		version, err := getSiteVersion(site.Name)
+		if err != nil {
+			return err
+		}
 
 		path := run.GetRepoPath(site.Name)
-		newDiff := run.GitDiff(path)
+		newDiff, err := run.GitDiff(path)
+		if err != nil {
+			return err
+		}
 
 		if node.Status != status || node.Message != msg || node.Version != version || node.Diff != newDiff || node.Pid != pid {
 			site.Nodes[i].Version = version
@@ -263,7 +277,12 @@ func (site *Site) checkNodes() {
 			site.Nodes[i].Pid = pid
 			site.Nodes[i].Status = status
 			site.Nodes[i].Message = msg
-			UpdateSite(site.GetId(), site)
+			_, err = UpdateSite(site.GetId(), site)
+			if err != nil {
+				return err
+			}
 		}
 	}
+
+	return nil
 }

@@ -48,17 +48,16 @@ func resolveDomainToIp(domain string) string {
 	return "(empty)"
 }
 
-func getBaseDomain(domain string) string {
+func getBaseDomain(domain string) (string, error) {
 	// abc.com -> abc.com
 	// abc.com.it -> abc.com.it
 	// subdomain.abc.io -> abc.io
 	// subdomain.abc.org.us -> abc.org.us
 	baseDomain, err := publicsuffix.EffectiveTLDPlusOne(domain)
 	if err != nil {
-		fmt.Println("Error:", err)
-		return ""
+		return "", err
 	}
-	return baseDomain
+	return baseDomain, nil
 }
 
 func pingUrl(url string) (bool, string) {
@@ -145,13 +144,13 @@ func getVersionInfo(path string) (*VersionInfo, error) {
 	return res, nil
 }
 
-func getSiteVersion(siteName string) string {
+func getSiteVersion(siteName string) (string, error) {
 	path := run.GetRepoPath(siteName)
 	versionInfo, err := getVersionInfo(path)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	res := util.StructToJsonNoIndent(versionInfo)
-	return res
+	return res, nil
 }

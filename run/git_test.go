@@ -32,6 +32,10 @@ func TestGitGetDiff(t *testing.T) {
 	//diff := GitDiff("F:/github_repos/casdoor")
 	//println(diff)
 
-	pid := CreateRepo("casdoor_test", true, "")
+	pid, err := CreateRepo("casdoor_test", true, "")
+	if err != nil {
+		panic(err)
+	}
+
 	println(pid)
 }

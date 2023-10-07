@@ -62,13 +62,11 @@ func getShortcut() string {
 	return res
 }
 
-func ensureFileFolderExists(path string) {
+func ensureFileFolderExists(path string) error {
 	if !util.FileExist(path) {
-		err := os.MkdirAll(path, os.ModePerm)
-		if err != nil {
-			panic(err)
-		}
+		return os.MkdirAll(path, os.ModePerm)
 	}
+	return nil
 }
 
 func updateAppConfFile(name string, i int) {
@@ -84,46 +82,41 @@ func updateAppConfFile(name string, i int) {
 	util.WriteStringToPath(content, confPath)
 }
 
-func updateBatFile(name string) {
+func updateBatFile(name string) error {
 	fmt.Printf("updateBatFile(): [%s]\n", name)
 
 	batPath := getBatPath(name)
-	ensureFileFolderExists(filepath.Dir(batPath))
+	err := ensureFileFolderExists(filepath.Dir(batPath))
+	if err != nil {
+		return err
+	}
 	content := fmt.Sprintf("cd %s\ngo run main.go", GetRepoPath(name))
 	util.WriteStringToPath(content, batPath)
+	return nil
 }
 
-func updateShortcutFile(name string) {
+func updateShortcutFile(name string) error {
 	fmt.Printf("updateShortcutFile(): [%s]\n", name)
 
 	cmd := exec.Command("powershell", fmt.Sprintf("$s=(New-Object -COM WScript.Shell).CreateShortcut('%s');$s.TargetPath='%s';$s.Save()", getShortcutPath(name), getBatPath(name)))
-	err := cmd.Run()
-	if err != nil {
-		panic(err)
-	}
+	return cmd.Run()
 }
 
-func startProcess(name string) {
+func startProcess(name string) error {
 	fmt.Printf("startProcess(): [%s]\n", name)
 
 	cmd := exec.Command("cmd", "/C", "start", "", getShortcutPath(name))
-	err := cmd.Run()
-	if err != nil {
-		panic(err)
-	}
+	return cmd.Run()
 }
 
-func stopProcess(name string) {
+func stopProcess(name string) error {
 	fmt.Printf("stopProcess(): [%s]\n", name)
 
 	windowName := fmt.Sprintf("%s.bat - %s", name, getShortcut())
 	// taskkill /IM "casdoor.bat - Shortcut" /F
 	// taskkill /F /FI "WINDOWTITLE eq casdoor.bat - Shortcut" /T
 	cmd := exec.Command("taskkill", "/F", "/FI", fmt.Sprintf("WINDOWTITLE eq %s", windowName), "/T")
-	err := cmd.Run()
-	if err != nil {
-		panic(err)
-	}
+	return cmd.Run()
 }
 
 func IsProcessActive(pid int) bool {
