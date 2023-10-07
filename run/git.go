@@ -21,6 +21,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/beego/beego"
+	"xorm.io/xorm"
 )
 
 func gitClone(repoUrl string, path string) error {
@@ -127,4 +130,30 @@ func gitWebBuild(path string) error {
 	}
 
 	return runCmd(webDir, "yarn", "build")
+}
+
+func gitCreateDatabase(name string) (bool, error) {
+	fmt.Printf("gitCreateDatabase(): [%s]\n", name)
+
+	driverName := "mysql"
+	dataSourceName := fmt.Sprintf("root:%s@tcp(localhost:3306)/", beego.AppConfig.String("dbPass"))
+	engine, err := xorm.NewEngine(driverName, dataSourceName)
+	if err != nil {
+		return false, err
+	}
+
+	cmd := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;", name)
+	result, err := engine.Exec(cmd)
+	if err != nil {
+		return false, err
+	}
+
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+
+	engine.Close()
+
+	return affected != 0, err
 }

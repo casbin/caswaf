@@ -119,16 +119,16 @@ func stopProcess(name string) error {
 	return cmd.Run()
 }
 
-func IsProcessActive(pid int) bool {
+func IsProcessActive(pid int) (bool, error) {
 	cmd := exec.Command("tasklist", "/FI", fmt.Sprintf("PID eq %d", pid))
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	err := cmd.Run()
 	if err != nil {
-		return false
+		return false, err
 	}
 
 	output := out.String()
 	res := strings.Contains(output, strconv.Itoa(pid))
-	return res
+	return res, nil
 }

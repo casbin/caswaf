@@ -31,6 +31,11 @@ func CreateRepo(siteName string, needStart bool, diff string) (int, error) {
 			return 0, err
 		}
 
+		_, err = gitCreateDatabase(siteName)
+		if err != nil {
+			return 0, err
+		}
+
 		if strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2 {
 			index := getNameIndex(siteName)
 			updateAppConfFile(siteName, index)

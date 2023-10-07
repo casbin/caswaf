@@ -239,7 +239,11 @@ func (site *Site) checkNodes() error {
 		status := "Running"
 		if !ok {
 			if node.Pid > 0 {
-				ok = run.IsProcessActive(node.Pid)
+				var err error
+				ok, err = run.IsProcessActive(node.Pid)
+				if err != nil {
+					return err
+				}
 			}
 		}
 		if !ok {
