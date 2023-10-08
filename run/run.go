@@ -18,6 +18,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/beego/beego"
 	"github.com/casbin/caswaf/util"
 )
 
@@ -31,9 +32,12 @@ func CreateRepo(siteName string, needStart bool, diff string) (int, error) {
 			return 0, err
 		}
 
-		_, err = gitCreateDatabase(siteName)
-		if err != nil {
-			return 0, err
+		language := beego.AppConfig.String("language")
+		if language == "en" {
+			_, err = gitCreateDatabase(siteName)
+			if err != nil {
+				return 0, err
+			}
 		}
 
 		if strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2 {
