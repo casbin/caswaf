@@ -21,6 +21,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"path/filepath"
 	"strings"
 
 	"github.com/beego/beego"
@@ -138,8 +139,30 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	targetUrl := joinPath(site.GetHost(), r.RequestURI)
-	forwardHandler(targetUrl, w, r)
+	host := site.GetHost()
+	if host == "" {
+		responseError(w, "CasWAF error: targetUrl should not be empty for host: %s, site = %v", r.Host, site)
+		return
+	}
+
+	if site.SslMode == "Static Folder" {
+		var path string
+		if r.RequestURI != "/" {
+			path = filepath.Join(host, r.RequestURI)
+		} else {
+			path = filepath.Join(host, "/index.htm")
+			if !util.FileExist(path) {
+				path = filepath.Join(host, "/index.html")
+				if !util.FileExist(path) {
+					path = filepath.Join(host, r.RequestURI)
+				}
+			}
+		}
+		http.ServeFile(w, r, path)
+	} else {
+		targetUrl := joinPath(site.GetHost(), r.RequestURI)
+		forwardHandler(targetUrl, w, r)
+	}
 }
 
 func Start() {

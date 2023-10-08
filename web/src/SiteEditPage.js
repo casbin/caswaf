@@ -219,6 +219,7 @@ class SiteEditPage extends React.Component {
                   {id: "HTTP", name: "HTTP"},
                   {id: "HTTPS and HTTP", name: "HTTPS and HTTP"},
                   {id: "HTTPS Only", name: "HTTPS Only"},
+                  {id: "Static Folder", name: "Static Folder"},
                 ].map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)
               }
             </Select>
