@@ -28,10 +28,10 @@ func monitorSites() error {
 	}
 
 	for _, site := range sites {
-		updatedTime, ok := siteUpdateMap[site.GetId()]
-		if ok && updatedTime != "" && updatedTime == site.UpdatedTime {
-			continue
-		}
+		//updatedTime, ok := siteUpdateMap[site.GetId()]
+		//if ok && updatedTime != "" && updatedTime == site.UpdatedTime {
+		//	continue
+		//}
 
 		site.checkNodes()
 		siteUpdateMap[site.GetId()] = site.UpdatedTime
