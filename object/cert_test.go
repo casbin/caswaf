@@ -28,7 +28,11 @@ import (
 func TestGetCertExpireTime(t *testing.T) {
 	InitConfig()
 
-	cert := getCert("admin", "casbin.com")
+	cert, err := getCert("admin", "casbin.com")
+	if err != nil {
+		panic(err)
+	}
+
 	println(getCertExpireTime(cert.Certificate))
 }
 
@@ -36,9 +40,17 @@ func TestRenewAllCerts(t *testing.T) {
 	InitConfig()
 	proxy.InitHttpClient()
 
-	certs := GetCerts("admin")
+	certs, err := GetCerts("admin")
+	if err != nil {
+		panic(err)
+	}
+
 	for i, cert := range certs {
-		res := RenewCert(cert)
+		res, err := RenewCert(cert)
+		if err != nil {
+			panic(err)
+		}
+
 		fmt.Printf("[%d/%d] Renewed cert: [%s] to [%s], res = %v\n", i+1, len(certs), cert.Name, cert.ExpireTime, res)
 	}
 }
@@ -47,7 +59,11 @@ func TestApplyAllCerts(t *testing.T) {
 	InitConfig()
 
 	baseDir := "F:/github_repos/nginx/conf/ssl"
-	certs := GetCerts("admin")
+	certs, err := GetCerts("admin")
+	if err != nil {
+		panic(err)
+	}
+
 	for _, cert := range certs {
 		if cert.Certificate == "" || cert.PrivateKey == "" {
 			continue
