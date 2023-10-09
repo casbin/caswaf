@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/beego/beego"
+	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
 
 func TestGitGetDiff(t *testing.T) {
@@ -38,4 +39,25 @@ func TestGitGetDiff(t *testing.T) {
 	}
 
 	println(pid)
+}
+
+var JwtPublicKey string
+
+func TestUploadCdn(t *testing.T) {
+	err := beego.LoadAppConfig("ini", "../conf/app.conf")
+	if err != nil {
+		panic(err)
+	}
+
+	casdoorEndpoint := beego.AppConfig.String("casdoorEndpoint")
+	clientId := beego.AppConfig.String("clientId")
+	clientSecret := beego.AppConfig.String("clientSecret")
+	casdoorOrganization := beego.AppConfig.String("casdoorOrganization")
+	casdoorApplication := beego.AppConfig.String("casdoorApplication")
+	casdoorsdk.InitConfig(casdoorEndpoint, clientId, clientSecret, JwtPublicKey, casdoorOrganization, casdoorApplication)
+
+	err = gitUploadCdn("provider_storage_aliyun_oss", "casdoor")
+	if err != nil {
+		panic(err)
+	}
 }
