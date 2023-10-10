@@ -74,14 +74,16 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 			}
 		}
 
-		err = updateBatFile(siteName)
+		batExisted, err := updateBatFile(siteName)
 		if err != nil {
 			return 0, err
 		}
 
-		err = updateShortcutFile(siteName)
-		if err != nil {
-			return 0, err
+		if !batExisted {
+			err = updateShortcutFile(siteName)
+			if err != nil {
+				return 0, err
+			}
 		}
 	} else {
 		affected, err := gitPull(path)

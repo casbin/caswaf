@@ -32,13 +32,15 @@ func InitSelfStart() {
 		panic("InitSelfStart() error, siteName should not be empty")
 	}
 
-	err := updateBatFile(siteName)
+	batExisted, err := updateBatFile(siteName)
 	if err != nil {
 		panic(err)
 	}
 
-	err = updateShortcutFile(siteName)
-	if err != nil {
-		panic(err)
+	if !batExisted {
+		err = updateShortcutFile(siteName)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
