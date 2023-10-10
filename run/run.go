@@ -15,6 +15,7 @@
 package run
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -26,6 +27,10 @@ func isTargetRepo(siteName string) bool {
 	return strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2
 }
 
+func wrapRepoError(function string, err error) (int, error) {
+	return 0, fmt.Errorf("%s(): %s", function, err.Error())
+}
+
 func CreateRepo(siteName string, needStart bool, diff string, providerName string) (int, error) {
 	path := GetRepoPath(siteName)
 	if !util.FileExist(path) {
@@ -33,14 +38,14 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 		repoUrl := getRepoUrl(originalName)
 		err := gitClone(repoUrl, path)
 		if err != nil {
-			return 0, err
+			return wrapRepoError("gitClone", err)
 		}
 
 		language := beego.AppConfig.String("language")
 		if language == "en" {
 			_, err = gitCreateDatabase(siteName)
 			if err != nil {
-				return 0, err
+				return wrapRepoError("gitCreateDatabase", err)
 			}
 		}
 
@@ -57,7 +62,7 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 			if diff != "" {
 				err = gitApply(path, diff)
 				if err != nil {
-					return 0, err
+					return wrapRepoError("gitApply", err)
 				}
 			}
 		}
@@ -65,30 +70,30 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 		if needWebBuild {
 			err = gitWebBuild(path)
 			if err != nil {
-				return 0, err
+				return wrapRepoError("gitWebBuild", err)
 			}
 
 			err = gitUploadCdn(providerName, siteName)
 			if err != nil {
-				return 0, err
+				return wrapRepoError("gitUploadCdn", err)
 			}
 		}
 
 		batExisted, err := updateBatFile(siteName)
 		if err != nil {
-			return 0, err
+			return wrapRepoError("updateBatFile", err)
 		}
 
 		if !batExisted {
 			err = updateShortcutFile(siteName)
 			if err != nil {
-				return 0, err
+				return wrapRepoError("updateShortcutFile", err)
 			}
 		}
 	} else {
 		affected, err := gitPull(path)
 		if err != nil {
-			return 0, err
+			return wrapRepoError("gitPull", err)
 		}
 
 		needWebBuild := false
@@ -118,12 +123,12 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 		if needWebBuild {
 			err = gitWebBuild(path)
 			if err != nil {
-				return 0, err
+				return wrapRepoError("gitWebBuild", err)
 			}
 
 			err = gitUploadCdn(providerName, siteName)
 			if err != nil {
-				return 0, err
+				return wrapRepoError("gitUploadCdn", err)
 			}
 		}
 
@@ -131,18 +136,18 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 			if !needStart {
 				err = stopProcess(siteName)
 				if err != nil {
-					return 0, err
+					return wrapRepoError("stopProcess", err)
 				}
 
 				err = startProcess(siteName)
 				if err != nil {
-					return 0, err
+					return wrapRepoError("startProcess", err)
 				}
 
 				var pid int
 				pid, err = getPid(siteName)
 				if err != nil {
-					return 0, err
+					return wrapRepoError("getPid", err)
 				}
 
 				return pid, nil
@@ -153,12 +158,12 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 	if needStart {
 		err := startProcess(siteName)
 		if err != nil {
-			return 0, err
+			return wrapRepoError("startProcess", err)
 		}
 
 		pid, err := getPid(siteName)
 		if err != nil {
-			return 0, err
+			return wrapRepoError("getPid", err)
 		}
 
 		return pid, nil

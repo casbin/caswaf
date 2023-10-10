@@ -228,6 +228,14 @@ func (site *Site) GetHost() string {
 	return res
 }
 
+func addErrorToMsg(msg string, function string, err error) string {
+	if msg == "" {
+		return fmt.Sprintf("%s(): %s", function, err.Error())
+	} else {
+		return fmt.Sprintf("%s || %s(): %s", msg, function, err.Error())
+	}
+}
+
 func (site *Site) checkNodes() error {
 	hostname := util.GetHostname()
 	for i, node := range site.Nodes {
@@ -242,11 +250,12 @@ func (site *Site) checkNodes() error {
 		ok, msg := pingUrl(site.GetHost())
 		status := "Running"
 		if !ok {
+			msg = ""
 			if node.Pid > 0 {
 				var err error
 				ok, err = run.IsProcessActive(node.Pid)
 				if err != nil {
-					return err
+					msg = addErrorToMsg(msg, "IsProcessActive", err)
 				}
 			}
 		}
@@ -261,7 +270,7 @@ func (site *Site) checkNodes() error {
 
 		pid, err := run.CreateRepo(site.Name, !ok, diff, node.Provider)
 		if err != nil {
-			return err
+			msg = addErrorToMsg(msg, "CreateRepo", err)
 		}
 
 		if pid == 0 {
@@ -270,13 +279,13 @@ func (site *Site) checkNodes() error {
 
 		version, err := getSiteVersion(site.Name)
 		if err != nil {
-			return err
+			msg = addErrorToMsg(msg, "getSiteVersion", err)
 		}
 
 		path := run.GetRepoPath(site.Name)
 		newDiff, err := run.GitDiff(path)
 		if err != nil {
-			return err
+			msg = addErrorToMsg(msg, "GitDiff", err)
 		}
 
 		if node.Status != status || node.Message != msg || node.Version != version || node.Diff != newDiff || node.Pid != pid {
