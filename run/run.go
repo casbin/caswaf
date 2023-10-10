@@ -22,6 +22,10 @@ import (
 	"github.com/casbin/caswaf/util"
 )
 
+func isTargetRepo(siteName string) bool {
+	return strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2
+}
+
 func CreateRepo(siteName string, needStart bool, diff string) (int, error) {
 	path := GetRepoPath(siteName)
 	if !util.FileExist(path) {
@@ -40,21 +44,25 @@ func CreateRepo(siteName string, needStart bool, diff string) (int, error) {
 			}
 		}
 
-		if strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2 {
+		needWebBuild := false
+		if isTargetRepo(siteName) {
 			index := getNameIndex(siteName)
 			updateAppConfFile(siteName, index)
 			if index == 0 {
-				err = gitWebBuild(path)
+				needWebBuild = true
+			}
+		} else {
+			needWebBuild = true
+
+			if diff != "" {
+				err = gitApply(path, diff)
 				if err != nil {
 					return 0, err
 				}
 			}
-		} else if diff != "" {
-			err = gitApply(path, diff)
-			if err != nil {
-				return 0, err
-			}
+		}
 
+		if needWebBuild {
 			err = gitWebBuild(path)
 			if err != nil {
 				return 0, err
@@ -75,12 +83,39 @@ func CreateRepo(siteName string, needStart bool, diff string) (int, error) {
 		if err != nil {
 			return 0, err
 		}
+
+		needWebBuild := false
 		if affected {
+			if isTargetRepo(siteName) {
+				index := getNameIndex(siteName)
+				if index == 0 {
+					needWebBuild = true
+				}
+			} else {
+				needWebBuild = true
+			}
+		} else {
+			webIndex := filepath.Join(path, "web/build/index.html")
+			if !util.FileExist(webIndex) {
+				needWebBuild = true
+			}
+
+			if isTargetRepo(siteName) {
+				index := getNameIndex(siteName)
+				if index != 0 {
+					needWebBuild = false
+				}
+			}
+		}
+
+		if needWebBuild {
 			err = gitWebBuild(path)
 			if err != nil {
 				return 0, err
 			}
+		}
 
+		if affected {
 			if !needStart {
 				err = stopProcess(siteName)
 				if err != nil {
@@ -99,24 +134,6 @@ func CreateRepo(siteName string, needStart bool, diff string) (int, error) {
 				}
 
 				return pid, nil
-			}
-		} else {
-			webIndex := filepath.Join(path, "web/build/index.html")
-			if !util.FileExist(webIndex) {
-				if strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2 {
-					index := getNameIndex(siteName)
-					if index == 0 {
-						err = gitWebBuild(path)
-						if err != nil {
-							return 0, err
-						}
-					}
-				} else {
-					err = gitWebBuild(path)
-					if err != nil {
-						return 0, err
-					}
-				}
 			}
 		}
 	}
