@@ -155,7 +155,10 @@ func UpdateSite(id string, site *Site) (bool, error) {
 		return false, err
 	}
 
-	site.checkNodes()
+	err = site.checkNodes()
+	if err != nil {
+		return false, err
+	}
 
 	return true, nil
 }

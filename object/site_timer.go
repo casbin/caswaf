@@ -33,7 +33,11 @@ func monitorSites() error {
 		//	continue
 		//}
 
-		site.checkNodes()
+		err = site.checkNodes()
+		if err != nil {
+			return err
+		}
+
 		siteUpdateMap[site.GetId()] = site.UpdatedTime
 	}
 
