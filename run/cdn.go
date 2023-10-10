@@ -21,7 +21,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/beego/beego"
 	"github.com/casbin/caswaf/storage"
 	"github.com/casbin/caswaf/util"
 )
@@ -42,7 +41,7 @@ func filterFiles(filenames []string, folder string) []string {
 	return res
 }
 
-func uploadFolder(provider storage.StorageProvider, appName string, siteName string, buildDir string, folder string) (string, error) {
+func uploadFolder(provider storage.StorageProvider, buildDir string, folder string) (string, error) {
 	domainUrl := ""
 
 	path := filepath.Join(buildDir, "static", folder)
@@ -56,7 +55,7 @@ func uploadFolder(provider storage.StorageProvider, appName string, siteName str
 		fileBuffer := bytes.NewBuffer(data)
 
 		objectKey := strings.ReplaceAll(filepath.Join("static", folder, filename), "\\", "/")
-		fileUrl, err := provider.PutObject(appName, siteName, objectKey, fileBuffer)
+		fileUrl, err := provider.PutObject("Built-in-Untracked", "", objectKey, fileBuffer)
 		if err != nil {
 			return "", err
 		}
@@ -98,15 +97,13 @@ func gitUploadCdn(providerName string, siteName string) error {
 		return err
 	}
 
-	appName := beego.AppConfig.String("dbName")
-
 	var domainUrl string
-	domainUrl, err = uploadFolder(provider, appName, siteName, buildDir, "js")
+	domainUrl, err = uploadFolder(provider, buildDir, "js")
 	if err != nil {
 		return err
 	}
 
-	_, err = uploadFolder(provider, appName, siteName, buildDir, "css")
+	_, err = uploadFolder(provider, buildDir, "css")
 	if err != nil {
 		return err
 	}
