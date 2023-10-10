@@ -93,7 +93,7 @@ class NodeTable extends React.Component {
         title: "Version",
         dataIndex: "version",
         key: "version",
-        width: "300px",
+        width: "160px",
         render: (text, record, index) => {
           if (text === "") {
             return null;
@@ -173,6 +173,19 @@ class NodeTable extends React.Component {
         title: "Message",
         dataIndex: "message",
         key: "message",
+      },
+      {
+        title: "Provider",
+        dataIndex: "provider",
+        key: "provider",
+        width: "250px",
+        render: (text, record, index) => {
+          return (
+            <Input value={text} onChange={e => {
+              this.updateField(table, index, "provider", e.target.value);
+            }} />
+          );
+        },
       },
       {
         title: "Action",

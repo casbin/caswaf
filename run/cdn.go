@@ -84,6 +84,10 @@ func updateHtml(domainUrl string, buildDir string) {
 }
 
 func gitUploadCdn(providerName string, siteName string) error {
+	if providerName == "" {
+		return nil
+	}
+
 	fmt.Printf("gitUploadCdn(): [%s]\n", siteName)
 
 	path := GetRepoPath(siteName)

@@ -26,7 +26,7 @@ func isTargetRepo(siteName string) bool {
 	return strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2
 }
 
-func CreateRepo(siteName string, needStart bool, diff string) (int, error) {
+func CreateRepo(siteName string, needStart bool, diff string, providerName string) (int, error) {
 	path := GetRepoPath(siteName)
 	if !util.FileExist(path) {
 		originalName := getOriginalName(siteName)
@@ -64,6 +64,11 @@ func CreateRepo(siteName string, needStart bool, diff string) (int, error) {
 
 		if needWebBuild {
 			err = gitWebBuild(path)
+			if err != nil {
+				return 0, err
+			}
+
+			err = gitUploadCdn(providerName, siteName)
 			if err != nil {
 				return 0, err
 			}
@@ -110,6 +115,11 @@ func CreateRepo(siteName string, needStart bool, diff string) (int, error) {
 
 		if needWebBuild {
 			err = gitWebBuild(path)
+			if err != nil {
+				return 0, err
+			}
+
+			err = gitUploadCdn(providerName, siteName)
 			if err != nil {
 				return 0, err
 			}

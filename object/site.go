@@ -24,12 +24,13 @@ import (
 )
 
 type Node struct {
-	Name    string `json:"name"`
-	Version string `json:"version"`
-	Diff    string `json:"diff"`
-	Pid     int    `json:"pid"`
-	Status  string `json:"status"`
-	Message string `json:"message"`
+	Name     string `json:"name"`
+	Version  string `json:"version"`
+	Diff     string `json:"diff"`
+	Pid      int    `json:"pid"`
+	Status   string `json:"status"`
+	Message  string `json:"message"`
+	Provider string `json:"provider"`
 }
 
 type Site struct {
@@ -255,7 +256,7 @@ func (site *Site) checkNodes() error {
 			diff = site.Nodes[0].Diff
 		}
 
-		pid, err := run.CreateRepo(site.Name, !ok, diff)
+		pid, err := run.CreateRepo(site.Name, !ok, diff, node.Provider)
 		if err != nil {
 			return err
 		}
