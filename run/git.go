@@ -42,7 +42,7 @@ func GitDiff(path string) (string, error) {
 
 	err := cmd.Run()
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	return out.String(), nil
