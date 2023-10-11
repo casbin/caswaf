@@ -25,15 +25,17 @@ import (
 	"github.com/casbin/caswaf/util"
 )
 
-func filterFiles(filenames []string, folder string) []string {
+func filterFiles(filenames []string, folder string, siteName string) []string {
 	res := []string{}
 	for _, filename := range filenames {
 		if !strings.HasSuffix(filename, folder) {
 			continue
 		}
 
-		if strings.Contains(filename, ".chunk.js") {
-			continue
+		if strings.HasPrefix(siteName, "casdoor") {
+			if strings.Contains(filename, ".chunk.js") || strings.Contains(filename, ".chunk.css") {
+				continue
+			}
 		}
 
 		res = append(res, filename)
@@ -41,12 +43,12 @@ func filterFiles(filenames []string, folder string) []string {
 	return res
 }
 
-func uploadFolder(provider storage.StorageProvider, buildDir string, folder string) (string, error) {
+func uploadFolder(provider storage.StorageProvider, buildDir string, folder string, siteName string) (string, error) {
 	domainUrl := ""
 
 	path := filepath.Join(buildDir, "static", folder)
 	filenames := util.ListFiles(path)
-	filteredFilenames := filterFiles(filenames, folder)
+	filteredFilenames := filterFiles(filenames, folder, siteName)
 	for _, filename := range filteredFilenames {
 		data, err := os.ReadFile(filepath.Join(path, filename))
 		if err != nil {
@@ -98,12 +100,12 @@ func gitUploadCdn(providerName string, siteName string) error {
 	}
 
 	var domainUrl string
-	domainUrl, err = uploadFolder(provider, buildDir, "js")
+	domainUrl, err = uploadFolder(provider, buildDir, "js", siteName)
 	if err != nil {
 		return err
 	}
 
-	_, err = uploadFolder(provider, buildDir, "css")
+	_, err = uploadFolder(provider, buildDir, "css", siteName)
 	if err != nil {
 		return err
 	}

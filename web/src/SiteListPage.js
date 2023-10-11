@@ -222,8 +222,12 @@ class SiteListPage extends React.Component {
           return record.nodes.map(node => {
             const versionInfo = Setting.getVersionInfo(node.version, record.name);
             let color = node.message === "" ? "processing" : "error";
-            if (node.provider !== "" && color === "processing") {
-              color = "success";
+            if (color === "processing" && node.provider !== "") {
+              if (node.version === "") {
+                color = "warning";
+              } else if (node.provider !== "") {
+                color = "success";
+              }
             }
 
             const getTag = () => {
