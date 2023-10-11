@@ -16,10 +16,14 @@ package object
 
 import (
 	"fmt"
+	"sync"
 	"time"
 )
 
-var siteUpdateMap = map[string]string{}
+var (
+	siteUpdateMap = map[string]string{}
+	lock          = &sync.Mutex{}
+)
 
 func monitorSites() error {
 	sites, err := GetGlobalSites()
@@ -33,7 +37,9 @@ func monitorSites() error {
 		//	continue
 		//}
 
+		lock.Lock()
 		err = site.checkNodes()
+		lock.Unlock()
 		if err != nil {
 			return err
 		}
