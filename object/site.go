@@ -16,6 +16,7 @@ package object
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/casbin/caswaf/run"
 	"github.com/casbin/caswaf/util"
@@ -44,6 +45,7 @@ type Site struct {
 	Domain       string   `xorm:"varchar(100)" json:"domain"`
 	OtherDomains []string `xorm:"varchar(500)" json:"otherDomains"`
 	NeedRedirect bool     `json:"needRedirect"`
+	Challenges   []string `xorm:"mediumtext" json:"challenges"`
 	Host         string   `xorm:"varchar(100)" json:"host"`
 	Port         int      `json:"port"`
 	SslMode      string   `xorm:"varchar(100)" json:"sslMode"`
@@ -213,6 +215,15 @@ func DeleteSite(site *Site) (bool, error) {
 
 func (site *Site) GetId() string {
 	return fmt.Sprintf("%s/%s", site.Owner, site.Name)
+}
+
+func (site *Site) GetChallengeMap() map[string]string {
+	m := map[string]string{}
+	for _, challenge := range site.Challenges {
+		tokens := strings.Split(challenge, ":")
+		m[tokens[0]] = tokens[1]
+	}
+	return m
 }
 
 func (site *Site) GetHost() string {

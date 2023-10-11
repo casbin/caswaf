@@ -56,6 +56,7 @@ class SiteListPage extends React.Component {
       domain: "door.casdoor.com",
       otherDomains: [],
       needRedirect: false,
+      challenges: [],
       host: "",
       port: 8000,
       sslMode: "HTTP",

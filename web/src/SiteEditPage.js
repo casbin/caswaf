@@ -170,6 +170,18 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("site:Challenges")}:
+          </Col>
+          <Col span={22} >
+            <Select virtual={false} mode="tags" style={{width: "100%"}} value={this.state.site.challenges} onChange={(value => {this.updateSiteField("challenges", value);})}>
+              {
+                this.state.site.challenges?.map((item, index) => <Option key={index} value={item}>{item}</Option>)
+              }
+            </Select>
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("site:Host")}:
           </Col>
           <Col span={22} >

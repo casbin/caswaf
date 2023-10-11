@@ -105,6 +105,16 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		object.UpdateSiteNoRefresh(site.GetId(), site)
 	}
 
+	if strings.HasPrefix(r.RequestURI, "/.well-known/acme-challenge/") {
+		challengeMap := site.GetChallengeMap()
+		for token, keyAuth := range challengeMap {
+			if r.RequestURI == fmt.Sprintf("/.well-known/acme-challenge/%s", token) {
+				responseOk(w, keyAuth)
+				return
+			}
+		}
+	}
+
 	if site.SslMode == "HTTPS Only" {
 		// This domain only supports https but receive http request, redirect to https
 		if r.TLS == nil {
