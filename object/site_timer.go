@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/casbin/caswaf/util"
 )
 
 var (
@@ -53,6 +55,13 @@ func monitorSites() error {
 func StartMonitorSitesLoop() {
 	fmt.Printf("StartMonitorSitesLoop() Start!\n\n")
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				fmt.Printf("[%s] Recovered from StartMonitorSitesLoop() panic: %v\n", util.GetCurrentTime(), r)
+				StartMonitorSitesLoop()
+			}
+		}()
+
 		for {
 			err := refreshSiteMap()
 			if err != nil {
@@ -69,5 +78,4 @@ func StartMonitorSitesLoop() {
 			time.Sleep(5 * time.Second)
 		}
 	}()
-
 }
