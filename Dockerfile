@@ -11,7 +11,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o server . 
     && apt update && apt install wait-for-it && chmod +x /usr/bin/wait-for-it
 
 FROM alpine:latest AS STANDARD
-LABEL MAINTAINER="https://waf.casbin.com/"
+LABEL MAINTAINER="https://caswaf.org/"
 
 COPY --from=BACK /go/src/caswaf/ ./
 COPY --from=BACK /usr/bin/wait-for-it ./

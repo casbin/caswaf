@@ -33,31 +33,41 @@
   </a>
 </p>
 
-## Online Demo
-Deployed site: [https://waf.casbin.com/](https://waf.casbin.com/)
+## Online demo
+
+- Read-only site: https://door.caswaf.com (any modification operation will fail)
+- Writable site: https://demo.caswaf.com (original data will be restored for every 5 minutes)
+
+## Documentation
+
+https://caswaf.org
 
 ## Architecture
+
 CasWAF contains 2 parts:
-Name | Description | Language | Source code
-----|------|----|----
-Frontend | Web frontend UI for CasWAF | Javascript + React | https://github.com/casbin/caswaf/tree/master/web
-Backend | RESTful API backend for CAsWAF | Golang + Beego + MySQL | https://github.com/casbin/caswaf
+
+| Name     | Description                    | Language               | Source code                                      |
+|----------|--------------------------------|------------------------|--------------------------------------------------|
+| Frontend | Web frontend UI for CasWAF     | Javascript + React     | https://github.com/casbin/caswaf/tree/master/web |
+| Backend  | RESTful API backend for CAsWAF | Golang + Beego + MySQL | https://github.com/casbin/caswaf                 |
 
 ## Installation
+
 CasWAF uses Casdoor to manage members. So you need to create an organization and an application for CasWAF in a Casdoor instance.
 
 ### Necessary configuration
 
 #### Get the code
-```bash
-go get github.com/casbin/casdoor
+
+```shell
+go get github.com/casdoor/casdoor
 go get github.com/casbin/caswaf
 ```
 
 or
 
-```bash
-git clone https://github.com/casbin/casdoor
+```shell
+git clone https://github.com/casdoor/casdoor
 git clone https://github.com/casbin/caswaf
 ```
 
@@ -68,6 +78,7 @@ CasWAF will store its users, nodes and topics informations in a MySQL database n
 ```ini
 dataSourceName = root:123@tcp(localhost:3306)/
 ```
+
 CasWAF uses XORM to connect to DB, so all DBs supported by XORM can also be used.
 
 #### Configure Casdoor
@@ -83,11 +94,11 @@ After creating an organization and an application for CasWAF in a Casdoor, you n
 
 #### Setup your WAF to enable some third-party login platform
 
-  CasWAF uses Casdoor to manage members. If you want to log in with oauth, you should see [casdoor oauth configuration](https://casdoor.org/docs/provider/oauth/overview).
+CasWAF uses Casdoor to manage members. If you want to log in with oauth, you should see [casdoor oauth configuration](https://casdoor.org/docs/provider/oauth/overview).
 
 #### OSS, Mail, and SMS services
 
-  CasWAF uses Casdoor to upload files to cloud storage, send Emails and send SMSs. See Casdoor for more details.
+CasWAF uses Casdoor to upload files to cloud storage, send Emails and send SMSs. See Casdoor for more details.
 
 ## Contribute
 
