@@ -132,6 +132,18 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 			}
 		}
 
+		batExisted, err := updateBatFile(siteName)
+		if err != nil {
+			return wrapRepoError("updateBatFile", err)
+		}
+
+		if !batExisted {
+			err = updateShortcutFile(siteName)
+			if err != nil {
+				return wrapRepoError("updateShortcutFile", err)
+			}
+		}
+
 		if affected {
 			if !needStart {
 				err = stopProcess(siteName)

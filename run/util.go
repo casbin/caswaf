@@ -83,8 +83,6 @@ func updateAppConfFile(name string, i int) {
 }
 
 func updateBatFile(name string) (bool, error) {
-	fmt.Printf("updateBatFile(): [%s]\n", name)
-
 	batPath := getBatPath(name)
 	err := ensureFileFolderExists(filepath.Dir(batPath))
 	if err != nil {
@@ -94,6 +92,8 @@ func updateBatFile(name string) (bool, error) {
 	if util.FileExist(batPath) {
 		return true, nil
 	}
+
+	fmt.Printf("updateBatFile(): [%s]\n", name)
 
 	content := fmt.Sprintf("cd %s\ngo run main.go", GetRepoPath(name))
 	util.WriteStringToPath(content, batPath)
