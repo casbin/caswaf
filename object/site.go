@@ -225,7 +225,7 @@ func (site *Site) populateCert() error {
 		return nil
 	}
 
-	cert, err := getCertByDomain(certMap, site.Domain)
+	cert, err := GetCertByDomain(site.Domain)
 	if err != nil {
 		return err
 	}

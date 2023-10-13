@@ -122,7 +122,3 @@ func GetSiteByDomain(domain string) *Site {
 		return nil
 	}
 }
-
-func GetCertByDomain(domain string) (*Cert, error) {
-	return getCertByDomain(certMap, domain)
-}
