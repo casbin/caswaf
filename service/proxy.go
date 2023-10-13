@@ -206,7 +206,7 @@ func Start() {
 		// start https server and set how to get certificate
 		server.TLSConfig.GetCertificate = func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
 			domain := info.ServerName
-			cert, err := getCertificateForDomain(domain)
+			cert, err := getX509CertByDomain(domain)
 			if err != nil {
 				return nil, err
 			}

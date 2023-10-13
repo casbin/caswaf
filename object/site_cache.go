@@ -21,6 +21,7 @@ import (
 )
 
 var siteMap = map[string]*Site{}
+var certMap = map[string]*Cert{}
 
 func InitSiteMap() {
 	err := refreshSiteMap()
@@ -43,7 +44,7 @@ func getCasdoorCertMap() (map[string]*casdoorsdk.Cert, error) {
 }
 
 func getCasdoorApplicationMap() (map[string]*casdoorsdk.Application, error) {
-	certMap, err := getCasdoorCertMap()
+	casdoorCertMap, err := getCasdoorCertMap()
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +57,7 @@ func getCasdoorApplicationMap() (map[string]*casdoorsdk.Application, error) {
 	res := map[string]*casdoorsdk.Application{}
 	for _, application := range applications {
 		if application.Cert != "" {
-			if cert, ok := certMap[application.Cert]; ok {
+			if cert, ok := casdoorCertMap[application.Cert]; ok {
 				application.CertObj = cert
 			}
 		}
@@ -78,17 +79,12 @@ func refreshSiteMap() error {
 		return err
 	}
 
-	certMap, err := getCertMap()
+	certMap, err = getCertMap()
 	if err != nil {
 		return err
 	}
 
 	for _, site := range sites {
-		err = site.populateCert(certMap)
-		if err != nil {
-			return err
-		}
-
 		if applicationMap != nil {
 			if site.CasdoorApplication != "" && site.ApplicationObj == nil {
 				if v, ok2 := applicationMap[site.CasdoorApplication]; ok2 {
@@ -100,7 +96,10 @@ func refreshSiteMap() error {
 		if site.Domain != "" && site.PublicIp == "" {
 			go func(site *Site) {
 				site.PublicIp = resolveDomainToIp(site.Domain)
-				UpdateSiteNoRefresh(site.GetId(), site)
+				_, err = UpdateSiteNoRefresh(site.GetId(), site)
+				if err != nil {
+					fmt.Printf("UpdateSiteNoRefresh() error: %v\n", err)
+				}
 			}(site)
 		}
 
@@ -122,4 +121,8 @@ func GetSiteByDomain(domain string) *Site {
 	} else {
 		return nil
 	}
+}
+
+func GetCertByDomain(domain string) (*Cert, error) {
+	return getCertByDomain(certMap, domain)
 }

@@ -222,7 +222,7 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:SSL mode")}:
+            {i18next.t("site:Mode")}:
           </Col>
           <Col span={22} >
             <Select virtual={false} style={{width: "100%"}} value={this.state.site.sslMode} onChange={(value => {this.updateSiteField("sslMode", value);})}>

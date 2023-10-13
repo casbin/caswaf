@@ -67,16 +67,16 @@ func getSiteByDomainWithWww(domain string) *object.Site {
 	return site
 }
 
-func getCertificateForDomain(domain string) (*tls.Certificate, error) {
-	site := getSiteByDomainWithWww(domain)
-	if site == nil {
-		return nil, fmt.Errorf("getCertificateForDomain() error: site not found for domain: [%s]", domain)
+func getX509CertByDomain(domain string) (*tls.Certificate, error) {
+	cert, err := object.GetCertByDomain(domain)
+	if err != nil {
+		return nil, fmt.Errorf("getX509CertByDomain() error: %v", err)
 	}
-	if site.SslCertObj == nil {
-		return nil, fmt.Errorf("getCertificateForDomain() error: cert not found for domain: [%s]", domain)
+	if cert == nil {
+		return nil, fmt.Errorf("getX509CertByDomain() error: cert not found for domain: [%s]", domain)
 	}
 
-	tlsCert, certErr := tls.X509KeyPair([]byte(site.SslCertObj.Certificate), []byte(site.SslCertObj.PrivateKey))
+	tlsCert, certErr := tls.X509KeyPair([]byte(cert.Certificate), []byte(cert.PrivateKey))
 
 	return &tlsCert, certErr
 }

@@ -55,10 +55,8 @@ type Site struct {
 	IsSelf       bool     `json:"isSelf"`
 	Nodes        []*Node  `xorm:"mediumtext" json:"nodes"`
 
-	CasdoorApplication string `xorm:"varchar(100)" json:"casdoorApplication"`
-
-	SslCertObj     *Cert                   `xorm:"-" json:"sslCertObj"`
-	ApplicationObj *casdoorsdk.Application `xorm:"-" json:"applicationObj"`
+	CasdoorApplication string                  `xorm:"varchar(100)" json:"casdoorApplication"`
+	ApplicationObj     *casdoorsdk.Application `xorm:"-" json:"applicationObj"`
 }
 
 func GetGlobalSites() ([]*Site, error) {
@@ -78,13 +76,8 @@ func GetSites(owner string) ([]*Site, error) {
 		return nil, err
 	}
 
-	certMap, err := getCertMap()
-	if err != nil {
-		return nil, err
-	}
-
 	for _, site := range sites {
-		err = site.populateCertName(certMap)
+		err = site.populateCert()
 		if err != nil {
 			return nil, err
 		}
@@ -113,18 +106,8 @@ func GetSite(id string) (*Site, error) {
 		return nil, err
 	}
 
-	certMap, err := getCertMap()
-	if err != nil {
-		return nil, err
-	}
-
 	if site != nil {
-		certMap, err = getCertMap()
-		if err != nil {
-			return nil, err
-		}
-
-		err = site.populateCertName(certMap)
+		err = site.populateCert()
 		if err != nil {
 			return nil, err
 		}
@@ -237,31 +220,20 @@ func (site *Site) GetId() string {
 	return fmt.Sprintf("%s/%s", site.Owner, site.Name)
 }
 
-func (site *Site) populateCert(certMap map[string]*Cert) error {
+func (site *Site) populateCert() error {
 	if site.Domain == "" {
 		return nil
 	}
 
-	cert, err := getCertFromDomain(certMap, site.Domain)
+	cert, err := getCertByDomain(certMap, site.Domain)
 	if err != nil {
 		return err
 	}
-
-	site.SslCertObj = cert
-	return nil
-}
-
-func (site *Site) populateCertName(certMap map[string]*Cert) error {
-	err := site.populateCert(certMap)
-	if err != nil {
-		return err
+	if cert == nil {
+		return nil
 	}
 
-	if site.SslCertObj != nil {
-		site.SslCert = site.SslCertObj.Name
-		site.SslCertObj = nil
-	}
-
+	site.SslCert = cert.Name
 	return nil
 }
 

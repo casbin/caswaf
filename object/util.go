@@ -164,7 +164,7 @@ func getCertMap() (map[string]*Cert, error) {
 	return res, nil
 }
 
-func getCertFromDomain(certMap map[string]*Cert, domain string) (*Cert, error) {
+func getCertByDomain(certMap map[string]*Cert, domain string) (*Cert, error) {
 	cert, ok := certMap[domain]
 	if ok {
 		return cert, nil

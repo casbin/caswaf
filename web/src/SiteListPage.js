@@ -289,7 +289,7 @@ class SiteListPage extends React.Component {
       //   },
       // },
       {
-        title: i18next.t("site:SSL mode"),
+        title: i18next.t("site:Mode"),
         dataIndex: "sslMode",
         key: "sslMode",
         width: "120px",
