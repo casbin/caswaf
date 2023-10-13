@@ -49,7 +49,7 @@ type Site struct {
 	Host         string   `xorm:"varchar(100)" json:"host"`
 	Port         int      `json:"port"`
 	SslMode      string   `xorm:"varchar(100)" json:"sslMode"`
-	SslCert      string   `xorm:"varchar(100)" json:"sslCert"`
+	SslCert      string   `xorm:"-" json:"sslCert"`
 	PublicIp     string   `xorm:"varchar(100)" json:"publicIp"`
 	Node         string   `xorm:"varchar(100)" json:"node"`
 	IsSelf       bool     `json:"isSelf"`
@@ -78,17 +78,15 @@ func GetSites(owner string) ([]*Site, error) {
 		return nil, err
 	}
 
-	for _, site := range sites {
-		if site.SslCert == "" && site.Domain != "" && (site.SslMode == "HTTPS and HTTP" || site.SslMode == "HTTPS Only") {
-			site.SslCert, err = getBaseDomain(site.Domain)
-			if err != nil {
-				return nil, err
-			}
+	certMap, err := getCertMap()
+	if err != nil {
+		return nil, err
+	}
 
-			_, err = UpdateSite(site.GetId(), site)
-			if err != nil {
-				return nil, err
-			}
+	for _, site := range sites {
+		err = site.populateCertName(certMap)
+		if err != nil {
+			return nil, err
 		}
 	}
 
@@ -110,7 +108,29 @@ func getSite(owner string, name string) (*Site, error) {
 
 func GetSite(id string) (*Site, error) {
 	owner, name := util.GetOwnerAndNameFromId(id)
-	return getSite(owner, name)
+	site, err := getSite(owner, name)
+	if err != nil {
+		return nil, err
+	}
+
+	certMap, err := getCertMap()
+	if err != nil {
+		return nil, err
+	}
+
+	if site != nil {
+		certMap, err = getCertMap()
+		if err != nil {
+			return nil, err
+		}
+
+		err = site.populateCertName(certMap)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return site, nil
 }
 
 func GetMaskedSite(site *Site, node string) *Site {
@@ -215,6 +235,34 @@ func DeleteSite(site *Site) (bool, error) {
 
 func (site *Site) GetId() string {
 	return fmt.Sprintf("%s/%s", site.Owner, site.Name)
+}
+
+func (site *Site) populateCert(certMap map[string]*Cert) error {
+	if site.Domain == "" {
+		return nil
+	}
+
+	cert, err := getCertFromDomain(certMap, site.Domain)
+	if err != nil {
+		return err
+	}
+
+	site.SslCertObj = cert
+	return nil
+}
+
+func (site *Site) populateCertName(certMap map[string]*Cert) error {
+	err := site.populateCert(certMap)
+	if err != nil {
+		return err
+	}
+
+	if site.SslCertObj != nil {
+		site.SslCert = site.SslCertObj.Name
+		site.SslCertObj = nil
+	}
+
+	return nil
 }
 
 func (site *Site) GetChallengeMap() map[string]string {

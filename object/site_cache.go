@@ -29,7 +29,7 @@ func InitSiteMap() {
 	}
 }
 
-func getCertMap() (map[string]*casdoorsdk.Cert, error) {
+func getCasdoorCertMap() (map[string]*casdoorsdk.Cert, error) {
 	certs, err := casdoorsdk.GetCerts()
 	if err != nil {
 		return nil, err
@@ -42,8 +42,8 @@ func getCertMap() (map[string]*casdoorsdk.Cert, error) {
 	return res, nil
 }
 
-func getApplicationMap() (map[string]*casdoorsdk.Application, error) {
-	certMap, err := getCertMap()
+func getCasdoorApplicationMap() (map[string]*casdoorsdk.Application, error) {
+	certMap, err := getCasdoorCertMap()
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func getApplicationMap() (map[string]*casdoorsdk.Application, error) {
 }
 
 func refreshSiteMap() error {
-	applicationMap, err := getApplicationMap()
+	applicationMap, err := getCasdoorApplicationMap()
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -78,12 +78,15 @@ func refreshSiteMap() error {
 		return err
 	}
 
+	certMap, err := getCertMap()
+	if err != nil {
+		return err
+	}
+
 	for _, site := range sites {
-		if site.SslCert != "" {
-			site.SslCertObj, err = getCert("admin", site.SslCert)
-			if err != nil {
-				return err
-			}
+		err = site.populateCert(certMap)
+		if err != nil {
+			return err
 		}
 
 		if applicationMap != nil {

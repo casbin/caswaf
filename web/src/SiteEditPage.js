@@ -242,7 +242,7 @@ class SiteEditPage extends React.Component {
             {i18next.t("site:SSL cert")}:
           </Col>
           <Col span={22} >
-            <Select virtual={false} style={{width: "100%"}} showSearch value={this.state.site.sslCert} onChange={(value => {
+            <Select disabled={true} virtual={false} style={{width: "100%"}} showSearch value={this.state.site.sslCert} onChange={(value => {
               this.updateSiteField("sslCert", value);
             })}>
               {

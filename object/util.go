@@ -53,11 +53,7 @@ func getBaseDomain(domain string) (string, error) {
 	// abc.com.it -> abc.com.it
 	// subdomain.abc.io -> abc.io
 	// subdomain.abc.org.us -> abc.org.us
-	baseDomain, err := publicsuffix.EffectiveTLDPlusOne(domain)
-	if err != nil {
-		return "", err
-	}
-	return baseDomain, nil
+	return publicsuffix.EffectiveTLDPlusOne(domain)
 }
 
 func pingUrl(url string) (bool, string) {
@@ -153,4 +149,36 @@ func getSiteVersion(siteName string) (string, error) {
 
 	res := util.StructToJsonNoIndent(versionInfo)
 	return res, nil
+}
+
+func getCertMap() (map[string]*Cert, error) {
+	certs, err := GetGlobalCerts()
+	if err != nil {
+		return nil, err
+	}
+
+	res := map[string]*Cert{}
+	for _, cert := range certs {
+		res[cert.Name] = cert
+	}
+	return res, nil
+}
+
+func getCertFromDomain(certMap map[string]*Cert, domain string) (*Cert, error) {
+	cert, ok := certMap[domain]
+	if ok {
+		return cert, nil
+	}
+
+	baseDomain, err := getBaseDomain(domain)
+	if err != nil {
+		return nil, err
+	}
+
+	cert, ok = certMap[baseDomain]
+	if ok {
+		return cert, nil
+	}
+
+	return nil, nil
 }

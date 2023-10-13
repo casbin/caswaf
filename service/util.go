@@ -73,7 +73,7 @@ func getCertificateForDomain(domain string) (*tls.Certificate, error) {
 		return nil, fmt.Errorf("getCertificateForDomain() error: site not found for domain: [%s]", domain)
 	}
 	if site.SslCertObj == nil {
-		return nil, fmt.Errorf("getCertificateForDomain() error: cert: [%s] not found for site: [%s]", site.SslCert, site.Name)
+		return nil, fmt.Errorf("getCertificateForDomain() error: cert not found for domain: [%s]", domain)
 	}
 
 	tlsCert, certErr := tls.X509KeyPair([]byte(site.SslCertObj.Certificate), []byte(site.SslCertObj.PrivateKey))
