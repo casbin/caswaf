@@ -101,7 +101,7 @@ func (site *Site) updateCertForDomain(domain string) error {
 		return err
 	}
 	if !ok {
-		fmt.Printf("preCheckCertForDomain(): not ok for domain: %s", domain)
+		fmt.Printf("preCheckCertForDomain(): not ok for domain: %s\n", domain)
 		return nil
 	}
 

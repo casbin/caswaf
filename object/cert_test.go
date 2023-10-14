@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/casbin/caswaf/casdoor"
 	"github.com/casbin/caswaf/proxy"
 	"github.com/casbin/caswaf/util"
 )
@@ -76,6 +77,7 @@ func TestApplyAllCerts(t *testing.T) {
 
 func TestUpdateCerts(t *testing.T) {
 	InitConfig()
+	casdoor.InitCasdoorConfig()
 
 	site, err := getSite("admin", "test-site")
 	if err != nil {

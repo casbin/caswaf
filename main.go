@@ -17,6 +17,7 @@ package main
 import (
 	"github.com/beego/beego"
 	"github.com/beego/beego/plugins/cors"
+	"github.com/casbin/caswaf/casdoor"
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/routers"
 	"github.com/casbin/caswaf/run"
@@ -27,6 +28,7 @@ func main() {
 	object.InitFlag()
 	object.InitAdapter()
 	object.CreateTables()
+	casdoor.InitCasdoorConfig()
 	object.InitSiteMap()
 	run.InitAppMap()
 	run.InitSelfStart()

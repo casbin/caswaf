@@ -12,42 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:build !skipCi
-// +build !skipCi
-
-package run
+package casdoor
 
 import (
-	"testing"
+	_ "embed"
 
 	"github.com/beego/beego"
-	"github.com/casbin/caswaf/casdoor"
-	"github.com/casbin/caswaf/object"
+	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
 
-func TestGitGetDiff(t *testing.T) {
-	err := beego.LoadAppConfig("ini", "../conf/app.conf")
-	if err != nil {
-		panic(err)
-	}
+//go:embed token_jwt_key.pem
+var JwtPublicKey string
 
-	//diff := GitDiff("F:/github_repos/casdoor")
-	//println(diff)
-
-	pid, err := CreateRepo("casdoor_test", true, "", "")
-	if err != nil {
-		panic(err)
-	}
-
-	println(pid)
-}
-
-func TestUploadCdn(t *testing.T) {
-	object.InitConfig()
-	casdoor.InitCasdoorConfig()
-
-	err := gitUploadCdn("provider_storage_aliyun_oss", "casdoor")
-	if err != nil {
-		panic(err)
-	}
+func InitCasdoorConfig() {
+	casdoorEndpoint := beego.AppConfig.String("casdoorEndpoint")
+	clientId := beego.AppConfig.String("clientId")
+	clientSecret := beego.AppConfig.String("clientSecret")
+	casdoorOrganization := beego.AppConfig.String("casdoorOrganization")
+	casdoorApplication := beego.AppConfig.String("casdoorApplication")
+	casdoorsdk.InitConfig(casdoorEndpoint, clientId, clientSecret, JwtPublicKey, casdoorOrganization, casdoorApplication)
 }

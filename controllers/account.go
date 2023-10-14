@@ -17,27 +17,9 @@ package controllers
 import (
 	_ "embed"
 
-	"github.com/beego/beego"
 	"github.com/casbin/caswaf/util"
 	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
-
-//go:embed token_jwt_key.pem
-var JwtPublicKey string
-
-func init() {
-	InitAuthConfig()
-}
-
-func InitAuthConfig() {
-	casdoorEndpoint := beego.AppConfig.String("casdoorEndpoint")
-	clientId := beego.AppConfig.String("clientId")
-	clientSecret := beego.AppConfig.String("clientSecret")
-	casdoorOrganization := beego.AppConfig.String("casdoorOrganization")
-	casdoorApplication := beego.AppConfig.String("casdoorApplication")
-
-	casdoorsdk.InitConfig(casdoorEndpoint, clientId, clientSecret, JwtPublicKey, casdoorOrganization, casdoorApplication)
-}
 
 func (c *ApiController) Signin() {
 	code := c.Input().Get("code")
