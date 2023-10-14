@@ -18,8 +18,10 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func IndexAt(s, sep string, n int) int {
@@ -122,4 +124,14 @@ func WriteBytesToPath(b []byte, path string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func GetRandomName() string {
+	rand.Seed(time.Now().UnixNano())
+	const charset = "0123456789abcdefghijklmnopqrstuvwxyz"
+	result := make([]byte, 6)
+	for i := range result {
+		result[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(result)
 }

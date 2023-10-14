@@ -220,23 +220,6 @@ func (site *Site) GetId() string {
 	return fmt.Sprintf("%s/%s", site.Owner, site.Name)
 }
 
-func (site *Site) populateCert() error {
-	if site.Domain == "" {
-		return nil
-	}
-
-	cert, err := GetCertByDomain(site.Domain)
-	if err != nil {
-		return err
-	}
-	if cert == nil {
-		return nil
-	}
-
-	site.SslCert = cert.Name
-	return nil
-}
-
 func (site *Site) GetChallengeMap() map[string]string {
 	m := map[string]string{}
 	for _, challenge := range site.Challenges {

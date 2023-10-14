@@ -73,3 +73,20 @@ func TestApplyAllCerts(t *testing.T) {
 		util.WriteStringToPath(cert.PrivateKey, fmt.Sprintf("%s/%s.key", baseDir, cert.Name))
 	}
 }
+
+func TestUpdateCerts(t *testing.T) {
+	InitConfig()
+
+	site, err := getSite("admin", "test-site")
+	if err != nil {
+		panic(err)
+	}
+	if site == nil {
+		panic("site should not be nil")
+	}
+
+	err = site.updateCerts()
+	if err != nil {
+		panic(err)
+	}
+}

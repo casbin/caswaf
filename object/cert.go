@@ -148,7 +148,10 @@ func (cert *Cert) GetId() string {
 }
 
 func RenewCert(cert *Cert) (bool, error) {
-	client := certificate.GetAcmeClient(acmeEmail, acmePrivateKey, false)
+	client, err := GetAcmeClient()
+	if err != nil {
+		return false, err
+	}
 
 	var certStr, privateKey string
 	if cert.Provider == "Aliyun" {
