@@ -61,6 +61,7 @@ func getMappedName(name string) string {
 	for k, v := range appMap {
 		if v == "cc" {
 			name = strings.Replace(name, k, v, 1)
+			name = strings.Replace(name, "cc_00", "cc_", 1)
 			return name
 		}
 	}
