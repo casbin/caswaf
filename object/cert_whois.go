@@ -23,7 +23,7 @@ import (
 	whoisparser "github.com/likexian/whois-parser"
 )
 
-func getDomainExpireTime(domainName string) string {
+func getDomainExpireTime(domainName string) (string, error) {
 	server := ""
 	if strings.HasSuffix(domainName, ".com") || strings.HasSuffix(domainName, ".net") {
 		server = "whois.verisign-grs.com"
@@ -52,15 +52,15 @@ func getDomainExpireTime(domainName string) string {
 	data, err := client.Whois(domainName, server)
 	if err != nil {
 		if !strings.HasSuffix(domainName, ".run") || data == "" {
-			panic(err)
+			return "", err
 		}
 	}
 
 	whoisInfo, err := whoisparser.Parse(data)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	res := whoisInfo.Domain.ExpirationDateInTime.Local().Format(time.RFC3339)
-	return res
+	return res, nil
 }

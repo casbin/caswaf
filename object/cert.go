@@ -57,8 +57,13 @@ func GetCerts(owner string) ([]*Cert, error) {
 
 	for _, cert := range certs {
 		if cert.Certificate != "" && cert.ExpireTime == "" {
-			cert.ExpireTime = getCertExpireTime(cert.Certificate)
-			if _, err := UpdateCert(cert.GetId(), cert); err != nil {
+			cert.ExpireTime, err = getCertExpireTime(cert.Certificate)
+			if err != nil {
+				return nil, err
+			}
+
+			_, err = UpdateCert(cert.GetId(), cert)
+			if err != nil {
 				return nil, err
 			}
 		}
@@ -112,7 +117,12 @@ func UpdateCert(id string, cert *Cert) (bool, error) {
 	}
 
 	if cert.Certificate != "" {
-		cert.ExpireTime = getCertExpireTime(cert.Certificate)
+		expireTime, err := getCertExpireTime(cert.Certificate)
+		if err != nil {
+			return false, err
+		}
+
+		cert.ExpireTime = expireTime
 	} else {
 		cert.ExpireTime = ""
 	}
@@ -162,7 +172,12 @@ func RenewCert(cert *Cert) (bool, error) {
 		return false, fmt.Errorf("unknown provider: %s", cert.Provider)
 	}
 
-	cert.ExpireTime = getCertExpireTime(certStr)
+	expireTime, err := getCertExpireTime(certStr)
+	if err != nil {
+		return false, err
+	}
+
+	cert.ExpireTime = expireTime
 	cert.Certificate = certStr
 	cert.PrivateKey = privateKey
 

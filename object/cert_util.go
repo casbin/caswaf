@@ -26,8 +26,7 @@ func getCertExpireTime(s string) (string, error) {
 	block, _ := pem.Decode([]byte(s))
 	if block == nil {
 		return "", errors.New("getCertExpireTime() error, block should not be nil")
-	}
-	if block == nil || block.Type != "CERTIFICATE" {
+	} else if block.Type != "CERTIFICATE" {
 		return "", errors.New(fmt.Sprintf("getCertExpireTime() error, block.Type should be \"CERTIFICATE\" instead of %s", block.Type))
 	}
 

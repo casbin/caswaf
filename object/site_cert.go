@@ -128,6 +128,16 @@ func (site *Site) updateCertForDomain(domain string) error {
 		return err
 	}
 
+	expireTime, err := getCertExpireTime(certificate)
+	if err != nil {
+		return err
+	}
+
+	domainExpireTime, err := getDomainExpireTime(domain)
+	if err != nil {
+		return err
+	}
+
 	cert := Cert{
 		Owner:            site.Owner,
 		Name:             domain,
@@ -135,8 +145,8 @@ func (site *Site) updateCertForDomain(domain string) error {
 		DisplayName:      domain,
 		Type:             "SSL",
 		CryptoAlgorithm:  "RSA",
-		ExpireTime:       getCertExpireTime(certificate),
-		DomainExpireTime: getDomainExpireTime(domain),
+		ExpireTime:       expireTime,
+		DomainExpireTime: domainExpireTime,
 		Provider:         "",
 		Account:          "",
 		AccessKey:        "",

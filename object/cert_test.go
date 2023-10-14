@@ -34,7 +34,12 @@ func TestGetCertExpireTime(t *testing.T) {
 		panic(err)
 	}
 
-	println(getCertExpireTime(cert.Certificate))
+	expireTime, err := getCertExpireTime(cert.Certificate)
+	if err != nil {
+		panic(err)
+	}
+
+	println(expireTime)
 }
 
 func TestRenewAllCerts(t *testing.T) {
