@@ -24,6 +24,11 @@ import (
 )
 
 func getDomainExpireTime(domainName string) (string, error) {
+	domainName, err := getBaseDomain(domainName)
+	if err != nil {
+		return "", err
+	}
+
 	server := ""
 	if strings.HasSuffix(domainName, ".com") || strings.HasSuffix(domainName, ".net") {
 		server = "whois.verisign-grs.com"

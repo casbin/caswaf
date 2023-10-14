@@ -15,8 +15,8 @@
 package object
 
 import (
-	"encoding/pem"
 	"fmt"
+
 	"github.com/casbin/lego/v4/certificate"
 )
 
@@ -86,7 +86,5 @@ func getHttp01Cert(siteId string, domain string) (string, string, error) {
 		return "", "", err
 	}
 
-	cert := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: resource.Certificate})
-	key := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: resource.PrivateKey})
-	return string(cert), string(key), nil
+	return string(resource.Certificate), string(resource.PrivateKey), nil
 }

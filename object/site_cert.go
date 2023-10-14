@@ -130,12 +130,12 @@ func (site *Site) updateCertForDomain(domain string) error {
 
 	expireTime, err := getCertExpireTime(certificate)
 	if err != nil {
-		return err
+		fmt.Printf("getCertExpireTime() error: %v\n", err)
 	}
 
 	domainExpireTime, err := getDomainExpireTime(domain)
 	if err != nil {
-		return err
+		fmt.Printf("getDomainExpireTime() error: %v\n", err)
 	}
 
 	cert := Cert{
