@@ -60,11 +60,14 @@ func checkUrlToken(url string, keyAuth string) (bool, error) {
 }
 
 func (site *Site) preCheckCertForDomain(domain string) (bool, error) {
-	token := util.GetRandomName()
-	keyAuth := util.GetRandomName()
+	token, keyAuth, err := util.GenerateTwoUniqueRandomStrings()
+	if err != nil {
+		return false, err
+	}
+
 	site.Challenges = []string{fmt.Sprintf("%s:%s", token, keyAuth)}
 
-	_, err := UpdateSiteNoRefresh(site.GetId(), site)
+	_, err = UpdateSiteNoRefresh(site.GetId(), site)
 	if err != nil {
 		return false, err
 	}

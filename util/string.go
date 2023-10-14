@@ -15,13 +15,13 @@
 package util
 
 import (
+	"crypto/rand"
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"math/rand"
+	"math/big"
 	"strconv"
 	"strings"
-	"time"
 )
 
 func IndexAt(s, sep string, n int) int {
@@ -126,12 +126,40 @@ func WriteBytesToPath(b []byte, path string) {
 	}
 }
 
-func GetRandomName() string {
-	rand.Seed(time.Now().UnixNano())
-	const charset = "0123456789abcdefghijklmnopqrstuvwxyz"
-	result := make([]byte, 6)
-	for i := range result {
-		result[i] = charset[rand.Intn(len(charset))]
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+func generateRandomString(length int) (string, error) {
+	b := make([]byte, length)
+	for i := range b {
+		var c byte
+		index, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		if err != nil {
+			return "", err
+		}
+		c = charset[index.Int64()]
+		b[i] = c
 	}
-	return string(result)
+	return string(b), nil
+}
+
+func GenerateTwoUniqueRandomStrings() (string, string, error) {
+	len1 := 16 + int(big.NewInt(17).Int64())
+	len2 := 16 + int(big.NewInt(17).Int64())
+
+	str1, err := generateRandomString(len1)
+	if err != nil {
+		return "", "", err
+	}
+	str2, err := generateRandomString(len2)
+	if err != nil {
+		return "", "", err
+	}
+
+	for str1 == str2 {
+		str2, err = generateRandomString(len2)
+		if err != nil {
+			return "", "", err
+		}
+	}
+	return str1, str2, nil
 }
