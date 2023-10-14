@@ -94,10 +94,12 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	hostNonWww := getHostNonWww(r.Host)
 	if hostNonWww != "" {
 		redirectToHost(w, r, hostNonWww)
+		return
 	}
 
 	if site.Domain != r.Host && site.NeedRedirect {
 		redirectToHost(w, r, site.Domain)
+		return
 	}
 
 	if site.Node == "" {
@@ -124,6 +126,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		// This domain only supports https but receive http request, redirect to https
 		if r.TLS == nil {
 			redirectToHttps(w, r)
+			return
 		}
 	}
 
