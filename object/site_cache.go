@@ -16,6 +16,7 @@ package object
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
@@ -103,10 +104,10 @@ func refreshSiteMap() error {
 			}(site)
 		}
 
-		newSiteMap[site.Domain] = site
+		newSiteMap[strings.ToLower(site.Domain)] = site
 		for _, domain := range site.OtherDomains {
 			if domain != "" {
-				newSiteMap[domain] = site
+				newSiteMap[strings.ToLower(domain)] = site
 			}
 		}
 	}
@@ -116,7 +117,7 @@ func refreshSiteMap() error {
 }
 
 func GetSiteByDomain(domain string) *Site {
-	if site, ok := siteMap[domain]; ok {
+	if site, ok := siteMap[strings.ToLower(domain)]; ok {
 		return site
 	} else {
 		return nil
