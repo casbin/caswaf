@@ -27,7 +27,7 @@ var (
 	lock          = &sync.Mutex{}
 )
 
-func monitorSites() error {
+func monitorSiteNodes() error {
 	sites, err := GetGlobalSites()
 	if err != nil {
 		return err
@@ -41,6 +41,31 @@ func monitorSites() error {
 
 		lock.Lock()
 		err = site.checkNodes()
+		lock.Unlock()
+		if err != nil {
+			return err
+		}
+
+		siteUpdateMap[site.GetId()] = site.UpdatedTime
+	}
+
+	return err
+}
+
+func monitorSiteCerts() error {
+	sites, err := GetGlobalSites()
+	if err != nil {
+		return err
+	}
+
+	for _, site := range sites {
+		//updatedTime, ok := siteUpdateMap[site.GetId()]
+		//if ok && updatedTime != "" && updatedTime == site.UpdatedTime {
+		//	continue
+		//}
+
+		lock.Lock()
+		err = site.checkCerts()
 		lock.Unlock()
 		if err != nil {
 			return err
@@ -69,7 +94,13 @@ func StartMonitorSitesLoop() {
 				continue
 			}
 
-			err = monitorSites()
+			err = monitorSiteNodes()
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			err = monitorSiteCerts()
 			if err != nil {
 				fmt.Println(err)
 				continue

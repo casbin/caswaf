@@ -80,7 +80,7 @@ func TestApplyAllCerts(t *testing.T) {
 	}
 }
 
-func TestUpdateCerts(t *testing.T) {
+func TestCheckCerts(t *testing.T) {
 	InitConfig()
 	casdoor.InitCasdoorConfig()
 	proxy.InitHttpClient()
@@ -93,7 +93,7 @@ func TestUpdateCerts(t *testing.T) {
 		panic("site should not be nil")
 	}
 
-	err = site.updateCerts()
+	err = site.checkCerts()
 	if err != nil {
 		panic(err)
 	}

@@ -151,6 +151,15 @@ func getSiteVersion(siteName string) (string, error) {
 	return res, nil
 }
 
+func getNodeNameFromTag(s string) string {
+	tokens := strings.SplitN(s, "-", 2)
+	if len(tokens) >= 2 {
+		return tokens[1]
+	} else {
+		return s
+	}
+}
+
 func getCertMap() (map[string]*Cert, error) {
 	certs, err := GetGlobalCerts()
 	if err != nil {

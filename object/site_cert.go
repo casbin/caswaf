@@ -167,7 +167,19 @@ func (site *Site) updateCertForDomain(domain string) error {
 	return nil
 }
 
-func (site *Site) updateCerts() error {
+func (site *Site) checkCerts() error {
+	hostname := util.GetHostname()
+	if len(site.Nodes) != 0 {
+		if site.Nodes[0].Name != hostname {
+			return nil
+		}
+	} else {
+		nodeName := getNodeNameFromTag(site.Tag)
+		if nodeName != hostname {
+			return nil
+		}
+	}
+
 	domains := []string{}
 	if site.Domain != "" {
 		domains = append(domains, site.Domain)
