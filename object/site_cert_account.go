@@ -47,10 +47,15 @@ func (a *Account) GetRegistration() *registration.Resource {
 	return a.Registration
 }
 
-func getLegoClientAndAccount(email string, privateKey string, devMode bool) (*lego.Client, *Account) {
+func getLegoClientAndAccount(email string, privateKey string, devMode bool) (*lego.Client, *Account, error) {
+	eccKey, err := decodeEccKey(privateKey)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	account := &Account{
 		Email: email,
-		key:   decodeEccKey(privateKey),
+		key:   eccKey,
 	}
 
 	config := lego.NewConfig(account)
@@ -65,23 +70,25 @@ func getLegoClientAndAccount(email string, privateKey string, devMode bool) (*le
 
 	client, err := lego.NewClient(config)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
-	return client, account
+	return client, account, nil
 }
 
-func getAcmeClient(email string, privateKey string, devMode bool) *lego.Client {
+func getAcmeClient(email string, privateKey string, devMode bool) (*lego.Client, error) {
 	// Create a user. New accounts need an email and private key to start.
-	client, account := getLegoClientAndAccount(email, privateKey, devMode)
+	client, account, err := getLegoClientAndAccount(email, privateKey, devMode)
+	if err != nil {
+		return nil, err
+	}
 
 	// try to obtain an account based on the private key
-	var err error
 	account.Registration, err = client.Registration.ResolveAccountByKey()
 	if err != nil {
 		acmeError, ok := err.(*acme.ProblemDetails)
 		if !ok {
-			panic(err)
+			return nil, err
 		}
 
 		if acmeError.Type != "urn:ietf:params:acme:error:accountDoesNotExist" {
@@ -89,14 +96,13 @@ func getAcmeClient(email string, privateKey string, devMode bool) *lego.Client {
 		}
 
 		// Failed to get account, so create an account based on the private key.
-		var err error
 		account.Registration, err = client.Registration.Register(registration.RegisterOptions{TermsOfServiceAgreed: true})
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 	}
 
-	return client
+	return client, nil
 }
 
 func GetAcmeClient() (*lego.Client, error) {
@@ -109,6 +115,5 @@ func GetAcmeClient() (*lego.Client, error) {
 		return nil, fmt.Errorf("acmePrivateKey should not be empty")
 	}
 
-	client := getAcmeClient(acmeEmail, acmePrivateKey, false)
-	return client, nil
+	return getAcmeClient(acmeEmail, acmePrivateKey, false)
 }

@@ -78,6 +78,7 @@ func TestApplyAllCerts(t *testing.T) {
 func TestUpdateCerts(t *testing.T) {
 	InitConfig()
 	casdoor.InitCasdoorConfig()
+	proxy.InitHttpClient()
 
 	site, err := getSite("admin", "test-site")
 	if err != nil {

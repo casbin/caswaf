@@ -84,13 +84,19 @@ func (site *Site) preCheckCertForDomain(domain string) (bool, error) {
 		return false, err
 	}
 
-	time.Sleep(2 * time.Second)
-
-	var ok bool
 	url := fmt.Sprintf("http://%s/.well-known/acme-challenge/%s", domain, token)
-	ok, err = checkUrlToken(url, keyAuth)
-	if err != nil {
-		fmt.Printf("preCheckCertForDomain() error: %v\n", err)
+	var ok bool
+	for i := 0; i < 10; i++ {
+		fmt.Printf("checkUrlToken(): try time: %d\n", i+1)
+		ok, err = checkUrlToken(url, keyAuth)
+		if err != nil {
+			fmt.Printf("preCheckCertForDomain() error: %v\n", err)
+			time.Sleep(time.Second)
+		}
+		if ok {
+			fmt.Printf("checkUrlToken(): try time: %d, succeed!\n", i+1)
+			break
+		}
 	}
 
 	site.Challenges = []string{}

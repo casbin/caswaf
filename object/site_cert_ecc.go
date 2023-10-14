@@ -20,6 +20,8 @@ import (
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
+	"strings"
 )
 
 // generateEccKey generates a public and private key pair.(NIST P-256)
@@ -40,13 +42,18 @@ func encodeEccKey(privateKey *ecdsa.PrivateKey) string {
 }
 
 // decodeEccKey Return the entered private key string as a private key object that can be used
-func decodeEccKey(pemEncoded string) *ecdsa.PrivateKey {
+func decodeEccKey(pemEncoded string) (*ecdsa.PrivateKey, error) {
+	pemEncoded = strings.ReplaceAll(pemEncoded, "\\n", "\n")
 	block, _ := pem.Decode([]byte(pemEncoded))
+	if block == nil {
+		return nil, fmt.Errorf("decodeEccKey() error, block should not be nil")
+	}
+
 	x509Encoded := block.Bytes
 	privateKey, err := x509.ParseECPrivateKey(x509Encoded)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return privateKey
+	return privateKey, nil
 }
