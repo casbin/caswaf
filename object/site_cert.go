@@ -19,6 +19,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/casbin/caswaf/util"
 )
@@ -41,7 +42,13 @@ func (site *Site) populateCert() error {
 }
 
 func checkUrlToken(url string, keyAuth string) (bool, error) {
-	resp, err := http.Get(url)
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+
+	resp, err := client.Get(url)
 	if err != nil {
 		return false, err
 	}
@@ -76,6 +83,8 @@ func (site *Site) preCheckCertForDomain(domain string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+
+	time.Sleep(2 * time.Second)
 
 	var ok bool
 	url := fmt.Sprintf("http://%s/.well-known/acme-challenge/%s", domain, token)

@@ -115,6 +115,9 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
+
+		responseError(w, fmt.Sprintf("CasWAF error: ACME HTTP-01 challenge failed, requestUri cannot match with challengeMap, requestUri = %s, challengeMap = %v", r.RequestURI, challengeMap))
+		return
 	}
 
 	if site.SslMode == "HTTPS Only" {
