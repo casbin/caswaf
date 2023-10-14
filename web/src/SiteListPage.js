@@ -59,7 +59,7 @@ class SiteListPage extends React.Component {
       challenges: [],
       host: "",
       port: 8000,
-      sslMode: "HTTP",
+      sslMode: "HTTPS Only",
       sslCert: "",
       publicIp: "",
       node: "",
@@ -202,6 +202,9 @@ class SiteListPage extends React.Component {
           }
 
           if (!record.isSelf) {
+            if (text.includes(":/")) {
+              return Setting.getShortText(text, 10);
+            }
             return text;
           }
 
@@ -292,14 +295,14 @@ class SiteListPage extends React.Component {
         title: i18next.t("site:Mode"),
         dataIndex: "sslMode",
         key: "sslMode",
-        width: "120px",
+        width: "100px",
         sorter: (a, b) => a.sslMode.localeCompare(b.sslMode),
       },
       {
         title: i18next.t("site:SSL cert"),
         dataIndex: "sslCert",
         key: "sslCert",
-        width: "150px",
+        width: "130px",
         sorter: (a, b) => a.sslCert.localeCompare(b.sslCert),
         render: (text, record, index) => {
           return (

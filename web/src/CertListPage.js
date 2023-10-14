@@ -114,16 +114,16 @@ class CertListPage extends React.Component {
           );
         },
       },
-      // {
-      //   title: i18next.t("general:Create time"),
-      //   dataIndex: "createdTime",
-      //   key: "createdTime",
-      //   width: "150px",
-      //   sorter: (a, b) => a.createdTime.localeCompare(b.createdTime),
-      //   render: (text, record, index) => {
-      //     return Setting.getFormattedDate(text);
-      //   },
-      // },
+      {
+        title: i18next.t("general:Create time"),
+        dataIndex: "createdTime",
+        key: "createdTime",
+        width: "150px",
+        sorter: (a, b) => a.createdTime.localeCompare(b.createdTime),
+        render: (text, record, index) => {
+          return Setting.getFormattedDate(text);
+        },
+      },
       // {
       //   title: i18next.t("general:Display name"),
       //   dataIndex: "displayName",
@@ -200,7 +200,7 @@ class CertListPage extends React.Component {
         width: "180px",
         sorter: (a, b) => a.certificate.localeCompare(b.certificate),
         render: (text, record, index) => {
-          return Setting.getShortText(text, 70);
+          return Setting.getShortText(text);
         },
       },
       {
@@ -210,7 +210,7 @@ class CertListPage extends React.Component {
         width: "180px",
         sorter: (a, b) => a.privateKey.localeCompare(b.privateKey),
         render: (text, record, index) => {
-          return Setting.getShortText(text, 70);
+          return Setting.getShortText(text);
         },
       },
       {

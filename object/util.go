@@ -174,6 +174,10 @@ func getCertMap() (map[string]*Cert, error) {
 }
 
 func GetCertByDomain(domain string) (*Cert, error) {
+	if domain == "" {
+		return nil, fmt.Errorf("GetCertByDomain() error: domain should not be empty")
+	}
+
 	cert, ok := certMap[domain]
 	if ok {
 		return cert, nil
