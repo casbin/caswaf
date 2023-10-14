@@ -18,28 +18,24 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
+	"fmt"
 	"time"
 )
 
-func getCertificateExpiry(certificatePEM string) (time.Time, error) {
-	block, _ := pem.Decode([]byte(certificatePEM))
+func getCertExpireTime(s string) (string, error) {
+	block, _ := pem.Decode([]byte(s))
+	if block == nil {
+		return "", errors.New("getCertExpireTime() error, block should not be nil")
+	}
 	if block == nil || block.Type != "CERTIFICATE" {
-		return time.Time{}, errors.New("failed to decode PEM block containing certificate")
+		return "", errors.New(fmt.Sprintf("getCertExpireTime() error, block.Type should be \"CERTIFICATE\" instead of %s", block.Type))
 	}
 
 	certificate, err := x509.ParseCertificate(block.Bytes)
 	if err != nil {
-		return time.Time{}, err
+		return "", err
 	}
 
-	return certificate.NotAfter, nil
-}
-
-func getCertExpireTime(certificate string) string {
-	t, err := getCertificateExpiry(certificate)
-	if err != nil {
-		panic(err)
-	}
-
-	return t.Local().Format(time.RFC3339)
+	t := certificate.NotAfter
+	return t.Local().Format(time.RFC3339), nil
 }
