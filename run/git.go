@@ -21,6 +21,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/beego/beego"
 	"xorm.io/xorm"
@@ -134,6 +135,7 @@ func gitWebBuild(path string) error {
 
 func gitCreateDatabase(name string) (bool, error) {
 	fmt.Printf("gitCreateDatabase(): [%s]\n", name)
+	name = strings.Replace(name, "_00", "_", 1)
 
 	driverName := "mysql"
 	dataSourceName := fmt.Sprintf("root:%s@tcp(localhost:3306)/", beego.AppConfig.String("dbPass"))
