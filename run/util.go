@@ -79,6 +79,7 @@ func updateAppConfFile(name string, i int) {
 	content = strings.ReplaceAll(content, "dbName = casdoor", fmt.Sprintf("dbName = casdoor_customer_%d", i))
 	content = strings.ReplaceAll(content, "redisEndpoint =", "redisEndpoint = \"localhost:6379\"")
 	content = strings.ReplaceAll(content, "socks5Proxy = \"127.0.0.1:10808\"", "socks5Proxy =")
+	content = strings.ReplaceAll(content, "../casdoor", "../cc_0")
 	util.WriteStringToPath(content, confPath)
 }
 
