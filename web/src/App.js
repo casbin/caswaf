@@ -28,7 +28,7 @@ import CertListPage from "./CertListPage";
 import CertEditPage from "./CertEditPage";
 import SigninPage from "./SigninPage";
 import i18next from "i18next";
-import SelectLanguageBox from "./SelectLanguageBox";
+// import SelectLanguageBox from "./SelectLanguageBox";
 
 const {Header, Footer} = Layout;
 
@@ -298,7 +298,7 @@ class App extends Component {
             {
               this.renderAccount()
             }
-            <SelectLanguageBox />
+            {/* <SelectLanguageBox /> */}
           </Menu>
         </Header>
         <Switch>
