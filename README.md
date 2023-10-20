@@ -102,7 +102,7 @@ CasWAF uses Casdoor to upload files to cloud storage, send Emails and send SMSs.
 
 ## Contribute
 
-For CasWAF, if you have any questions, you can give Issues, or you can also directly start Pull Requests(but we recommend giving issues first to communicate with the community).
+For CasWAF, if you have any questions, you can open Issues, or you can also directly start Pull Requests(but we recommend opening issues first to communicate with the community).
 
 ## License
 
