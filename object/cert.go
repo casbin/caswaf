@@ -19,7 +19,7 @@ import (
 
 	"github.com/casbin/caswaf/certificate"
 	"github.com/casbin/caswaf/util"
-	"xorm.io/core"
+	"github.com/xorm-io/core"
 )
 
 type Cert struct {

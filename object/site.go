@@ -21,7 +21,7 @@ import (
 	"github.com/casbin/caswaf/run"
 	"github.com/casbin/caswaf/util"
 	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
-	"xorm.io/core"
+	"github.com/xorm-io/core"
 )
 
 type Node struct {

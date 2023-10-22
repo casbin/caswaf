@@ -24,7 +24,7 @@ import (
 	"strings"
 
 	"github.com/beego/beego"
-	"xorm.io/xorm"
+	"github.com/xorm-io/xorm"
 )
 
 func gitClone(repoUrl string, path string) error {

@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	"github.com/go-mysql-org/go-mysql/canal"
-	"xorm.io/xorm"
+	"github.com/xorm-io/xorm"
 )
 
 type Database struct {

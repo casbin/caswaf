@@ -15,8 +15,8 @@ require (
 	github.com/likexian/whois v1.15.1
 	github.com/likexian/whois-parser v1.24.9
 	github.com/siddontang/go-log v0.0.0-20190221022429-1e957dd83bed
+	github.com/xorm-io/core v0.7.4
+	github.com/xorm-io/xorm v1.1.6
 	golang.org/x/net v0.15.0
 	modernc.org/sqlite v1.11.2
-	xorm.io/core v0.7.3
-	xorm.io/xorm v1.2.5
 )

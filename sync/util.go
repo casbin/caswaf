@@ -18,7 +18,7 @@ import (
 	"log"
 
 	"github.com/Masterminds/squirrel"
-	"xorm.io/xorm"
+	"github.com/xorm-io/xorm"
 )
 
 func getUpdateSql(schemaName string, tableName string, columnNames []string, newColumnVal []interface{}, pkColumnNames []string, pkColumnValue []interface{}) (string, []interface{}, error) {
