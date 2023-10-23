@@ -243,6 +243,7 @@ func (site *Site) GetHost() string {
 }
 
 func addErrorToMsg(msg string, function string, err error) string {
+	fmt.Printf("%s(): %s\n", function, err.Error())
 	if msg == "" {
 		return fmt.Sprintf("%s(): %s", function, err.Error())
 	} else {
