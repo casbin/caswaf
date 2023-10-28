@@ -66,14 +66,14 @@ go get github.com/casbin/caswaf
 
 or
 
-```shell
+``` shell
 git clone https://github.com/casdoor/casdoor
 git clone https://github.com/casbin/caswaf
 ```
 
 #### Setup database
 
-CasWAF will store its users, nodes and topics information in a MySQL database named: `caswaf`, will create it if not existed. The DB connection string can be specified at: https://github.com/casbin/caswaf/blob/master/conf/app.conf
+CasWAF will store its users, nodes and topics information in a MySQL database named: `caswaf`, which will create it if not exist. The DB connection string can be specified at: https://github.com/casbin/caswaf/blob/master/conf/app.conf
 
 ```ini
 dataSourceName = root:123@tcp(localhost:3306)/
@@ -83,7 +83,7 @@ CasWAF uses XORM to connect to DB, so all DBs supported by XORM can also be used
 
 #### Configure Casdoor
 
-After creating an organization and an application for CasWAF in a Casdoor, you need to update `clientID`, `clientSecret`, `casdoorOrganization` and `casdoorApplication` in app.conf.
+After creating an organization and an application for CasWAF in a Casdoor, you need to update `clientID`, `clientSecret`, `casdoorOrganization` and `casdoorApplication` in the app.conf.
 
 #### Run CasWAF
 
@@ -94,7 +94,7 @@ After creating an organization and an application for CasWAF in a Casdoor, you n
 
 #### Setup your WAF to enable some third-party login platform
 
-CasWAF uses Casdoor to manage members. If you want to log in with oauth, you should see [casdoor oauth configuration](https://casdoor.org/docs/provider/oauth/overview).
+CasWAF uses Casdoor to manage members. If you want to log in with Oauth, you should see [casdoor Oauth configuration](https://casdoor.org/docs/provider/oauth/overview).
 
 #### OSS, Mail, and SMS services
 
