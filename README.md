@@ -33,6 +33,10 @@
   </a>
 </p>
 
+## 💻Tech Stack
+![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)
+![Javascript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+
 ## Online demo
 
 - Read-only site: https://door.caswaf.com (any modification operation will fail)
