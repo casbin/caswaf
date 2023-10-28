@@ -36,7 +36,7 @@
 ## Online demo
 
 - Read-only site: https://door.caswaf.com (any modification operation will fail)
-- Writable site: https://demo.caswaf.com (original data will be restored for every 5 minutes)
+- Writable site: https://demo.caswaf.com (original data will be restored every 5 minutes)
 
 ## Documentation
 
