@@ -36,7 +36,7 @@
 ## Online demo
 
 - Read-only site: https://door.caswaf.com (any modification operation will fail)
-- Writable site: https://demo.caswaf.com (original data will be restored for every 5 minutes)
+- Writable site: https://demo.caswaf.com (original data will be restored every 5 minutes)
 
 ## Documentation
 
@@ -73,7 +73,7 @@ git clone https://github.com/casbin/caswaf
 
 #### Setup database
 
-CasWAF will store its users, nodes and topics information in a MySQL database named: `caswaf`, will create it if not existed. The DB connection string can be specified at: https://github.com/casbin/caswaf/blob/master/conf/app.conf
+CasWAF will store its users, nodes, and topics information in a MySQL database named: `caswaf`, which will create it if not existed. The DB connection string can be specified at: https://github.com/casbin/caswaf/blob/master/conf/app.conf
 
 ```ini
 dataSourceName = root:123@tcp(localhost:3306)/
@@ -83,7 +83,7 @@ CasWAF uses XORM to connect to DB, so all DBs supported by XORM can also be used
 
 #### Configure Casdoor
 
-After creating an organization and an application for CasWAF in a Casdoor, you need to update `clientID`, `clientSecret`, `casdoorOrganization` and `casdoorApplication` in app.conf.
+After creating an organization and an application for CasWAF in a Casdoor, you need to update `clientID`, `clientSecret`, `casdoorOrganization`, and `casdoorApplication` in app.conf.
 
 #### Run CasWAF
 
@@ -98,7 +98,7 @@ CasWAF uses Casdoor to manage members. If you want to log in with oauth, you sho
 
 #### OSS, Mail, and SMS services
 
-CasWAF uses Casdoor to upload files to cloud storage, send Emails and send SMSs. See Casdoor for more details.
+CasWAF uses Casdoor to upload files to cloud storage, send Emails, and send SMSs. See Casdoor for more details.
 
 ## Contribute
 
