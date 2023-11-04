@@ -18,6 +18,11 @@
 package run
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/beego/beego"
@@ -47,6 +52,37 @@ func TestUploadCdn(t *testing.T) {
 	casdoor.InitCasdoorConfig()
 
 	err := gitUploadCdn("provider_storage_aliyun_oss", "casdoor")
+	if err != nil {
+		panic(err)
+	}
+}
+
+func TestUpdatePort(t *testing.T) {
+	appDir := beego.AppConfig.String("appDir")
+	err := filepath.Walk(appDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			panic(err)
+		}
+
+		if strings.HasSuffix(path, "/conf/app.conf") {
+			var content []byte
+			content, err = os.ReadFile(path)
+			if err != nil {
+				panic(err)
+			}
+
+			newContent := strings.Replace(string(content), "(localhost:3306)", "(localhost:33060)", -1)
+
+			err = ioutil.WriteFile(path, []byte(newContent), info.Mode())
+			if err != nil {
+				panic(err)
+			}
+
+			fmt.Printf("Successfully updated: %s\n", path)
+		}
+
+		return nil
+	})
 	if err != nil {
 		panic(err)
 	}
