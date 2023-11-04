@@ -138,7 +138,7 @@ func gitCreateDatabase(name string) (bool, error) {
 	name = strings.Replace(name, "_00", "_", 1)
 
 	driverName := "mysql"
-	dataSourceName := fmt.Sprintf("root:%s@tcp(localhost:3306)/", beego.AppConfig.String("dbPass"))
+	dataSourceName := fmt.Sprintf("root:%s@tcp(localhost:33060)/", beego.AppConfig.String("dbPass"))
 	engine, err := xorm.NewEngine(driverName, dataSourceName)
 	if err != nil {
 		return false, err
