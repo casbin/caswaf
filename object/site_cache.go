@@ -34,7 +34,7 @@ func InitSiteMap() {
 func getCasdoorCertMap() (map[string]*casdoorsdk.Cert, error) {
 	certs, err := casdoorsdk.GetCerts()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("casdoorsdk.GetCerts() error: %s", err.Error())
 	}
 
 	res := map[string]*casdoorsdk.Cert{}
@@ -52,7 +52,7 @@ func getCasdoorApplicationMap() (map[string]*casdoorsdk.Application, error) {
 
 	applications, err := casdoorsdk.GetOrganizationApplications()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("casdoorsdk.GetOrganizationApplications() error: %s", err.Error())
 	}
 
 	res := map[string]*casdoorsdk.Application{}
