@@ -52,6 +52,14 @@ func TestRenewAllCerts(t *testing.T) {
 	}
 
 	for i, cert := range certs {
+		if cert.Provider == "" {
+			continue
+		}
+
+		// if cert.Provider == "GoDaddy" {
+		//	continue
+		// }
+
 		res, err := RenewCert(cert)
 		if err != nil {
 			panic(err)
