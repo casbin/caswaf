@@ -119,6 +119,7 @@ func startProcess(name string) error {
 func stopProcess(name string) error {
 	fmt.Printf("stopProcess(): [%s]\n", name)
 
+	name = getMappedName(name)
 	windowName := fmt.Sprintf("%s.bat - %s", name, getShortcut())
 	// taskkill /IM "casdoor.bat - Shortcut" /F
 	// taskkill /F /FI "WINDOWTITLE eq casdoor.bat - Shortcut" /T
