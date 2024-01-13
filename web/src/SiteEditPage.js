@@ -268,6 +268,21 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("site:Status")}:
+          </Col>
+          <Col span={22} >
+            <Select virtual={false} style={{width: "100%"}} value={this.state.site.status} onChange={(value => {this.updateSiteField("status", value);})}>
+              {
+                [
+                  {id: "Active", name: "Active"},
+                  {id: "Inactive", name: "Inactive"},
+                ].map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)
+              }
+            </Select>
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             Nodes:
           </Col>
           <Col span={22} >

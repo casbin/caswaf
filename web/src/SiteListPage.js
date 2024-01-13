@@ -204,21 +204,14 @@ class SiteListPage extends React.Component {
         width: "80px",
         sorter: (a, b) => a.host.localeCompare(b.host),
         render: (text, record, index) => {
-          if (text === "") {
-            text = `${record.port}`;
-          }
-
-          if (!record.isSelf) {
-            if (text.includes(":/")) {
-              return Setting.getShortText(text, 10);
-            }
-            return text;
+          if (record.status === "Active") {
+            return `${record.port}`;
           }
 
           return (
-            <a target="_blank" rel="noreferrer" href={text}>
-              {text}
-            </a>
+            <Tag color={"warning"}>
+              {`${record.port}`}
+            </Tag>
           );
         },
       },

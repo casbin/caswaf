@@ -20,6 +20,9 @@ import moment from "moment";
 import Sdk from "casdoor-js-sdk";
 
 export let ServerUrl = "";
+
+export const StaticBaseUrl = "https://cdn.casbin.org";
+
 export let CasdoorSdk;
 
 export function initServerUrl() {

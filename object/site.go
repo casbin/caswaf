@@ -53,6 +53,7 @@ type Site struct {
 	PublicIp     string   `xorm:"varchar(100)" json:"publicIp"`
 	Node         string   `xorm:"varchar(100)" json:"node"`
 	IsSelf       bool     `json:"isSelf"`
+	Status       string   `xorm:"varchar(100)" json:"status"`
 	Nodes        []*Node  `xorm:"mediumtext" json:"nodes"`
 
 	CasdoorApplication string                  `xorm:"varchar(100)" json:"casdoorApplication"`
@@ -252,6 +253,10 @@ func addErrorToMsg(msg string, function string, err error) string {
 }
 
 func (site *Site) checkNodes() error {
+	if site.Status == "Inactive" {
+		return nil
+	}
+
 	hostname := util.GetHostname()
 	for i, node := range site.Nodes {
 		if node.Name != hostname {
