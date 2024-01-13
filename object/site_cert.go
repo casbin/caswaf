@@ -154,6 +154,12 @@ func (site *Site) updateCertForDomain(domain string) error {
 		Certificate:      certificate,
 		PrivateKey:       privateKey,
 	}
+
+	_, err = DeleteCert(&cert)
+	if err != nil {
+		return err
+	}
+
 	_, err = AddCert(&cert)
 	if err != nil {
 		return err
