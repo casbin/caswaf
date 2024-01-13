@@ -196,7 +196,15 @@ func (site *Site) checkCerts() error {
 		}
 
 		if cert != nil {
-			continue
+			var nearExpire bool
+			nearExpire, err = cert.isCertNearExpire()
+			if err != nil {
+				return err
+			}
+
+			if !nearExpire {
+				continue
+			}
 		}
 
 		err = site.updateCertForDomain(domain)

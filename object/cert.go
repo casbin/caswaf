@@ -16,6 +16,7 @@ package object
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/casbin/caswaf/certificate"
 	"github.com/casbin/caswaf/util"
@@ -182,4 +183,21 @@ func RenewCert(cert *Cert) (bool, error) {
 	cert.PrivateKey = privateKey
 
 	return UpdateCert(cert.GetId(), cert)
+}
+
+func (cert *Cert) isCertNearExpire() (bool, error) {
+	if cert.ExpireTime == "" {
+		return true, nil
+	}
+
+	expireTime, err := time.Parse(time.RFC3339, cert.ExpireTime)
+	if err != nil {
+		return false, err
+	}
+
+	now := time.Now()
+	duration := expireTime.Sub(now)
+	res := duration <= 7*24*time.Hour
+
+	return res, nil
 }
