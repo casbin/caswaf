@@ -197,7 +197,7 @@ func (cert *Cert) isCertNearExpire() (bool, error) {
 
 	now := time.Now()
 	duration := expireTime.Sub(now)
-	res := duration <= 7*24*time.Hour
+	res := duration <= 14*24*time.Hour
 
 	return res, nil
 }
