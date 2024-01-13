@@ -40,4 +40,19 @@ func TestCheckNode(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+
+	site, err = getSite("admin", "caswaf_my")
+	if err != nil {
+		panic(err)
+	}
+	if site == nil {
+		panic("site should not be nil")
+	}
+
+	site.Status = "Inactive"
+
+	_, err = UpdateSite(site.GetId(), site)
+	if err != nil {
+		panic(err)
+	}
 }
