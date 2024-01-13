@@ -29,6 +29,7 @@ class SiteEditPage extends React.Component {
     super(props);
     this.state = {
       classes: props,
+      owner: props.match.params.owner,
       siteName: props.match.params.siteName,
       site: null,
       certs: null,
@@ -43,7 +44,7 @@ class SiteEditPage extends React.Component {
   }
 
   getSite() {
-    SiteBackend.getSite(this.props.account.name, this.state.siteName)
+    SiteBackend.getSite(this.state.owner, this.state.siteName)
       .then((res) => {
         if (res.status === "ok") {
           this.setState({
@@ -295,7 +296,7 @@ class SiteEditPage extends React.Component {
           this.setState({
             siteName: this.state.site.name,
           });
-          this.props.history.push(`/sites/${this.state.site.name}`);
+          this.props.history.push(`/sites/${this.state.site.owner}/${this.state.site.name}`);
           this.getSite();
         }
       })

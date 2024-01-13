@@ -40,6 +40,10 @@ func (c *ApiController) GetCerts() {
 	}
 
 	owner := c.Input().Get("owner")
+	if owner == "admin" {
+		owner = ""
+	}
+
 	certs, err := object.GetCerts(owner)
 	if err != nil {
 		c.ResponseError(err.Error())

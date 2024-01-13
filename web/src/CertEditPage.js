@@ -28,6 +28,7 @@ class CertEditPage extends React.Component {
     super(props);
     this.state = {
       classes: props,
+      owner: props.match.params.owner,
       certName: props.match.params.certName,
       cert: null,
     };
@@ -38,7 +39,7 @@ class CertEditPage extends React.Component {
   }
 
   getCert() {
-    CertBackend.getCert(this.props.account.name, this.state.certName)
+    CertBackend.getCert(this.state.owner, this.state.certName)
       .then((res) => {
         if (res.status === "ok") {
           this.setState({
@@ -243,7 +244,7 @@ class CertEditPage extends React.Component {
           this.setState({
             certName: this.state.cert.name,
           });
-          this.props.history.push(`/certs/${this.state.cert.name}`);
+          this.props.history.push(`/certs/${this.state.cert.owner}/${this.state.cert.name}`);
         }
       })
       .catch(error => {

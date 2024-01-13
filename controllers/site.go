@@ -41,6 +41,9 @@ func (c *ApiController) GetSites() {
 	}
 
 	owner := c.Input().Get("owner")
+	if owner == "admin" {
+		owner = ""
+	}
 
 	sites, err := object.GetSites(owner)
 	if err != nil {

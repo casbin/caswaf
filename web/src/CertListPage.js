@@ -101,6 +101,13 @@ class CertListPage extends React.Component {
   renderTable(certs) {
     const columns = [
       {
+        title: i18next.t("general:Owner"),
+        dataIndex: "owner",
+        key: "owner",
+        width: "120px",
+        sorter: (a, b) => a.owner.localeCompare(b.owner),
+      },
+      {
         title: i18next.t("general:Name"),
         dataIndex: "name",
         key: "name",
@@ -108,7 +115,7 @@ class CertListPage extends React.Component {
         sorter: (a, b) => a.name.localeCompare(b.name),
         render: (text, record, index) => {
           return (
-            <Link to={`/certs/${text}`}>
+            <Link to={`/certs/${record.owner}/${record.name}`}>
               {text}
             </Link>
           );
@@ -221,7 +228,7 @@ class CertListPage extends React.Component {
         render: (text, record, index) => {
           return (
             <div>
-              <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="primary" onClick={() => this.props.history.push(`/certs/${record.name}`)}>{i18next.t("general:Edit")}</Button>
+              <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="primary" onClick={() => this.props.history.push(`/certs/${record.owner}/${record.name}`)}>{i18next.t("general:Edit")}</Button>
               <Popconfirm
                 title={`Sure to delete cert: ${record.name} ?`}
                 onConfirm={() => this.deleteCert(index)}

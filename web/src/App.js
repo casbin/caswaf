@@ -307,9 +307,9 @@ class App extends Component {
           <Route exact path="/" render={(props) => <Redirect to="/sites" />} />
           <Route exact path="/signin" render={(props) => this.renderHomeIfSignedIn(<SigninPage {...props} />)} />
           <Route exact path="/sites" render={(props) => this.renderSigninIfNotSignedIn(<SiteListPage account={this.state.account} {...props} />)} />
-          <Route exact path="/sites/:siteName" render={(props) => this.renderSigninIfNotSignedIn(<SiteEditPage account={this.state.account} {...props} />)} />
+          <Route exact path="/sites/:owner/:siteName" render={(props) => this.renderSigninIfNotSignedIn(<SiteEditPage account={this.state.account} {...props} />)} />
           <Route exact path="/certs" render={(props) => this.renderSigninIfNotSignedIn(<CertListPage account={this.state.account} {...props} />)} />
-          <Route exact path="/certs/:certName" render={(props) => this.renderSigninIfNotSignedIn(<CertEditPage account={this.state.account} {...props} />)} />
+          <Route exact path="/certs/:owner/:certName" render={(props) => this.renderSigninIfNotSignedIn(<CertEditPage account={this.state.account} {...props} />)} />
         </Switch>
       </div>
     );
@@ -327,7 +327,7 @@ class App extends Component {
           textAlign: "center",
         }
       }>
-        Powered by <a style={{fontWeight: "bold", color: "black"}} target="_blank" rel="noreferrer" href="https://github.com/casbin/caswaf">CasWAF</a>
+        Powered by <a target="_blank" href="https://github.com/casbin/caswaf" rel="noreferrer"><img style={{paddingBottom: "3px"}} height={"20px"} alt={"Casdoor"} src={`${Setting.StaticBaseUrl}/img/casbin_logo_1024x256.png`} /></a>
       </Footer>
     );
   }

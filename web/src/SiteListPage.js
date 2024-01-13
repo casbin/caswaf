@@ -117,6 +117,13 @@ class SiteListPage extends React.Component {
 
     const columns = [
       {
+        title: i18next.t("general:Owner"),
+        dataIndex: "owner",
+        key: "owner",
+        width: "90px",
+        sorter: (a, b) => a.owner.localeCompare(b.owner),
+      },
+      {
         title: i18next.t("general:Tag"),
         dataIndex: "tag",
         key: "tag",
@@ -131,7 +138,7 @@ class SiteListPage extends React.Component {
         sorter: (a, b) => a.name.localeCompare(b.name),
         render: (text, record, index) => {
           return (
-            <Link to={`/sites/${text}`}>
+            <Link to={`/sites/${record.owner}/${record.name}`}>
               {text}
             </Link>
           );
@@ -194,7 +201,7 @@ class SiteListPage extends React.Component {
         title: i18next.t("site:Host"),
         dataIndex: "host",
         key: "host",
-        width: "110px",
+        width: "80px",
         sorter: (a, b) => a.host.localeCompare(b.host),
         render: (text, record, index) => {
           if (text === "") {
@@ -306,7 +313,7 @@ class SiteListPage extends React.Component {
         sorter: (a, b) => a.sslCert.localeCompare(b.sslCert),
         render: (text, record, index) => {
           return (
-            <Link to={`/certs/${text}`}>
+            <Link to={`/certs/admin/${text}`}>
               {text}
             </Link>
           );
@@ -339,7 +346,7 @@ class SiteListPage extends React.Component {
         render: (text, record, index) => {
           return (
             <div>
-              <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="primary" onClick={() => this.props.history.push(`/sites/${record.name}`)}>{i18next.t("general:Edit")}</Button>
+              <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="primary" onClick={() => this.props.history.push(`/sites/${record.owner}/${record.name}`)}>{i18next.t("general:Edit")}</Button>
               <Popconfirm
                 title={`Sure to delete site: ${record.name} ?`}
                 onConfirm={() => this.deleteSite(index)}
@@ -373,14 +380,10 @@ class SiteListPage extends React.Component {
     return (
       <div>
         <Row style={{width: "100%"}}>
-          <Col span={1}>
-          </Col>
-          <Col span={22}>
+          <Col span={24}>
             {
               this.renderTable(this.state.sites)
             }
-          </Col>
-          <Col span={1}>
           </Col>
         </Row>
       </div>
