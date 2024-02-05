@@ -17,7 +17,12 @@ package util
 import "time"
 
 func GetCurrentTime() string {
+	location, err := time.LoadLocation("Asia/Singapore")
+	if err != nil {
+		panic(err)
+	}
+
 	timestamp := time.Now().Unix()
 	tm := time.Unix(timestamp, 0)
-	return tm.Format(time.RFC3339)
+	return tm.In(location).Format(time.RFC3339)
 }
