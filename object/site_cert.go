@@ -196,6 +196,10 @@ func (site *Site) checkCerts() error {
 	}
 
 	for _, domain := range domains {
+		if site.Owner != "admin" && strings.HasSuffix(domain, ".casdoor.com") {
+			continue
+		}
+
 		cert, err := GetCertByDomain(domain)
 		if err != nil {
 			return err

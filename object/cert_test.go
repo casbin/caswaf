@@ -42,6 +42,23 @@ func TestGetCertExpireTime(t *testing.T) {
 	println(expireTime)
 }
 
+func TestRenewCert(t *testing.T) {
+	InitConfig()
+	proxy.InitHttpClient()
+
+	cert, err := GetCert("admin/cert")
+	if err != nil {
+		panic(err)
+	}
+
+	res, err := RenewCert(cert)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("Renewed cert: [%s] to [%s], res = %v\n", cert.Name, cert.ExpireTime, res)
+}
+
 func TestRenewAllCerts(t *testing.T) {
 	InitConfig()
 	proxy.InitHttpClient()
@@ -52,7 +69,7 @@ func TestRenewAllCerts(t *testing.T) {
 	}
 
 	for i, cert := range certs {
-		if cert.Provider == "" {
+		if cert.Owner != "admin" {
 			continue
 		}
 
@@ -92,6 +109,12 @@ func TestCheckCerts(t *testing.T) {
 	InitConfig()
 	casdoor.InitCasdoorConfig()
 	proxy.InitHttpClient()
+
+	var err error
+	certMap, err = getCertMap()
+	if err != nil {
+		panic(err)
+	}
 
 	site, err := getSite("admin", "test-site")
 	if err != nil {
