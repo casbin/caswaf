@@ -71,7 +71,7 @@ func TestUpdatePort(t *testing.T) {
 				panic(err)
 			}
 
-			newContent := strings.Replace(string(content), "(localhost:3306)", "(localhost:33060)", -1)
+			newContent := strings.Replace(string(content), "(localhost:3306)", "(localhost:3306)", -1)
 
 			err = ioutil.WriteFile(path, []byte(newContent), info.Mode())
 			if err != nil {
