@@ -17,8 +17,8 @@ package object
 import (
 	"crypto"
 	"fmt"
-	"github.com/beego/beego"
 
+	"github.com/beego/beego"
 	"github.com/casbin/caswaf/proxy"
 	"github.com/casbin/lego/v4/acme"
 	"github.com/casbin/lego/v4/certcrypto"
@@ -47,7 +47,7 @@ func (a *Account) GetRegistration() *registration.Resource {
 	return a.Registration
 }
 
-func getLegoClientAndAccount(email string, privateKey string, devMode bool) (*lego.Client, *Account, error) {
+func getLegoClientAndAccount(email string, privateKey string, devMode bool, useProxy bool) (*lego.Client, *Account, error) {
 	eccKey, err := decodeEccKey(privateKey)
 	if err != nil {
 		return nil, nil, err
@@ -66,7 +66,12 @@ func getLegoClientAndAccount(email string, privateKey string, devMode bool) (*le
 	}
 
 	config.Certificate.KeyType = certcrypto.RSA2048
-	config.HTTPClient = proxy.ProxyHttpClient
+
+	if useProxy {
+		config.HTTPClient = proxy.ProxyHttpClient
+	} else {
+		config.HTTPClient = proxy.DefaultHttpClient
+	}
 
 	client, err := lego.NewClient(config)
 	if err != nil {
@@ -76,9 +81,9 @@ func getLegoClientAndAccount(email string, privateKey string, devMode bool) (*le
 	return client, account, nil
 }
 
-func getAcmeClient(email string, privateKey string, devMode bool) (*lego.Client, error) {
+func getAcmeClient(email string, privateKey string, devMode bool, useProxy bool) (*lego.Client, error) {
 	// Create a user. New accounts need an email and private key to start.
-	client, account, err := getLegoClientAndAccount(email, privateKey, devMode)
+	client, account, err := getLegoClientAndAccount(email, privateKey, devMode, useProxy)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +110,7 @@ func getAcmeClient(email string, privateKey string, devMode bool) (*lego.Client,
 	return client, nil
 }
 
-func GetAcmeClient() (*lego.Client, error) {
+func GetAcmeClient(useProxy bool) (*lego.Client, error) {
 	acmeEmail := beego.AppConfig.String("acmeEmail")
 	acmePrivateKey := beego.AppConfig.String("acmePrivateKey")
 	if acmeEmail == "" {
@@ -115,5 +120,5 @@ func GetAcmeClient() (*lego.Client, error) {
 		return nil, fmt.Errorf("acmePrivateKey should not be empty")
 	}
 
-	return getAcmeClient(acmeEmail, acmePrivateKey, false)
+	return getAcmeClient(acmeEmail, acmePrivateKey, false, useProxy)
 }

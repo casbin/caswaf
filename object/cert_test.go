@@ -69,15 +69,25 @@ func TestRenewAllCerts(t *testing.T) {
 	}
 
 	for i, cert := range certs {
-		if cert.Owner != "admin" {
+		if cert.Owner != "admin" || cert.Provider == "" {
 			continue
 		}
 
-		// if cert.Provider == "GoDaddy" {
-		//	continue
-		// }
+		if cert.Provider == "GoDaddy" {
+			continue
+		}
 
-		res, err := RenewCert(cert)
+		var nearExpire bool
+		nearExpire, err = cert.isCertNearExpire()
+		if err != nil {
+			panic(err)
+		}
+		if !nearExpire {
+			continue
+		}
+
+		var res bool
+		res, err = RenewCert(cert)
 		if err != nil {
 			panic(err)
 		}

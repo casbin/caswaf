@@ -65,7 +65,7 @@ func (p *HttpProvider) CleanUp(domain string, token string, keyAuth string) erro
 }
 
 func getHttp01Cert(siteId string, domain string) (string, string, error) {
-	client, err := GetAcmeClient()
+	client, err := GetAcmeClient(false)
 	if err != nil {
 		return "", "", err
 	}

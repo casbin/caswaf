@@ -159,7 +159,12 @@ func (cert *Cert) GetId() string {
 }
 
 func RenewCert(cert *Cert) (bool, error) {
-	client, err := GetAcmeClient()
+	useProxy := false
+	if cert.Provider == "GoDaddy" {
+		useProxy = true
+	}
+
+	client, err := GetAcmeClient(useProxy)
 	if err != nil {
 		return false, err
 	}
