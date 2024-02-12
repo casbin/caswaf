@@ -17,6 +17,7 @@ package service
 import (
 	"crypto/tls"
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 
@@ -33,6 +34,12 @@ func joinPath(a string, b string) string {
 	}
 	res := a + b
 	return res
+}
+
+func isHostIp(host string) bool {
+	hostWithoutPort := strings.Split(host, ":")[0]
+	ip := net.ParseIP(hostWithoutPort)
+	return ip != nil
 }
 
 func responseOk(w http.ResponseWriter, format string, a ...interface{}) {

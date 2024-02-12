@@ -87,6 +87,11 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 	site := getSiteByDomainWithWww(r.Host)
 	if site == nil {
+		if isHostIp(r.Host) {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
 		responseError(w, "CasWAF error: site not found for host: %s", r.Host)
 		return
 	}
