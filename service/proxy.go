@@ -93,7 +93,11 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if strings.HasSuffix(r.Host, ".casdoor.com") && r.RequestURI == "/health-ping" {
-			responseOk(w, "OK")
+			w.WriteHeader(http.StatusOK)
+			_, err := fmt.Fprintf(w, "OK")
+			if err != nil {
+				panic(err)
+			}
 			return
 		}
 
