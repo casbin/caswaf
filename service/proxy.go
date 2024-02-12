@@ -92,6 +92,11 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		if strings.HasSuffix(r.Host, ".casdoor.com") && r.RequestURI == "/health-ping" {
+			responseOk(w, "OK")
+			return
+		}
+
 		responseError(w, "CasWAF error: site not found for host: %s", r.Host)
 		return
 	}
