@@ -19,6 +19,7 @@ import moment from "moment";
 import * as Setting from "./Setting";
 import * as CertBackend from "./backend/CertBackend";
 import i18next from "i18next";
+import copy from "copy-to-clipboard";
 
 class CertListPage extends React.Component {
   constructor(props) {
@@ -207,7 +208,15 @@ class CertListPage extends React.Component {
         width: "180px",
         sorter: (a, b) => a.certificate.localeCompare(b.certificate),
         render: (text, record, index) => {
-          return Setting.getShortText(text);
+          return (
+            <Button onClick={() => {
+              copy(text);
+              Setting.showMessage("success", i18next.t("cert:Certificate copied to clipboard successfully"));
+            }}
+            >
+              {Setting.getShortText(text)}
+            </Button>
+          );
         },
       },
       {
@@ -217,7 +226,15 @@ class CertListPage extends React.Component {
         width: "180px",
         sorter: (a, b) => a.privateKey.localeCompare(b.privateKey),
         render: (text, record, index) => {
-          return Setting.getShortText(text);
+          return (
+            <Button onClick={() => {
+              copy(text);
+              Setting.showMessage("success", i18next.t("cert:Private key copied to clipboard successfully"));
+            }}
+            >
+              {Setting.getShortText(text)}
+            </Button>
+          );
         },
       },
       {
@@ -262,14 +279,10 @@ class CertListPage extends React.Component {
     return (
       <div>
         <Row style={{width: "100%"}}>
-          <Col span={1}>
-          </Col>
-          <Col span={22}>
+          <Col span={24}>
             {
               this.renderTable(this.state.certs)
             }
-          </Col>
-          <Col span={1}>
           </Col>
         </Row>
       </div>
