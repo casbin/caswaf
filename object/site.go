@@ -72,7 +72,7 @@ func GetGlobalSites() ([]*Site, error) {
 
 func GetSites(owner string) ([]*Site, error) {
 	sites := []*Site{}
-	err := ormer.Engine.Asc("tag").Asc("name").Desc("created_time").Find(&sites, &Site{Owner: owner})
+	err := ormer.Engine.Asc("tag").Asc("port").Desc("created_time").Find(&sites, &Site{Owner: owner})
 	if err != nil {
 		return nil, err
 	}
