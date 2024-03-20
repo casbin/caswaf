@@ -73,7 +73,7 @@ git clone https://github.com/casbin/caswaf
 
 #### Setup database
 
-CasWAF will store its users, nodes and topics information in a MySQL database named: `caswaf`, will create it if not existed. The DB connection string can be specified at: https://github.com/casbin/caswaf/blob/master/conf/app.conf
+CasWAF will store its users, nodes and topics information in a MySQL database named: `caswaf`, which will create it if it does not exist. The DB connection string can be specified at: https://github.com/casbin/caswaf/blob/master/conf/app.conf
 
 ```ini
 dataSourceName = root:123@tcp(localhost:3306)/
@@ -87,7 +87,7 @@ After creating an organization and an application for CasWAF in a Casdoor, you n
 
 #### Run CasWAF
 
-- Configure and run CasWAF by yourself. If you want to learn more about caswaf.
+- Configure and run CasWAF by yourself. If you want to learn more about CasWAF.
 - Open browser: http://localhost:16001/
 
 ### Optional configuration
