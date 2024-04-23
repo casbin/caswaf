@@ -356,7 +356,7 @@ class SiteListPage extends React.Component {
 
     return (
       <div>
-        <Table columns={columns} dataSource={sites} rowKey="name" size="middle" bordered pagination={{pageSize: 100}}
+        <Table columns={columns} dataSource={sites} rowKey="name" size="middle" bordered pagination={{pageSize: 1000}}
           title={() => (
             <div>
               {i18next.t("general:Sites")}&nbsp;&nbsp;&nbsp;&nbsp;
