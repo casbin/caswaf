@@ -68,7 +68,29 @@ func TestRenewAllCerts(t *testing.T) {
 		panic(err)
 	}
 
-	for i, cert := range certs {
+	filteredCerts := []*Cert{}
+	for _, cert := range certs {
+		if cert.Owner != "admin" || cert.Provider == "" {
+			continue
+		}
+
+		if cert.Provider == "GoDaddy" {
+			continue
+		}
+
+		var nearExpire bool
+		nearExpire, err = cert.isCertNearExpire()
+		if err != nil {
+			panic(err)
+		}
+		if !nearExpire {
+			continue
+		}
+
+		filteredCerts = append(filteredCerts, cert)
+	}
+
+	for i, cert := range filteredCerts {
 		if cert.Owner != "admin" || cert.Provider == "" {
 			continue
 		}
@@ -92,7 +114,7 @@ func TestRenewAllCerts(t *testing.T) {
 			panic(err)
 		}
 
-		fmt.Printf("[%d/%d] Renewed cert: [%s] to [%s], res = %v\n", i+1, len(certs), cert.Name, cert.ExpireTime, res)
+		fmt.Printf("[%d/%d] Renewed cert: [%s] to [%s], res = %v\n", i+1, len(filteredCerts), cert.Name, cert.ExpireTime, res)
 	}
 }
 
