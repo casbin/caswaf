@@ -17,6 +17,7 @@ package service
 import (
 	"crypto/tls"
 	"fmt"
+	httptx "github.com/corazawaf/coraza/v3/http"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -176,7 +177,19 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		responseError(w, "CasWAF error: targetUrl should not be empty for host: %s, site = %v", r.Host, site)
 		return
 	}
+	if site.EnableWaf {
+		if site.Waf == nil {
+			site.Waf = createWAF()
+		}
+		httptx.WrapHandler(site.Waf, http.HandlerFunc(nextHandle)).ServeHTTP(w, r)
+	} else {
+		nextHandle(w, r)
+	}
+}
 
+func nextHandle(w http.ResponseWriter, r *http.Request) {
+	site := getSiteByDomainWithWww(r.Host)
+	host := site.GetHost()
 	if site.SslMode == "Static Folder" {
 		var path string
 		if r.RequestURI != "/" {

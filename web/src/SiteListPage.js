@@ -55,6 +55,7 @@ class SiteListPage extends React.Component {
       displayName: `New Site - ${randomName}`,
       domain: "door.casdoor.com",
       otherDomains: [],
+      enableWaf: false,
       needRedirect: false,
       challenges: [],
       host: "",
@@ -195,6 +196,22 @@ class SiteListPage extends React.Component {
               </a>
             );
           });
+        },
+      },
+      {
+        title: i18next.t("site: Enable WAF"),
+        dataIndex: "enableWaf",
+        key: "enableWaf",
+        width: "120px",
+        sorter: (a, b) => a.otherDomains.localeCompare(b.otherDomains),
+        render: (text, record, index) => {
+          return (
+            <a key={text} target="_blank" rel="noreferrer">
+              <Tag color={!record.enableWaf ? "default" : "processing"}>
+                {record.enableWaf ? "enabled" : "disabled"}
+              </Tag>
+            </a>
+          );
         },
       },
       {

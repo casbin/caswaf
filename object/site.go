@@ -21,6 +21,7 @@ import (
 	"github.com/casbin/caswaf/run"
 	"github.com/casbin/caswaf/util"
 	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
+	"github.com/corazawaf/coraza/v3"
 	"github.com/xorm-io/core"
 )
 
@@ -41,20 +42,22 @@ type Site struct {
 	UpdatedTime string `xorm:"varchar(100)" json:"updatedTime"`
 	DisplayName string `xorm:"varchar(100)" json:"displayName"`
 
-	Tag          string   `xorm:"varchar(100)" json:"tag"`
-	Domain       string   `xorm:"varchar(100)" json:"domain"`
-	OtherDomains []string `xorm:"varchar(500)" json:"otherDomains"`
-	NeedRedirect bool     `json:"needRedirect"`
-	Challenges   []string `xorm:"mediumtext" json:"challenges"`
-	Host         string   `xorm:"varchar(100)" json:"host"`
-	Port         int      `json:"port"`
-	SslMode      string   `xorm:"varchar(100)" json:"sslMode"`
-	SslCert      string   `xorm:"-" json:"sslCert"`
-	PublicIp     string   `xorm:"varchar(100)" json:"publicIp"`
-	Node         string   `xorm:"varchar(100)" json:"node"`
-	IsSelf       bool     `json:"isSelf"`
-	Status       string   `xorm:"varchar(100)" json:"status"`
-	Nodes        []*Node  `xorm:"mediumtext" json:"nodes"`
+	Tag          string     `xorm:"varchar(100)" json:"tag"`
+	Domain       string     `xorm:"varchar(100)" json:"domain"`
+	OtherDomains []string   `xorm:"varchar(500)" json:"otherDomains"`
+	NeedRedirect bool       `json:"needRedirect"`
+	EnableWaf    bool       `json:"enableWaf"`
+	Waf          coraza.WAF `xorm:"-" json:"-"`
+	Challenges   []string   `xorm:"mediumtext" json:"challenges"`
+	Host         string     `xorm:"varchar(100)" json:"host"`
+	Port         int        `json:"port"`
+	SslMode      string     `xorm:"varchar(100)" json:"sslMode"`
+	SslCert      string     `xorm:"-" json:"sslCert"`
+	PublicIp     string     `xorm:"varchar(100)" json:"publicIp"`
+	Node         string     `xorm:"varchar(100)" json:"node"`
+	IsSelf       bool       `json:"isSelf"`
+	Status       string     `xorm:"varchar(100)" json:"status"`
+	Nodes        []*Node    `xorm:"mediumtext" json:"nodes"`
 
 	CasdoorApplication string                  `xorm:"varchar(100)" json:"casdoorApplication"`
 	ApplicationObj     *casdoorsdk.Application `xorm:"-" json:"applicationObj"`
