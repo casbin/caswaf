@@ -29,7 +29,6 @@ func GetRecords(owner string) ([]*Record, error) {
 
 func AddRecord(record *Record) (bool, error) {
 	affected, err := ormer.Engine.Insert(record)
-	fmt.Println("try add Record: ", record)
 	if err != nil {
 		return false, err
 	}

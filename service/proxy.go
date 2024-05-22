@@ -93,8 +93,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 			RequestURI:  r.RequestURI,
 			UserAgent:   r.UserAgent(),
 		}
-		result, err := object.AddRecord(&record)
-		fmt.Println("Add result:", result)
+		_, err := object.AddRecord(&record)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
