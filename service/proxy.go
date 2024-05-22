@@ -24,6 +24,7 @@ import (
 	"net/url"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/beego/beego"
 	"github.com/casbin/caswaf/object"
@@ -84,6 +85,19 @@ func redirectToHost(w http.ResponseWriter, r *http.Request, host string) {
 func handleRequest(w http.ResponseWriter, r *http.Request) {
 	if !strings.Contains(r.UserAgent(), "Uptime-Kuma") {
 		fmt.Printf("handleRequest: %s\t%s\t%s\t%s\t%s\n", r.RemoteAddr, r.Method, r.Host, r.RequestURI, r.UserAgent())
+		record := object.Record{
+			Owner:       "admin",
+			CreatedTime: time.Now().Format("2006-01-02 15:04:05.000000"),
+			Method:      r.Method,
+			Host:        r.Host,
+			RequestURI:  r.RequestURI,
+			UserAgent:   r.UserAgent(),
+		}
+		result, err := object.AddRecord(&record)
+		fmt.Println("Add result:", result)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 	}
 
 	site := getSiteByDomainWithWww(r.Host)

@@ -27,7 +27,10 @@ import SiteEditPage from "./SiteEditPage";
 import CertListPage from "./CertListPage";
 import CertEditPage from "./CertEditPage";
 import SigninPage from "./SigninPage";
+import RecordListPage from "./RecordListPage";
+
 import i18next from "i18next";
+import RecordEditPage from "./RecordEditPage";
 // import SelectLanguageBox from "./SelectLanguageBox";
 
 const {Header, Footer} = Layout;
@@ -71,6 +74,8 @@ class App extends Component {
       this.setState({selectedMenuKey: "/sites"});
     } else if (uri.includes("/certs")) {
       this.setState({selectedMenuKey: "/certs"});
+    } else if (uri.includes("/records")) {
+      this.setState({selectedMenuKey: "/records"});
     } else {
       this.setState({selectedMenuKey: "null"});
     }
@@ -253,6 +258,13 @@ class App extends Component {
       </Menu.Item>
     );
 
+    res.push(
+      <Menu.Item key="/records">
+        <Link to="/records">
+          {i18next.t("general:Records")}
+        </Link>
+      </Menu.Item>
+    );
     return res;
   }
 
@@ -310,6 +322,9 @@ class App extends Component {
           <Route exact path="/sites/:owner/:siteName" render={(props) => this.renderSigninIfNotSignedIn(<SiteEditPage account={this.state.account} {...props} />)} />
           <Route exact path="/certs" render={(props) => this.renderSigninIfNotSignedIn(<CertListPage account={this.state.account} {...props} />)} />
           <Route exact path="/certs/:owner/:certName" render={(props) => this.renderSigninIfNotSignedIn(<CertEditPage account={this.state.account} {...props} />)} />
+
+          <Route exact path="/records" render={(props) => this.renderSigninIfNotSignedIn(<RecordListPage account={this.state.account} {...props} />)} />
+          <Route exact path="/records/:owner/:id" render={(props) => this.renderSigninIfNotSignedIn(<RecordEditPage account={this.state.account} {...props} />)} />
         </Switch>
       </div>
     );
