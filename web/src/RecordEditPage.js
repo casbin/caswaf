@@ -127,11 +127,11 @@ class RecordEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "10px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("general:RequestURI")}:
+            {i18next.t("general:Path")}:
           </Col>
           <Col span={22} >
-            <Input value={this.state.record.requestURI} onChange={e => {
-              this.updateRecordField("requestURI", e.target.value);
+            <Input value={this.state.record.path} onChange={e => {
+              this.updateRecordField("path", e.target.value);
             }} />
           </Col>
         </Row>

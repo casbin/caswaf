@@ -1,9 +1,27 @@
+// Copyright 2024 The casbin Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package object
 
 import (
 	"fmt"
-	"github.com/xorm-io/core"
+	"net/http"
 	"strconv"
+	"strings"
+
+	"github.com/casbin/caswaf/util"
+	"github.com/xorm-io/core"
 )
 
 type Record struct {
@@ -11,15 +29,15 @@ type Record struct {
 	Owner       string `xorm:"varchar(100) notnull" json:"owner"`
 	CreatedTime string `xorm:"varchar(100) notnull" json:"createdTime"`
 
-	Method     string `xorm:"varchar(100)" json:"method"`
-	Host       string `xorm:"varchar(100)" json:"host"`
-	RequestURI string `xorm:"varchar(100)" json:"requestURI"`
-	UserAgent  string `xorm:"varchar(512)" json:"userAgent"`
+	Method    string `xorm:"varchar(100)" json:"method"`
+	Host      string `xorm:"varchar(100)" json:"host"`
+	Path      string `xorm:"varchar(100)" json:"path"`
+	UserAgent string `xorm:"varchar(512)" json:"userAgent"`
 }
 
 func GetRecords(owner string) ([]*Record, error) {
 	records := []*Record{}
-	err := ormer.Engine.Asc("Id").Desc("created_time").Asc("Host").Asc("request_u_r_i").Find(&records, &Record{Owner: owner})
+	err := ormer.Engine.Asc("id").Asc("host").Find(&records, &Record{Owner: owner})
 	if err != nil {
 		return nil, err
 	}
@@ -27,13 +45,12 @@ func GetRecords(owner string) ([]*Record, error) {
 	return records, nil
 }
 
-func AddRecord(record *Record) (bool, error) {
-	affected, err := ormer.Engine.Insert(record)
+func AddRecord(record *Record) (*Record, error) {
+	_, err := ormer.Engine.Insert(record)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
-
-	return affected != 0, nil
+	return record, nil
 }
 
 func DeleteRecord(record *Record) (bool, error) {
@@ -46,11 +63,6 @@ func DeleteRecord(record *Record) (bool, error) {
 }
 
 func UpdateRecord(owner string, id string, record *Record) (bool, error) {
-	//id_num, err := strconv.ParseInt(id, 10, 64)
-	//if err != nil {
-	//	fmt.Println("Failed to transform id(string) to num: ", err)
-	//}
-
 	affected, err := ormer.Engine.ID(core.PK{record.Id}).AllCols().Update(record)
 	if err != nil {
 		return false, err
@@ -83,4 +95,23 @@ func getRecord(owner string, id int64) (*Record, error) {
 		return &record, nil
 	}
 	return nil, nil
+}
+
+func LogRequest(r *http.Request) {
+	if !strings.Contains(r.UserAgent(), "Uptime-Kuma") {
+		fmt.Printf("handleRequest: %s\t%s\t%s\t%s\t%s\n", r.RemoteAddr, r.Method, r.Host, r.RequestURI, r.UserAgent())
+		record := Record{
+			Owner:       "admin",
+			CreatedTime: util.GetCurrentFormattedTime(),
+			Method:      r.Method,
+			Host:        r.Host,
+			Path:        r.RequestURI,
+			UserAgent:   r.UserAgent(),
+		}
+		fmt.Println(util.GetCurrentTime())
+		_, err := AddRecord(&record)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}
 }

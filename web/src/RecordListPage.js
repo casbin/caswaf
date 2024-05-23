@@ -14,6 +14,7 @@
 
 import React from "react";
 import {Button, Col, Popconfirm, Row, Table} from "antd";
+import moment from "moment";
 import * as Setting from "./Setting";
 import * as RecordBackend from "./backend/RecordBackend";
 import i18next from "i18next";
@@ -44,6 +45,38 @@ class RecordListPage extends React.Component {
       });
   }
 
+  newRecord() {
+    const randomName = Setting.getRandomName();
+    return {
+      owner: this.props.account.name,
+      name: `record_${randomName}`,
+      createdTime: moment().format("YYYY-MM-DD HH:mm:ss"),
+      method: "GET",
+      host: "door.casdoor.com",
+      path: "/",
+      userAgent: "",
+    };
+  }
+
+  addRecord() {
+    const newRecord = this.newRecord();
+    RecordBackend.addRecord(newRecord)
+      .then((res) => {
+        if (res.status === "error") {
+          Setting.showMessage("error", `Failed to add: ${res.msg}`);
+        } else {
+          Setting.showMessage("success", "Record added successfully");
+          this.setState({
+            records: Setting.addRow(this.state.records, res.data),
+          });
+        }
+      }
+      )
+      .catch(error => {
+        Setting.showMessage("error", `Record failed to add: ${error}`);
+      });
+  }
+
   deleteRecord(i) {
     RecordBackend.deleteRecord(this.state.records[i])
       .then((res) => {
@@ -66,7 +99,7 @@ class RecordListPage extends React.Component {
 
     const columns = [
       {
-        title: i18next.t("general:Id"),
+        title: i18next.t("general:ID"),
         dataIndex: "id",
         key: "id",
         width: "40px",
@@ -80,7 +113,7 @@ class RecordListPage extends React.Component {
         sorter: (a, b) => a.owner.localeCompare(b.owner),
       },
       {
-        title: i18next.t("general:CreatedTime"),
+        title: i18next.t("general:Created time"),
         dataIndex: "createdTime",
         key: "createdTime",
         width: "70px",
@@ -101,14 +134,14 @@ class RecordListPage extends React.Component {
         sorter: (a, b) => a.host.localeCompare(b.host),
       },
       {
-        title: i18next.t("general:RequestURI"),
-        dataIndex: "requestURI",
-        key: "requestURI",
+        title: i18next.t("general:Path"),
+        dataIndex: "path",
+        key: "path",
         width: "100px",
-        sorter: (a, b) => a.requestURI.localeCompare(b.requestURI),
+        sorter: (a, b) => a.path.localeCompare(b.path),
       },
       {
-        title: i18next.t("general:UserAgent"),
+        title: i18next.t("general:User agent"),
         dataIndex: "userAgent",
         key: "userAgent",
         width: "240px",
@@ -143,6 +176,7 @@ class RecordListPage extends React.Component {
           title={() => (
             <div>
               {i18next.t("general:Records")}&nbsp;&nbsp;&nbsp;&nbsp;
+              <Button type="primary" size="small" onClick={this.addRecord.bind(this)}>{i18next.t("general:Add")}</Button>
             </div>
           )}
           loading={records === null}

@@ -17,18 +17,17 @@ package service
 import (
 	"crypto/tls"
 	"fmt"
-	httptx "github.com/corazawaf/coraza/v3/http"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/beego/beego"
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/util"
+	httptx "github.com/corazawaf/coraza/v3/http"
 )
 
 func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.Request) {
@@ -83,21 +82,7 @@ func redirectToHost(w http.ResponseWriter, r *http.Request, host string) {
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
-	if !strings.Contains(r.UserAgent(), "Uptime-Kuma") {
-		fmt.Printf("handleRequest: %s\t%s\t%s\t%s\t%s\n", r.RemoteAddr, r.Method, r.Host, r.RequestURI, r.UserAgent())
-		record := object.Record{
-			Owner:       "admin",
-			CreatedTime: time.Now().Format("2006-01-02 15:04:05.000000"),
-			Method:      r.Method,
-			Host:        r.Host,
-			RequestURI:  r.RequestURI,
-			UserAgent:   r.UserAgent(),
-		}
-		_, err := object.AddRecord(&record)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-	}
+	object.LogRequest(r)
 
 	site := getSiteByDomainWithWww(r.Host)
 	if site == nil {

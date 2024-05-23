@@ -45,3 +45,15 @@ export function updateRecord(owner, id, record) {
     body: JSON.stringify(newRecord),
   }).then(res => res.json());
 }
+
+export function addRecord(record) {
+  const newRecord = Setting.deepCopy(record);
+  return fetch(`${Setting.ServerUrl}/api/add-record`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newRecord),
+  }).then(res => res.json());
+}

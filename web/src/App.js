@@ -28,10 +28,8 @@ import CertListPage from "./CertListPage";
 import CertEditPage from "./CertEditPage";
 import SigninPage from "./SigninPage";
 import RecordListPage from "./RecordListPage";
-
-import i18next from "i18next";
 import RecordEditPage from "./RecordEditPage";
-// import SelectLanguageBox from "./SelectLanguageBox";
+import i18next from "i18next";
 
 const {Header, Footer} = Layout;
 

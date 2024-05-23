@@ -18,6 +18,7 @@ import (
 	"encoding/gob"
 
 	"github.com/beego/beego"
+	"github.com/casbin/caswaf/object"
 	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
 
@@ -45,6 +46,16 @@ func wrapActionResponse(affected bool, e ...error) *Response {
 	} else {
 		return &Response{Status: "ok", Msg: "", Data: "Unaffected"}
 	}
+}
+
+func wrapRecordResponse(record *object.Record, err error) *Response {
+	if err != nil {
+		return &Response{Status: "error", Msg: err.Error()}
+	}
+	if record != nil {
+		return &Response{Status: "ok", Data: record}
+	}
+	return &Response{Status: "error", Msg: "Record not found"}
 }
 
 func (c *ApiController) GetSessionClaims() *casdoorsdk.Claims {
