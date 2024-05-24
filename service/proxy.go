@@ -66,7 +66,7 @@ func getHostNonWww(host string) string {
 	return res
 }
 
-func getClientIP(r *http.Request) string {
+func getClientIp(r *http.Request) string {
 	forwarded := r.Header.Get("X-Forwarded-For")
 	if forwarded != "" {
 		clientIP := strings.Split(forwarded, ",")[0]
@@ -97,11 +97,7 @@ func logRequest(clientIp string, r *http.Request) {
 			ClientIp:    clientIp,
 			UserAgent:   r.UserAgent(),
 		}
-		fmt.Println(util.GetCurrentTime())
-		_, err := object.AddRecord(&record)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
+		object.AddRecord(&record)
 	}
 }
 
@@ -121,7 +117,7 @@ func redirectToHost(w http.ResponseWriter, r *http.Request, host string) {
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
-	clientIp := getClientIP(r)
+	clientIp := getClientIp(r)
 	logRequest(clientIp, r)
 
 	site := getSiteByDomainWithWww(r.Host)

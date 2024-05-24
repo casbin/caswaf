@@ -51,9 +51,6 @@ export function addRecord(record) {
   return fetch(`${Setting.ServerUrl}/api/add-record`, {
     method: "POST",
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(newRecord),
   }).then(res => res.json());
 }

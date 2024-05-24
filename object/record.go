@@ -42,12 +42,13 @@ func GetRecords(owner string) ([]*Record, error) {
 	return records, nil
 }
 
-func AddRecord(record *Record) (*Record, error) {
-	_, err := ormer.Engine.Insert(record)
+func AddRecord(record *Record) (bool, error) {
+	affected, err := ormer.Engine.Insert(record)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
-	return record, nil
+
+	return affected != 0, nil
 }
 
 func DeleteRecord(record *Record) (bool, error) {

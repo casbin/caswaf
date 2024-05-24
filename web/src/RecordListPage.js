@@ -67,6 +67,7 @@ class RecordListPage extends BaseListPage {
           this.setState({
             data: Setting.addRow(this.state.data, res.data),
           });
+          this.fetch();
         }
       }
       )

@@ -103,12 +103,6 @@ func (c *ApiController) AddRecord() {
 		return
 	}
 
-	addedRecord, err := object.AddRecord(&record)
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-
-	c.Data["json"] = wrapRecordResponse(addedRecord, err)
+	c.Data["json"] = wrapActionResponse(object.AddRecord(&record))
 	c.ServeJSON()
 }
