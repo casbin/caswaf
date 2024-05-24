@@ -16,12 +16,8 @@ package object
 
 import (
 	"fmt"
-	"net/http"
-	"strconv"
-	"strings"
-
-	"github.com/casbin/caswaf/util"
 	"github.com/xorm-io/core"
+	"strconv"
 )
 
 type Record struct {
@@ -32,6 +28,7 @@ type Record struct {
 	Method    string `xorm:"varchar(100)" json:"method"`
 	Host      string `xorm:"varchar(100)" json:"host"`
 	Path      string `xorm:"varchar(100)" json:"path"`
+	ClientIp  string `xorm:"varchar(100)" json:"clientIp"`
 	UserAgent string `xorm:"varchar(512)" json:"userAgent"`
 }
 
@@ -95,23 +92,4 @@ func getRecord(owner string, id int64) (*Record, error) {
 		return &record, nil
 	}
 	return nil, nil
-}
-
-func LogRequest(r *http.Request) {
-	if !strings.Contains(r.UserAgent(), "Uptime-Kuma") {
-		fmt.Printf("handleRequest: %s\t%s\t%s\t%s\t%s\n", r.RemoteAddr, r.Method, r.Host, r.RequestURI, r.UserAgent())
-		record := Record{
-			Owner:       "admin",
-			CreatedTime: util.GetCurrentFormattedTime(),
-			Method:      r.Method,
-			Host:        r.Host,
-			Path:        r.RequestURI,
-			UserAgent:   r.UserAgent(),
-		}
-		fmt.Println(util.GetCurrentTime())
-		_, err := AddRecord(&record)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-	}
 }

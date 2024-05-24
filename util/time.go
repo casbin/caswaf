@@ -26,13 +26,3 @@ func GetCurrentTime() string {
 	tm := time.Unix(timestamp, 0)
 	return tm.In(location).Format(time.RFC3339)
 }
-
-func GetCurrentFormattedTime() string {
-	location, err := time.LoadLocation("Asia/Singapore")
-	if err != nil {
-		panic(err)
-	}
-
-	tm := time.Now().In(location)
-	return tm.Format("2006-01-02 15:04:05")
-}

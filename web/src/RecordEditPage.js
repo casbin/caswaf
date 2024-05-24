@@ -137,6 +137,16 @@ class RecordEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "10px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("general:Client ip")}:
+          </Col>
+          <Col span={22} >
+            <Input value={this.state.record.clientIp} onChange={e => {
+              this.updateRecordField("clientIp", e.target.value);
+            }} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "10px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("general:UserAgent")}:
           </Col>
           <Col span={22} >

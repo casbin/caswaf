@@ -66,6 +66,45 @@ func getHostNonWww(host string) string {
 	return res
 }
 
+func getClientIP(r *http.Request) string {
+	forwarded := r.Header.Get("X-Forwarded-For")
+	if forwarded != "" {
+		clientIP := strings.Split(forwarded, ",")[0]
+		return strings.TrimSpace(clientIP)
+	}
+
+	realIP := r.Header.Get("X-Real-IP")
+	if realIP != "" {
+		return realIP
+	}
+
+	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return r.RemoteAddr
+	}
+	return ip
+}
+
+func logRequest(clientIp string, r *http.Request) {
+	if !strings.Contains(r.UserAgent(), "Uptime-Kuma") {
+		fmt.Printf("handleRequest: %s\t%s\t%s\t%s\t%s\n", r.RemoteAddr, r.Method, r.Host, r.RequestURI, r.UserAgent())
+		record := object.Record{
+			Owner:       "admin",
+			CreatedTime: util.GetCurrentTime(),
+			Method:      r.Method,
+			Host:        r.Host,
+			Path:        r.RequestURI,
+			ClientIp:    clientIp,
+			UserAgent:   r.UserAgent(),
+		}
+		fmt.Println(util.GetCurrentTime())
+		_, err := object.AddRecord(&record)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}
+}
+
 func redirectToHttps(w http.ResponseWriter, r *http.Request) {
 	targetUrl := fmt.Sprintf("https://%s", joinPath(r.Host, r.RequestURI))
 	http.Redirect(w, r, targetUrl, http.StatusMovedPermanently)
@@ -82,7 +121,8 @@ func redirectToHost(w http.ResponseWriter, r *http.Request, host string) {
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
-	object.LogRequest(r)
+	clientIp := getClientIP(r)
+	logRequest(clientIp, r)
 
 	site := getSiteByDomainWithWww(r.Host)
 	if site == nil {

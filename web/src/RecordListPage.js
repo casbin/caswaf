@@ -13,44 +13,42 @@
 // limitations under the License.
 
 import React from "react";
-import {Button, Col, Popconfirm, Row, Table} from "antd";
+import {Button, Popconfirm, Table} from "antd";
 import moment from "moment";
 import * as Setting from "./Setting";
 import * as RecordBackend from "./backend/RecordBackend";
 import i18next from "i18next";
+import BaseListPage from "./BaseListPage";
 
-class RecordListPage extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      classes: props,
-      records: null,
-    };
-  }
+class RecordListPage extends BaseListPage {
 
   UNSAFE_componentWillMount() {
-    this.getRecords();
+    this.fetch();
   }
 
-  getRecords() {
+  fetch = (params = {}) => {
+    this.setState({loading: true});
     RecordBackend.getRecords(this.props.account.name)
       .then((res) => {
+        this.setState({
+          loading: false,
+        });
         if (res.status === "ok") {
           this.setState({
-            records: res.data,
+            data: res.data,
           });
         } else {
           Setting.showMessage("error", `Failed to get records: ${res.msg}`);
         }
       });
-  }
+  };
 
   newRecord() {
     const randomName = Setting.getRandomName();
     return {
       owner: this.props.account.name,
       name: `record_${randomName}`,
-      createdTime: moment().format("YYYY-MM-DD HH:mm:ss"),
+      createdTime: moment().format(),
       method: "GET",
       host: "door.casdoor.com",
       path: "/",
@@ -67,7 +65,7 @@ class RecordListPage extends React.Component {
         } else {
           Setting.showMessage("success", "Record added successfully");
           this.setState({
-            records: Setting.addRow(this.state.records, res.data),
+            data: Setting.addRow(this.state.data, res.data),
           });
         }
       }
@@ -78,14 +76,14 @@ class RecordListPage extends React.Component {
   }
 
   deleteRecord(i) {
-    RecordBackend.deleteRecord(this.state.records[i])
+    RecordBackend.deleteRecord(this.state.data[i])
       .then((res) => {
         if (res.status === "error") {
           Setting.showMessage("error", `Failed to delete: ${res.msg}`);
         } else {
           Setting.showMessage("success", "Record deleted successfully");
           this.setState({
-            records: Setting.deleteRow(this.state.records, i),
+            data: Setting.deleteRow(this.state.data, i),
           });
         }
       }
@@ -95,21 +93,20 @@ class RecordListPage extends React.Component {
       });
   }
 
-  renderTable(records) {
-
+  renderTable(data) {
     const columns = [
       {
         title: i18next.t("general:ID"),
         dataIndex: "id",
         key: "id",
-        width: "40px",
+        width: "30px",
         sorter: (a, b) => a.id - b.id,
       },
       {
         title: i18next.t("general:Owner"),
         dataIndex: "owner",
         key: "owner",
-        width: "40px",
+        width: "30px",
         sorter: (a, b) => a.owner.localeCompare(b.owner),
       },
       {
@@ -118,6 +115,9 @@ class RecordListPage extends React.Component {
         key: "createdTime",
         width: "70px",
         sorter: (a, b) => a.createdTime.localeCompare(b.createdTime),
+        render: (text, record, index) => {
+          return Setting.getFormattedDate(text);
+        },
       },
       {
         title: i18next.t("general:Method"),
@@ -139,6 +139,13 @@ class RecordListPage extends React.Component {
         key: "path",
         width: "100px",
         sorter: (a, b) => a.path.localeCompare(b.path),
+      },
+      {
+        title: i18next.t("general:Client ip"),
+        dataIndex: "clientIp",
+        key: "clientIp",
+        width: "100px",
+        sorter: (a, b) => a.clientIp.localeCompare(b.clientIp),
       },
       {
         title: i18next.t("general:User agent"),
@@ -172,32 +179,20 @@ class RecordListPage extends React.Component {
 
     return (
       <div>
-        <Table columns={columns} dataSource={records} rowKey="name" size="middle" bordered pagination={{pageSize: 1000}}
+        <Table columns={columns} dataSource={data} rowKey="name" size="middle" bordered pagination={{pageSize: 1000}}
           title={() => (
             <div>
               {i18next.t("general:Records")}&nbsp;&nbsp;&nbsp;&nbsp;
               <Button type="primary" size="small" onClick={this.addRecord.bind(this)}>{i18next.t("general:Add")}</Button>
             </div>
           )}
-          loading={records === null}
+          loading={this.state.loading}
+          onChange={this.handleTableChange}
         />
       </div>
     );
   }
 
-  render() {
-    return (
-      <div>
-        <Row style={{width: "100%"}}>
-          <Col span={24}>
-            {
-              this.renderTable(this.state.records)
-            }
-          </Col>
-        </Row>
-      </div>
-    );
-  }
 }
 
 export default RecordListPage;
