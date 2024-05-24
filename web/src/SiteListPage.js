@@ -14,37 +14,35 @@
 
 import React from "react";
 import {Link} from "react-router-dom";
-import {Button, Col, Popconfirm, Row, Table, Tag, Tooltip} from "antd";
+import {Button, Popconfirm, Table, Tag, Tooltip} from "antd";
 import moment from "moment";
 import * as Setting from "./Setting";
 import * as SiteBackend from "./backend/SiteBackend";
 import i18next from "i18next";
+import BaseListPage from "./BaseListPage";
 
-class SiteListPage extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      classes: props,
-      sites: null,
-    };
-  }
+class SiteListPage extends BaseListPage {
 
   UNSAFE_componentWillMount() {
-    this.getSites();
+    this.fetch();
   }
 
-  getSites() {
+  fetch = (params = {}) => {
+    this.setState({loading: true});
     SiteBackend.getSites(this.props.account.name)
       .then((res) => {
+        this.setState({
+          loading: false,
+        });
         if (res.status === "ok") {
           this.setState({
-            sites: res.data,
+            data: res.data,
           });
         } else {
           Setting.showMessage("error", `Failed to get sites: ${res.msg}`);
         }
       });
-  }
+  };
 
   newSite() {
     const randomName = Setting.getRandomName();
@@ -62,7 +60,7 @@ class SiteListPage extends React.Component {
       port: 8000,
       sslMode: "HTTPS Only",
       sslCert: "",
-      publicIp: "",
+      publicIp: "8.131.81.162",
       node: "",
       isSelf: false,
       nodes: [],
@@ -79,7 +77,7 @@ class SiteListPage extends React.Component {
         } else {
           Setting.showMessage("success", "Site added successfully");
           this.setState({
-            sites: Setting.prependRow(this.state.sites, newSite),
+            data: Setting.prependRow(this.state.data, newSite),
           });
         }
       }
@@ -90,14 +88,14 @@ class SiteListPage extends React.Component {
   }
 
   deleteSite(i) {
-    SiteBackend.deleteSite(this.state.sites[i])
+    SiteBackend.deleteSite(this.state.data[i])
       .then((res) => {
         if (res.status === "error") {
           Setting.showMessage("error", `Failed to delete: ${res.msg}`);
         } else {
           Setting.showMessage("success", "Site deleted successfully");
           this.setState({
-            sites: Setting.deleteRow(this.state.sites, i),
+            data: Setting.deleteRow(this.state.data, i),
           });
         }
       }
@@ -107,7 +105,7 @@ class SiteListPage extends React.Component {
       });
   }
 
-  renderTable(sites) {
+  renderTable(data) {
     // const renderExternalLink = () => {
     //   return (
     //     <svg style={{marginLeft: "5px"}} width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" className="iconExternalLink_nPIU">
@@ -373,32 +371,20 @@ class SiteListPage extends React.Component {
 
     return (
       <div>
-        <Table columns={columns} dataSource={sites} rowKey="name" size="middle" bordered pagination={{pageSize: 1000}}
+        <Table columns={columns} dataSource={data} rowKey="name" size="middle" bordered pagination={{pageSize: 1000}}
           title={() => (
             <div>
               {i18next.t("general:Sites")}&nbsp;&nbsp;&nbsp;&nbsp;
               <Button type="primary" size="small" onClick={this.addSite.bind(this)}>{i18next.t("general:Add")}</Button>
             </div>
           )}
-          loading={sites === null}
+          loading={data === null}
+          onChange={this.handleTableChange}
         />
       </div>
     );
   }
 
-  render() {
-    return (
-      <div>
-        <Row style={{width: "100%"}}>
-          <Col span={24}>
-            {
-              this.renderTable(this.state.sites)
-            }
-          </Col>
-        </Row>
-      </div>
-    );
-  }
 }
 
 export default SiteListPage;

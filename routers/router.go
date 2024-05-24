@@ -52,4 +52,11 @@ func initAPI() {
 	beego.Router("/api/delete-cert", &controllers.ApiController{}, "POST:DeleteCert")
 
 	beego.Router("/api/get-applications", &controllers.ApiController{}, "GET:GetApplications")
+
+	beego.Router("/api/get-records", &controllers.ApiController{}, "GET:GetRecords")
+	beego.Router("/api/get-record", &controllers.ApiController{}, "GET:GetRecord")
+	beego.Router("/api/delete-record", &controllers.ApiController{}, "POST:DeleteRecord")
+	beego.Router("/api/update-record", &controllers.ApiController{}, "POST:UpdateRecord")
+	beego.Router("/api/add-record", &controllers.ApiController{}, "POST:AddRecord")
+
 }
