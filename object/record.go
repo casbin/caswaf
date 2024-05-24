@@ -15,9 +15,9 @@
 package object
 
 import (
-	"fmt"
-	"github.com/xorm-io/core"
 	"strconv"
+
+	"github.com/xorm-io/core"
 )
 
 type Record struct {
@@ -72,8 +72,9 @@ func UpdateRecord(owner string, id string, record *Record) (bool, error) {
 func GetRecord(owner string, id string) (*Record, error) {
 	idNum, err := strconv.Atoi(id)
 	if err != nil {
-		fmt.Println("Failed to transform id(string) to num: ", err)
+		return nil, err
 	}
+
 	record, err := getRecord(owner, int64(idNum))
 	if err != nil {
 		return nil, err
