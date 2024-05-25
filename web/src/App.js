@@ -28,6 +28,8 @@ import CertListPage from "./CertListPage";
 import CertEditPage from "./CertEditPage";
 import SigninPage from "./SigninPage";
 import i18next from "i18next";
+import DashboardListPage from "./DashboardListPage";
+import DashboardDetailPage from "./DashboardDetailPage";
 // import SelectLanguageBox from "./SelectLanguageBox";
 
 const {Header, Footer} = Layout;
@@ -239,6 +241,13 @@ class App extends Component {
     );
 
     res.push(
+      <Menu.Item key="/dashboard">
+        <Link to="/dashboard">
+          {i18next.t("general:Dashboard")}
+        </Link>
+      </Menu.Item>
+    );
+    res.push(
       <Menu.Item key="/sites">
         <Link to="/sites">
           {i18next.t("general:Sites")}
@@ -310,6 +319,8 @@ class App extends Component {
           <Route exact path="/sites/:owner/:siteName" render={(props) => this.renderSigninIfNotSignedIn(<SiteEditPage account={this.state.account} {...props} />)} />
           <Route exact path="/certs" render={(props) => this.renderSigninIfNotSignedIn(<CertListPage account={this.state.account} {...props} />)} />
           <Route exact path="/certs/:owner/:certName" render={(props) => this.renderSigninIfNotSignedIn(<CertEditPage account={this.state.account} {...props} />)} />
+          <Route exact path="/dashboard" render={(props) => this.renderSigninIfNotSignedIn(<DashboardListPage account={this.state.account} {...props} />)} />
+          <Route exact path="/dashboard/:owner/:siteName" render={(props) => this.renderSigninIfNotSignedIn(<DashboardDetailPage account={this.state.account} {...props} />)} />
         </Switch>
       </div>
     );
