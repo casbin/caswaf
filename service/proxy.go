@@ -257,18 +257,28 @@ func Start() {
 		return
 	}
 
+	gatewayHttpPort, err := beego.AppConfig.Int("gatewayHttpPort")
+	if err != nil {
+		panic(err)
+	}
+
+	gatewayHttpsPort, err := beego.AppConfig.Int("gatewayHttpsPort")
+	if err != nil {
+		panic(err)
+	}
+
 	go func() {
-		fmt.Printf("CasWAF gateway running on: http://127.0.0.1:80\n")
-		err := http.ListenAndServe(":80", nil)
+		fmt.Printf("CasWAF gateway running on: http://127.0.0.1:%d\n", gatewayHttpPort)
+		err := http.ListenAndServe(fmt.Sprintf(":%d", gatewayHttpPort), nil)
 		if err != nil {
 			panic(err)
 		}
 	}()
 
 	go func() {
-		fmt.Printf("CasWAF gateway running on: https://127.0.0.1:443\n")
+		fmt.Printf("CasWAF gateway running on: https://127.0.0.1:%d\n", gatewayHttpsPort)
 		server := &http.Server{
-			Addr:      ":443",
+			Addr:      fmt.Sprintf(":%d", gatewayHttpsPort),
 			TLSConfig: &tls.Config{},
 		}
 
