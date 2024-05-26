@@ -64,13 +64,27 @@ func responseError(w http.ResponseWriter, format string, a ...interface{}) {
 	}
 }
 
+func getDomainWithoutPort(domain string) string {
+	if !strings.Contains(domain, ":") {
+		return domain
+	}
+
+	tokens := strings.SplitN(domain, ":", 2)
+	if len(tokens) > 1 {
+		return tokens[0]
+	}
+	return domain
+}
+
 func getSiteByDomainWithWww(domain string) *object.Site {
 	hostNonWww := getHostNonWww(domain)
 	if hostNonWww != "" {
 		domain = hostNonWww
 	}
 
-	site := object.GetSiteByDomain(domain)
+	domainWithoutPort := getDomainWithoutPort(domain)
+
+	site := object.GetSiteByDomain(domainWithoutPort)
 	return site
 }
 
