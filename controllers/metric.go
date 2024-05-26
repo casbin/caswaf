@@ -22,9 +22,9 @@ import (
 )
 
 func (c *ApiController) GetMetricsOverTime() {
-	//if c.RequireSignedIn() {
-	//	return
-	//}
+	if c.RequireSignedIn() {
+		return
+	}
 	rangeType := c.Input().Get("rangeType")
 	count, err := strconv.Atoi(c.Input().Get("count"))
 	if err != nil {
