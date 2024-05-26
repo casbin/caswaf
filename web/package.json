@@ -9,6 +9,8 @@
     "casdoor-js-sdk": "^0.2.7",
     "copy-to-clipboard": "^3.3.3",
     "craco-less": "2.0.0",
+    "echarts": "^5.5.0",
+    "echarts-for-react": "^3.0.2",
     "eslint-plugin-unused-imports": "^2.0.0",
     "file-saver": "^2.0.5",
     "i18next": "^19.8.9",

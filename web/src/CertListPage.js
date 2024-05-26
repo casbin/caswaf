@@ -14,38 +14,36 @@
 
 import React from "react";
 import {Link} from "react-router-dom";
-import {Button, Col, Popconfirm, Row, Table} from "antd";
+import {Button, Popconfirm, Table} from "antd";
 import moment from "moment";
 import * as Setting from "./Setting";
 import * as CertBackend from "./backend/CertBackend";
 import i18next from "i18next";
 import copy from "copy-to-clipboard";
+import BaseListPage from "./BaseListPage";
 
-class CertListPage extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      classes: props,
-      certs: null,
-    };
-  }
+class CertListPage extends BaseListPage {
 
   UNSAFE_componentWillMount() {
-    this.getCerts();
+    this.fetch();
   }
 
-  getCerts() {
+  fetch = (params = {}) => {
+    this.setState({loading: true});
     CertBackend.getCerts(this.props.account.name)
       .then((res) => {
+        this.setState({
+          loading: false,
+        });
         if (res.status === "ok") {
           this.setState({
-            certs: res.data,
+            data: res.data,
           });
         } else {
           Setting.showMessage("error", `Failed to get certs: ${res.msg}`);
         }
       });
-  }
+  };
 
   newCert() {
     const randomName = Setting.getRandomName();
@@ -71,7 +69,7 @@ class CertListPage extends React.Component {
         } else {
           Setting.showMessage("success", "Cert added successfully");
           this.setState({
-            certs: Setting.prependRow(this.state.certs, newCert),
+            data: Setting.prependRow(this.state.data, newCert),
           });
         }
       }
@@ -82,14 +80,14 @@ class CertListPage extends React.Component {
   }
 
   deleteCert(i) {
-    CertBackend.deleteCert(this.state.certs[i])
+    CertBackend.deleteCert(this.state.data[i])
       .then((res) => {
         if (res.status === "error") {
           Setting.showMessage("error", `Failed to delete: ${res.msg}`);
         } else {
           Setting.showMessage("success", "Cert deleted successfully");
           this.setState({
-            certs: Setting.deleteRow(this.state.certs, i),
+            data: Setting.deleteRow(this.state.data, i),
           });
         }
       }
@@ -99,7 +97,7 @@ class CertListPage extends React.Component {
       });
   }
 
-  renderTable(certs) {
+  renderTable(data) {
     const columns = [
       {
         title: i18next.t("general:Owner"),
@@ -262,29 +260,16 @@ class CertListPage extends React.Component {
 
     return (
       <div>
-        <Table columns={columns} dataSource={certs} rowKey="name" size="middle" bordered pagination={{pageSize: 100}}
+        <Table columns={columns} dataSource={data} rowKey="name" size="middle" bordered pagination={{pageSize: 100}}
           title={() => (
             <div>
               {i18next.t("general:Certs")}&nbsp;&nbsp;&nbsp;&nbsp;
               <Button type="primary" size="small" onClick={this.addCert.bind(this)}>{i18next.t("general:Add")}</Button>
             </div>
           )}
-          loading={certs === null}
+          loading={this.state.loading}
+          onChange={this.handleTableChange}
         />
-      </div>
-    );
-  }
-
-  render() {
-    return (
-      <div>
-        <Row style={{width: "100%"}}>
-          <Col span={24}>
-            {
-              this.renderTable(this.state.certs)
-            }
-          </Col>
-        </Row>
       </div>
     );
   }

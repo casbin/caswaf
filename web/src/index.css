@@ -30,6 +30,10 @@ code {
   padding: 2px !important;
 }
 
+.ant-card {
+  margin: 7px !important;
+}
+
 .highlight-row {
   background: rgb(249,198,205);
 }

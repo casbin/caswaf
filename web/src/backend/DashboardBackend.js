@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const AuthConfig = {
-  // serverUrl: "https://door.casdoor.com",
-  serverUrl: "http://localhost:7001",
-  clientId: "8e49fe802f2aa73026c4",
-  appName: "app-build-in",
-  organizationName: "build-in",
-  redirectPath: "/callback",
-};
+import * as Setting from "../Setting";
 
-export const IsDemoMode = false;
+export function getMetric(type, rangeType, count, top) {
+  return fetch(`${Setting.ServerUrl}/api/get-metrics?type=${type}&rangeType=${rangeType}&count=${count}&top=${top}`, {
+    method: "GET",
+    credentials: "include",
+  }).then(res => res.json());
+}
 
-export const ForceLanguage = "";
-export const DefaultLanguage = "en";
+export function getMetricOverTime(rangeType, count, granularity) {
+  return fetch(`${Setting.ServerUrl}/api/get-metrics-over-time?rangeType=${rangeType}&count=${count}&granularity=${granularity}`, {
+    method: "GET",
+    credentials: "include",
+  }).then(res => res.json());
+}

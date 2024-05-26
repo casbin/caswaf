@@ -17,7 +17,6 @@ package service
 import (
 	"crypto/tls"
 	"fmt"
-	httptx "github.com/corazawaf/coraza/v3/http"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -28,6 +27,7 @@ import (
 	"github.com/beego/beego"
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/util"
+	httptx "github.com/corazawaf/coraza/v3/http"
 )
 
 func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.Request) {
@@ -66,6 +66,41 @@ func getHostNonWww(host string) string {
 	return res
 }
 
+func getClientIp(r *http.Request) string {
+	forwarded := r.Header.Get("X-Forwarded-For")
+	if forwarded != "" {
+		clientIP := strings.Split(forwarded, ",")[0]
+		return strings.TrimSpace(clientIP)
+	}
+
+	realIP := r.Header.Get("X-Real-IP")
+	if realIP != "" {
+		return realIP
+	}
+
+	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return r.RemoteAddr
+	}
+	return ip
+}
+
+func logRequest(clientIp string, r *http.Request) {
+	if !strings.Contains(r.UserAgent(), "Uptime-Kuma") {
+		fmt.Printf("handleRequest: %s\t%s\t%s\t%s\t%s\n", r.RemoteAddr, r.Method, r.Host, r.RequestURI, r.UserAgent())
+		record := object.Record{
+			Owner:       "admin",
+			CreatedTime: util.GetCurrentTime(),
+			Method:      r.Method,
+			Host:        r.Host,
+			Path:        r.RequestURI,
+			ClientIp:    clientIp,
+			UserAgent:   r.UserAgent(),
+		}
+		object.AddRecord(&record)
+	}
+}
+
 func redirectToHttps(w http.ResponseWriter, r *http.Request) {
 	targetUrl := fmt.Sprintf("https://%s", joinPath(r.Host, r.RequestURI))
 	http.Redirect(w, r, targetUrl, http.StatusMovedPermanently)
@@ -82,9 +117,8 @@ func redirectToHost(w http.ResponseWriter, r *http.Request, host string) {
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
-	if !strings.Contains(r.UserAgent(), "Uptime-Kuma") {
-		fmt.Printf("handleRequest: %s\t%s\t%s\t%s\t%s\n", r.RemoteAddr, r.Method, r.Host, r.RequestURI, r.UserAgent())
-	}
+	clientIp := getClientIp(r)
+	logRequest(clientIp, r)
 
 	site := getSiteByDomainWithWww(r.Host)
 	if site == nil {
