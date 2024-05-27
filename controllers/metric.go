@@ -16,10 +16,10 @@ package controllers
 
 import (
 	"errors"
-	"github.com/casbin/caswaf/util"
 	"time"
 
 	"github.com/casbin/caswaf/object"
+	"github.com/casbin/caswaf/util"
 )
 
 func (c *ApiController) GetMetricsOverTime() {
