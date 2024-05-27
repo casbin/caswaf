@@ -30,10 +30,6 @@ code {
   padding: 2px !important;
 }
 
-.ant-card {
-  margin: 7px !important;
-}
-
 .highlight-row {
   background: rgb(249,198,205);
 }
@@ -81,4 +77,8 @@ code {
 
 .conferenceMenu {
   background-color: rgb(242,242,242) !important;
+}
+
+.dashboard-card {
+  margin: 7px !important;
 }

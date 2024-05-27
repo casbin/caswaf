@@ -158,7 +158,7 @@ class DashboardDetailPage extends React.Component {
     ];
 
     return (
-      <Card title={i18next.t("general:Top 10 User-Agents")}>
+      <Card title={i18next.t("general:Top 10 User-Agents")} className="dashboard-card">
         <Table
           columns={columns}
           dataSource={this.state.userAgents}
@@ -189,7 +189,7 @@ class DashboardDetailPage extends React.Component {
     ];
 
     return (
-      <Card title={i18next.t("general:Top 10 IP Addresses")}>
+      <Card title={i18next.t("general:Top 10 IP Addresses")} className="dashboard-card">
         <Table
           columns={columns}
           dataSource={this.state.ipAddresses}
@@ -211,7 +211,9 @@ class DashboardDetailPage extends React.Component {
       return {value: item.count, name: item.data};
     });
     return (
-      <PieChartCard title={title} data={d} />
+      <div className="dashboard-card" >
+        <PieChartCard title={title} data={d} />
+      </div>
     );
   }
 
@@ -225,13 +227,17 @@ class DashboardDetailPage extends React.Component {
 
   renderStatistic(title, value) {
     return (
-      <StatisticCard title={title} value={value} />
+      <div className="dashboard-card" >
+        <StatisticCard title={title} value={value} className="dashboard-card" />
+      </div>
     );
   }
 
   renderBarChart(title, data) {
     return (
-      <BarChartCard title={title} data={data} />
+      <div className="dashboard-card" >
+        <BarChartCard title={title} data={data} className="dashboard-card" />
+      </div>
     );
   }
 
