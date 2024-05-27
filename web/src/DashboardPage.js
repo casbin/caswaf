@@ -13,11 +13,13 @@
 // limitations under the License.
 
 import React from "react";
-import ReactECharts from "echarts-for-react";
 import {Card, Col, Radio, Row, Table} from "antd";
 import * as Setting from "./Setting";
+import BarChartCard from "./components/BarChartCard";
+import StatisticCard from "./components/StatisticCard";
 import * as DashboardBackend from "./backend/DashboardBackend";
 import i18next from "i18next";
+import PieChartCard from "./components/PieChartCard";
 
 class DashboardDetailPage extends React.Component {
   constructor(props) {
@@ -208,48 +210,8 @@ class DashboardDetailPage extends React.Component {
     const d = data.map((item) => {
       return {value: item.count, name: item.data};
     });
-    const option = {
-      tooltip: {
-        trigger: "item",
-      },
-      legend: {
-        top: "5%",
-        left: "right",
-        orient: "vertical",
-      },
-      series: [
-        {
-          name: title,
-          type: "pie",
-          radius: ["40%", "70%"],
-          avoidLabelOverlap: false,
-          itemStyle: {
-            borderRadius: 10,
-            borderColor: "#fff",
-            borderWidth: 2,
-          },
-          label: {
-            show: false,
-            position: "center",
-          },
-          emphasis: {
-            label: {
-              show: true,
-              fontSize: 30,
-              fontWeight: "bold",
-            },
-          },
-          labelLine: {
-            show: false,
-          },
-          data: d,
-        },
-      ],
-    };
     return (
-      <Card title={i18next.t(`general:${title}`)}>
-        <ReactECharts option={option}></ReactECharts>
-      </Card>
+      <PieChartCard title={title} data={d} />
     );
   }
 
@@ -262,83 +224,14 @@ class DashboardDetailPage extends React.Component {
   }
 
   renderStatistic(title, value) {
-    const option = {
-      series: [
-        {
-          type: "scatter",
-          data: [[0, 0]],
-          symbolSize: 1,
-          label: {
-            show: true,
-            formatter: [
-              value,
-            ].join("\n"),
-            color: "#000",
-            fontSize: 64,
-          },
-        },
-      ],
-      xAxis: {
-        axisLabel: {show: false},
-        axisLine: {show: false},
-        splitLine: {show: false},
-        axisTick: {show: false},
-        min: -1,
-        max: 1,
-      },
-      yAxis: {
-        axisLabel: {show: false},
-        axisLine: {show: false},
-        splitLine: {show: false},
-        axisTick: {show: false},
-        min: -1,
-        max: 1,
-      },
-    };
     return (
-      <Card title={i18next.t(`general:${title}`)}>
-        <ReactECharts option={option}></ReactECharts>
-      </Card>
+      <StatisticCard title={title} value={value} />
     );
   }
 
   renderBarChart(title, data) {
-    const option = {
-      tooltip: {
-        trigger: "axis",
-        axisPointer: {
-          type: "shadow",
-        },
-      },
-      grid: {
-        left: "3%",
-        right: "4%",
-        bottom: "3%",
-        containLabel: true,
-      },
-      xAxis: {
-        type: "category",
-        data: data.map((item) => item.data),
-        axisTick: {
-          alignWithLabel: true,
-        },
-      },
-      yAxis: {
-        type: "value",
-      },
-      series: [
-        {
-          name: title,
-          type: "bar",
-          barWidth: "60%",
-          data: data.map((item) => item.count),
-        },
-      ],
-    };
     return (
-      <Card title={i18next.t(`general:${title}`)}>
-        <ReactECharts option={option}></ReactECharts>
-      </Card>
+      <BarChartCard title={title} data={data} />
     );
   }
 
