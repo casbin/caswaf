@@ -16,9 +16,10 @@ package controllers
 
 import (
 	"errors"
-	"github.com/casbin/caswaf/object"
-	"strconv"
+	"github.com/casbin/caswaf/util"
 	"time"
+
+	"github.com/casbin/caswaf/object"
 )
 
 func (c *ApiController) GetMetricsOverTime() {
@@ -26,11 +27,7 @@ func (c *ApiController) GetMetricsOverTime() {
 		return
 	}
 	rangeType := c.Input().Get("rangeType")
-	count, err := strconv.Atoi(c.Input().Get("count"))
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
+	count := util.ParseInt(c.Input().Get("count"))
 	granularity := c.Input().Get("granularity")
 	timeType := granularity2TimeType(granularity)
 	startTime := time.Now().Add(time.Duration(-count) * rangeType2Duration(rangeType))
@@ -75,12 +72,9 @@ func (c *ApiController) GetMetrics() {
 		return
 	}
 	rangeType := c.Input().Get("rangeType")
-	count, err := strconv.Atoi(c.Input().Get("count"))
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-	top, err := strconv.Atoi(c.Input().Get("top"))
+	count := util.ParseInt(c.Input().Get("count"))
+	top, err := util.ParseIntWithError(c.Input().Get("top"))
+	// if top is not set or invalid, set it to the maximum value
 	if err != nil || top <= 0 {
 		top = int(^uint(0) >> 1)
 	}
