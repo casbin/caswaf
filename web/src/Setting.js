@@ -25,6 +25,32 @@ export const StaticBaseUrl = "https://cdn.casbin.org";
 
 export let CasdoorSdk;
 
+export const Countries = [
+  {label: "English", key: "en", country: "US", alt: "English"},
+  {label: "Español", key: "es", country: "ES", alt: "Español"},
+  {label: "Français", key: "fr", country: "FR", alt: "Français"},
+  {label: "Deutsch", key: "de", country: "DE", alt: "Deutsch"},
+  {label: "中文", key: "zh", country: "CN", alt: "中文"},
+  {label: "Indonesia", key: "id", country: "ID", alt: "Indonesia"},
+  {label: "日本語", key: "ja", country: "JP", alt: "日本語"},
+  {label: "한국어", key: "ko", country: "KR", alt: "한국어"},
+  {label: "Русский", key: "ru", country: "RU", alt: "Русский"},
+  {label: "TiếngViệt", key: "vi", country: "VN", alt: "TiếngViệt"},
+  {label: "Português", key: "pt", country: "PT", alt: "Português"},
+  {label: "Italiano", key: "it", country: "IT", alt: "Italiano"},
+  {label: "Malay", key: "ms", country: "MY", alt: "Malay"},
+  {label: "Türkçe", key: "tr", country: "TR", alt: "Türkçe"},
+  {label: "لغة عربية", key: "ar", country: "SA", alt: "لغة عربية"},
+  {label: "עִבְרִית", key: "he", country: "IL", alt: "עִבְרִית"},
+  {label: "Nederlands", key: "nl", country: "NL", alt: "Nederlands"},
+  {label: "Polski", key: "pl", country: "PL", alt: "Polski"},
+  {label: "Suomi", key: "fi", country: "FI", alt: "Suomi"},
+  {label: "Svenska", key: "sv", country: "SE", alt: "Svenska"},
+  {label: "Українська", key: "uk", country: "UA", alt: "Українська"},
+  {label: "Қазақ", key: "kk", country: "KZ", alt: "Қазақ"},
+  {label: "فارسی", key: "fa", country: "IR", alt: "فارسی"},
+];
+
 export function initServerUrl() {
   const hostname = window.location.hostname;
   if (hostname === "localhost") {
@@ -34,6 +60,10 @@ export function initServerUrl() {
 
 export function initCasdoorSdk(config) {
   CasdoorSdk = new Sdk(config);
+}
+
+export function getItem(label, key, icon, children, type) {
+  return {label: label, key: key, icon: icon, children: children, type: type};
 }
 
 function getUrlWithLanguage(url) {
@@ -213,7 +243,7 @@ export function getLanguage() {
 
 export function setLanguage(language) {
   localStorage.setItem("language", language);
-  changeMomentLanguage(language);
+  // changeMomentLanguage(language);
   i18next.changeLanguage(language);
 }
 

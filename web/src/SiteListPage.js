@@ -161,7 +161,7 @@ class SiteListPage extends BaseListPage {
         sorter: (a, b) => a.displayName.localeCompare(b.displayName),
       },
       {
-        title: i18next.t("site:Domain"),
+        title: i18next.t("general:Domain"),
         dataIndex: "domain",
         key: "domain",
         width: "150px",
@@ -179,7 +179,7 @@ class SiteListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("site:Other domains"),
+        title: i18next.t("general:Other domains"),
         dataIndex: "otherDomains",
         key: "otherDomains",
         width: "120px",
@@ -197,7 +197,7 @@ class SiteListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("site: Enable WAF"),
+        title: i18next.t("general:Enable WAF"),
         dataIndex: "enableWaf",
         key: "enableWaf",
         width: "120px",
@@ -213,7 +213,7 @@ class SiteListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("site:Host"),
+        title: i18next.t("general:Host"),
         dataIndex: "host",
         key: "host",
         width: "80px",
@@ -231,7 +231,7 @@ class SiteListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("site:Nodes"),
+        title: i18next.t("general:Nodes"),
         dataIndex: "nodes",
         key: "nodes",
         // width: "200px",
@@ -307,14 +307,14 @@ class SiteListPage extends BaseListPage {
       //   },
       // },
       {
-        title: i18next.t("site:Mode"),
+        title: i18next.t("general:Mode"),
         dataIndex: "sslMode",
         key: "sslMode",
         width: "100px",
         sorter: (a, b) => a.sslMode.localeCompare(b.sslMode),
       },
       {
-        title: i18next.t("site:SSL cert"),
+        title: i18next.t("general:SSL cert"),
         dataIndex: "sslCert",
         key: "sslCert",
         width: "130px",

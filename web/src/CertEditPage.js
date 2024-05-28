@@ -73,7 +73,7 @@ class CertEditPage extends React.Component {
     return (
       <Card size="small" title={
         <div>
-          {i18next.t("cert:Edit Cert")}&nbsp;&nbsp;&nbsp;&nbsp;
+          {i18next.t("general:Edit Cert")}&nbsp;&nbsp;&nbsp;&nbsp;
           <Button type="primary" onClick={this.submitCertEdit.bind(this)}>{i18next.t("general:Save")}</Button>
         </div>
       } style={{marginLeft: "5px"}} type="inner">
@@ -89,7 +89,7 @@ class CertEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("cert:Type")}:
+            {i18next.t("general:Type")}:
           </Col>
           <Col span={22} >
             <Select virtual={false} style={{width: "100%"}} value={this.state.cert.type} onChange={(value => {this.updateCertField("type", value);})}>
@@ -103,7 +103,7 @@ class CertEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("cert:Crypto algorithm")}:
+            {i18next.t("general:Crypto algorithm")}:
           </Col>
           <Col span={22} >
             <Select virtual={false} style={{width: "100%"}} value={this.state.cert.cryptoAlgorithm} onChange={(value => {this.updateCertField("cryptoAlgorithm", value);})}>
@@ -118,7 +118,7 @@ class CertEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("cert:Expire time")}:
+            {i18next.t("general:Expire time")}:
           </Col>
           <Col span={22} >
             <Input disabled={true} value={Setting.getFormattedDate(this.state.cert.expireTime)} onChange={e => {
@@ -128,7 +128,7 @@ class CertEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("cert:Domain expire")}:
+            {i18next.t("general:Domain expire")}:
           </Col>
           <Col span={22} >
             <Input disabled={true} value={Setting.getFormattedDate(this.state.cert.domainExpireTime)} onChange={e => {
@@ -138,7 +138,7 @@ class CertEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("cert:Provider")}:
+            {i18next.t("general:Provider")}:
           </Col>
           <Col span={22} >
             <Select virtual={false} style={{width: "100%"}} value={this.state.cert.provider} onChange={(value => {this.updateCertField("provider", value);})}>
@@ -153,7 +153,7 @@ class CertEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("cert:Account")}:
+            {i18next.t("general:Account")}:
           </Col>
           <Col span={22} >
             <Input value={this.state.cert.account} onChange={e => {
@@ -163,7 +163,7 @@ class CertEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("cert:Access key")}:
+            {i18next.t("general:Access key")}:
           </Col>
           <Col span={22} >
             <Input value={this.state.cert.accessKey} onChange={e => {
@@ -173,7 +173,7 @@ class CertEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("cert:Access secret")}:
+            {i18next.t("general:Access secret")}:
           </Col>
           <Col span={22} >
             <Input value={this.state.cert.accessSecret} onChange={e => {
@@ -183,7 +183,7 @@ class CertEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {i18next.t("cert:Certificate")}:
+            {i18next.t("general:Certificate")}:
           </Col>
           <Col span={editorWidth} >
             <Button style={{marginRight: "10px", marginBottom: "10px"}} onClick={() => {
@@ -191,14 +191,14 @@ class CertEditPage extends React.Component {
               Setting.showMessage("success", i18next.t("cert:Certificate copied to clipboard successfully"));
             }}
             >
-              {i18next.t("cert:Copy certificate")}
+              {i18next.t("general:Copy certificate")}
             </Button>
             <Button type="primary" onClick={() => {
               const blob = new Blob([this.state.cert.certificate], {type: "text/plain;charset=utf-8"});
               FileSaver.saveAs(blob, "token_jwt_key.pem");
             }}
             >
-              {i18next.t("cert:Download certificate")}
+              {i18next.t("general:Download certificate")}
             </Button>
             <TextArea autoSize={{minRows: 30, maxRows: 30}} value={this.state.cert.certificate} onChange={e => {
               this.updateCertField("certificate", e.target.value);
@@ -206,7 +206,7 @@ class CertEditPage extends React.Component {
           </Col>
           <Col span={1} />
           <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {i18next.t("cert:Private key")}:
+            {i18next.t("general:Private key")}:
           </Col>
           <Col span={editorWidth} >
             <Button style={{marginRight: "10px", marginBottom: "10px"}} onClick={() => {
@@ -214,14 +214,14 @@ class CertEditPage extends React.Component {
               Setting.showMessage("success", i18next.t("cert:Private key copied to clipboard successfully"));
             }}
             >
-              {i18next.t("cert:Copy private key")}
+              {i18next.t("general:Copy private key")}
             </Button>
             <Button type="primary" onClick={() => {
               const blob = new Blob([this.state.cert.privateKey], {type: "text/plain;charset=utf-8"});
               FileSaver.saveAs(blob, "token_jwt_key.key");
             }}
             >
-              {i18next.t("cert:Download private key")}
+              {i18next.t("general:Download private key")}
             </Button>
             <TextArea autoSize={{minRows: 30, maxRows: 30}} value={this.state.cert.privateKey} onChange={e => {
               this.updateCertField("privateKey", e.target.value);

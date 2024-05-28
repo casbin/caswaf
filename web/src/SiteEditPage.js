@@ -103,7 +103,7 @@ class SiteEditPage extends React.Component {
     return (
       <Card size="small" title={
         <div>
-          {i18next.t("site:Edit Site")}&nbsp;&nbsp;&nbsp;&nbsp;
+          {i18next.t("general:Edit Site")}&nbsp;&nbsp;&nbsp;&nbsp;
           <Button type="primary" onClick={this.submitSiteEdit.bind(this)}>{i18next.t("general:Save")}</Button>
         </div>
       } style={{marginLeft: "5px"}} type="inner">
@@ -139,7 +139,7 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Domain")}:
+            {i18next.t("general:Domain")}:
           </Col>
           <Col span={22} >
             <Input value={this.state.site.domain} onChange={e => {
@@ -149,7 +149,7 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Other domains")}:
+            {i18next.t("general:Other domains")}:
           </Col>
           <Col span={22} >
             <Select virtual={false} mode="tags" style={{width: "100%"}} value={this.state.site.otherDomains} onChange={(value => {this.updateSiteField("otherDomains", value);})}>
@@ -161,7 +161,7 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Need redirect")}:
+            {i18next.t("general:Need redirect")}:
           </Col>
           <Col span={1} >
             <Switch checked={this.state.site.needRedirect} onChange={checked => {
@@ -171,7 +171,7 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Enable WAF")}:
+            {i18next.t("general:Enable WAF")}:
           </Col>
           <Col span={1} >
             <Switch checked={this.state.site.enableWaf} onChange={checked => {
@@ -181,7 +181,7 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Challenges")}:
+            {i18next.t("general:Challenges")}:
           </Col>
           <Col span={22} >
             <Select virtual={false} mode="tags" style={{width: "100%"}} value={this.state.site.challenges} onChange={(value => {this.updateSiteField("challenges", value);})}>
@@ -193,7 +193,7 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Host")}:
+            {i18next.t("general:Host")}:
           </Col>
           <Col span={22} >
             <Input prefix={<LinkOutlined />} value={this.state.site.host} onChange={e => {
@@ -203,7 +203,7 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Port")}:
+            {i18next.t("general:Port")}:
           </Col>
           <Col span={22} >
             <InputNumber min={0} max={65535} value={this.state.site.port} onChange={value => {
@@ -213,7 +213,7 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Public IP")}:
+            {i18next.t("general:Public IP")}:
           </Col>
           <Col span={22} >
             <Input disabled={true} value={this.state.site.publicIp} onChange={e => {
@@ -223,7 +223,7 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Node")}:
+            {i18next.t("general:Node")}:
           </Col>
           <Col span={22} >
             <Input disabled={true} value={this.state.site.node} onChange={e => {
@@ -233,7 +233,7 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Mode")}:
+            {i18next.t("general:Mode")}:
           </Col>
           <Col span={22} >
             <Select virtual={false} style={{width: "100%"}} value={this.state.site.sslMode} onChange={(value => {this.updateSiteField("sslMode", value);})}>
@@ -250,7 +250,7 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:SSL cert")}:
+            {i18next.t("general:SSL cert")}:
           </Col>
           <Col span={22} >
             <Select disabled={true} virtual={false} style={{width: "100%"}} showSearch value={this.state.site.sslCert} onChange={(value => {
@@ -264,7 +264,7 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Casdoor app")}:
+            {i18next.t("general:Casdoor app")}:
           </Col>
           <Col span={22} >
             <Select virtual={false} style={{width: "100%"}} showSearch value={this.state.site.casdoorApplication} onChange={(value => {
@@ -278,7 +278,7 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Status")}:
+            {i18next.t("general:Status")}:
           </Col>
           <Col span={22} >
             <Select virtual={false} style={{width: "100%"}} value={this.state.site.status} onChange={(value => {this.updateSiteField("status", value);})}>
@@ -293,7 +293,7 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            Nodes:
+            {i18next.t("general:Nodes")}:
           </Col>
           <Col span={22} >
             <NodeTable

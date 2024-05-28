@@ -121,7 +121,7 @@ class CertListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("general:Create time"),
+        title: i18next.t("general:Created time"),
         dataIndex: "createdTime",
         key: "createdTime",
         width: "150px",
@@ -152,7 +152,7 @@ class CertListPage extends BaseListPage {
       //   sorter: (a, b) => a.cryptoAlgorithm.localeCompare(b.cryptoAlgorithm),
       // },
       {
-        title: i18next.t("cert:Expire time"),
+        title: i18next.t("general:Expire time"),
         dataIndex: "expireTime",
         key: "expireTime",
         width: "150px",
@@ -162,7 +162,7 @@ class CertListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("cert:Domain expire"),
+        title: i18next.t("general:Domain expire"),
         dataIndex: "domainExpireTime",
         key: "domainExpireTime",
         width: "150px",
@@ -172,14 +172,14 @@ class CertListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("cert:Provider"),
+        title: i18next.t("general:Provider"),
         dataIndex: "provider",
         key: "provider",
         width: "110px",
         sorter: (a, b) => a.provider.localeCompare(b.provider),
       },
       {
-        title: i18next.t("cert:Account"),
+        title: i18next.t("general:Account"),
         dataIndex: "account",
         key: "account",
         width: "120px",
@@ -200,7 +200,7 @@ class CertListPage extends BaseListPage {
       //   sorter: (a, b) => a.accessSecret.localeCompare(b.accessSecret),
       // },
       {
-        title: i18next.t("cert:Certificate"),
+        title: i18next.t("general:Certificate"),
         dataIndex: "certificate",
         key: "certificate",
         width: "180px",
@@ -218,7 +218,7 @@ class CertListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("cert:Private key"),
+        title: i18next.t("general:Private key"),
         dataIndex: "privateKey",
         key: "privateKey",
         width: "180px",
