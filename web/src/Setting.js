@@ -243,7 +243,7 @@ export function getLanguage() {
 
 export function setLanguage(language) {
   localStorage.setItem("language", language);
-  // changeMomentLanguage(language);
+  changeMomentLanguage(language);
   i18next.changeLanguage(language);
 }
 

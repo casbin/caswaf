@@ -212,14 +212,6 @@ class App extends Component {
         </Menu.Item>
       );
     } else {
-      // res.push(this.renderRightDropdown());
-      // return (
-      //   <div style={{float: "right", margin: "0px", padding: "0px"}}>
-      //     {
-      //       res
-      //     }
-      //   </div>
-      // );
       res.push(
         <div style={{float: "right", display: "flex", alignItems: "center"}}>
           <LanguageSelect style={{marginRight: "20px", marginTop: "10px"}} />
