@@ -30,6 +30,8 @@ import SigninPage from "./SigninPage";
 import RecordListPage from "./RecordListPage";
 import RecordEditPage from "./RecordEditPage";
 import i18next from "i18next";
+import DashboardPage from "./DashboardPage";
+// import SelectLanguageBox from "./SelectLanguageBox";
 
 const {Header, Footer} = Layout;
 
@@ -242,6 +244,13 @@ class App extends Component {
     );
 
     res.push(
+      <Menu.Item key="/dashboard">
+        <Link to="/dashboard">
+          {i18next.t("general:Dashboard")}
+        </Link>
+      </Menu.Item>
+    );
+    res.push(
       <Menu.Item key="/sites">
         <Link to="/sites">
           {i18next.t("general:Sites")}
@@ -323,6 +332,7 @@ class App extends Component {
 
           <Route exact path="/records" render={(props) => this.renderSigninIfNotSignedIn(<RecordListPage account={this.state.account} {...props} />)} />
           <Route exact path="/records/:owner/:id" render={(props) => this.renderSigninIfNotSignedIn(<RecordEditPage account={this.state.account} {...props} />)} />
+          <Route exact path="/dashboard" render={(props) => this.renderSigninIfNotSignedIn(<DashboardPage account={this.state.account} {...props} />)} />
         </Switch>
       </div>
     );

@@ -16,6 +16,7 @@ package object
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/xorm-io/core"
 )
@@ -94,4 +95,51 @@ func getRecord(owner string, id int64) (*Record, error) {
 		return &record, nil
 	}
 	return nil, nil
+}
+
+type DataCount struct {
+	Data  string `json:"data"`
+	Count int64  `json:"count"`
+}
+
+func GetMetrics(dataType string, startAt time.Time, top int) (*[]DataCount, error) {
+	var dataCounts []DataCount
+	err := ormer.Engine.Table("record").
+		Where("UNIX_TIMESTAMP(created_time) > ?", startAt.Unix()).
+		Select(dataType + " as data, COUNT(*) as count").
+		GroupBy("data").
+		Desc("count").
+		Limit(top).
+		Find(&dataCounts)
+	if err != nil {
+		return nil, err
+	}
+	return &dataCounts, nil
+}
+
+func GetMetricsOverTime(startAt time.Time, timeType string) (*[]DataCount, error) {
+	var dataCounts []DataCount
+	createdTime := "DATE_FORMAT(created_time, '" + timeType2Format(timeType) + "')"
+	err := ormer.Engine.Table("record").
+		Where("UNIX_TIMESTAMP(created_time) > ?", startAt.Unix()).
+		GroupBy(createdTime).
+		Select(createdTime + " as data, COUNT(*) as count").
+		Asc("data").
+		Find(&dataCounts)
+	if err != nil {
+		return nil, err
+	}
+	return &dataCounts, nil
+}
+
+func timeType2Format(timeType string) string {
+	switch timeType {
+	case "hour":
+		return "%Y-%m-%d %H"
+	case "day":
+		return "%Y-%m-%d"
+	case "month":
+		return "%Y-%m"
+	}
+	return "%Y-%m-%d %H"
 }

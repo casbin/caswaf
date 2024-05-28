@@ -78,3 +78,7 @@ code {
 .conferenceMenu {
   background-color: rgb(242,242,242) !important;
 }
+
+.dashboard-card {
+  margin: 7px !important;
+}

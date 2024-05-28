@@ -59,4 +59,6 @@ func initAPI() {
 	beego.Router("/api/update-record", &controllers.ApiController{}, "POST:UpdateRecord")
 	beego.Router("/api/add-record", &controllers.ApiController{}, "POST:AddRecord")
 
+	beego.Router("/api/get-metrics", &controllers.ApiController{}, "GET:GetMetrics")
+	beego.Router("/api/get-metrics-over-time", &controllers.ApiController{}, "GET:GetMetricsOverTime")
 }
