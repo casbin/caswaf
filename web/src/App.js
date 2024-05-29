@@ -31,6 +31,8 @@ import RecordListPage from "./RecordListPage";
 import RecordEditPage from "./RecordEditPage";
 import i18next from "i18next";
 import DashboardPage from "./DashboardPage";
+import LanguageSelect from "./LanguageSelect";
+import {withTranslation} from "react-i18next";
 // import SelectLanguageBox from "./SelectLanguageBox";
 
 const {Header, Footer} = Layout;
@@ -212,7 +214,12 @@ class App extends Component {
         </Menu.Item>
       );
     } else {
-      res.push(this.renderRightDropdown());
+      res.push(
+        <div style={{float: "right", display: "flex", alignItems: "center"}}>
+          <LanguageSelect style={{marginRight: "20px", marginTop: "10px"}} />
+          {this.renderRightDropdown()}
+        </div>
+      );
       return (
         <div style={{float: "right", margin: "0px", padding: "0px"}}>
           {
@@ -372,4 +379,4 @@ class App extends Component {
   }
 }
 
-export default withRouter(App);
+export default withRouter(withTranslation()(App));
