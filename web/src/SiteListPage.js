@@ -197,7 +197,7 @@ class SiteListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("site: Enable WAF"),
+        title: i18next.t("site:Enable WAF"),
         dataIndex: "enableWaf",
         key: "enableWaf",
         width: "120px",
