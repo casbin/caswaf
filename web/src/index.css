@@ -82,3 +82,7 @@ code {
 .dashboard-card {
   margin: 7px !important;
 }
+
+.custom-link:hover {
+  color: rgb(64 64 64) !important;
+}
