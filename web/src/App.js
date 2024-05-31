@@ -14,8 +14,8 @@
 
 import React, {Component} from "react";
 import {Link, Redirect, Route, Switch, withRouter} from "react-router-dom";
-import {Avatar, BackTop, Dropdown, Layout, Menu} from "antd";
-import {DownOutlined, LogoutOutlined, SettingOutlined} from "@ant-design/icons";
+import {Avatar, BackTop, Drawer, Dropdown, Layout, Menu, Tooltip} from "antd";
+import {DeploymentUnitOutlined, DownOutlined, GithubOutlined, LogoutOutlined, SettingOutlined, ShareAltOutlined} from "@ant-design/icons";
 import "./App.less";
 import * as Setting from "./Setting";
 import * as AccountBackend from "./backend/AccountBackend";
@@ -45,6 +45,7 @@ class App extends Component {
       selectedMenuKey: 0,
       account: undefined,
       uri: null,
+      isAiAssistantOpen: false,
     };
 
     Setting.initServerUrl();
@@ -96,6 +97,12 @@ class App extends Component {
       Setting.setLanguage(language);
     }
   }
+
+  openAiAssistant = () => {
+    this.setState({
+      isAiAssistantOpen: true,
+    });
+  };
 
   getAccount() {
     AccountBackend.getAccount()
@@ -216,7 +223,12 @@ class App extends Component {
     } else {
       res.push(
         <div style={{float: "right", display: "flex", alignItems: "center"}}>
-          <LanguageSelect style={{marginRight: "20px", marginTop: "10px"}} />
+          <Tooltip title="Click to open AI assitant" style={{marginRight: "50px", marginTop: "10px"}} >
+            <div className="select-box" onClick={this.openAiAssistant}>
+              <DeploymentUnitOutlined style={{fontSize: "24px"}} />
+            </div>
+          </Tooltip>
+          <LanguageSelect />
           {this.renderRightDropdown()}
         </div>
       );
@@ -362,6 +374,40 @@ class App extends Component {
     );
   }
 
+  renderAiAssistant() {
+    return (
+      <Drawer
+        title={
+          <React.Fragment>
+            <Tooltip title="Want to deploy your own AI assistant? Click to learn more!">
+              <a target="_blank" rel="noreferrer" href={"https://casdoor.com"}>
+                <img style={{width: "20px", marginRight: "10px", marginBottom: "2px"}} alt="help" src="https://casbin.org/img/casbin.svg" />
+                AI Assistant
+              </a>
+            </Tooltip>
+            <a className="custom-link" style={{float: "right", marginRight: "35px", marginTop: "2px"}} target="_blank" rel="noreferrer" href={"https://ai.casbin.com"}>
+              <ShareAltOutlined className="custom-link" style={{fontSize: "20px", color: "rgb(140,140,140)"}} />
+            </a>
+            <a className="custom-link" style={{float: "right", marginRight: "30px", marginTop: "2px"}} target="_blank" rel="noreferrer" href={"https://github.com/casibase/casibase"}>
+              <GithubOutlined className="custom-link" style={{fontSize: "20px", color: "rgb(140,140,140)"}} />
+            </a>
+          </React.Fragment>
+        }
+        placement="right"
+        width={500}
+        mask={false}
+        onClose={() => {
+          this.setState({
+            isAiAssistantOpen: false,
+          });
+        }}
+        visible={this.state.isAiAssistantOpen}
+      >
+        <iframe id="iframeHelper" title={"iframeHelper"} src={"https://ai.casbin.com/?isRaw=1"} width="100%" height="100%" scrolling="no" frameBorder="no" />
+      </Drawer>
+    );
+  }
+
   render() {
     return (
       <div id="parent-area">
@@ -373,6 +419,9 @@ class App extends Component {
         </div>
         {
           this.renderFooter()
+        }
+        {
+          this.renderAiAssistant()
         }
       </div>
     );
