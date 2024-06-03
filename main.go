@@ -17,6 +17,7 @@ package main
 import (
 	"github.com/beego/beego"
 	"github.com/beego/beego/plugins/cors"
+	_ "github.com/beego/beego/session/redis"
 	"github.com/casbin/caswaf/casdoor"
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/proxy"
@@ -51,8 +52,13 @@ func main() {
 	beego.InsertFilter("/*", beego.BeforeRouter, routers.TransparentStatic)
 	beego.InsertFilter("/api/*", beego.BeforeRouter, routers.ApiFilter)
 
-	beego.BConfig.WebConfig.Session.SessionProvider = "file"
-	beego.BConfig.WebConfig.Session.SessionProviderConfig = "./tmp"
+	if beego.AppConfig.String("redisEndpoint") == "" {
+		beego.BConfig.WebConfig.Session.SessionProvider = "file"
+		beego.BConfig.WebConfig.Session.SessionProviderConfig = "./tmp"
+	} else {
+		beego.BConfig.WebConfig.Session.SessionProvider = "redis"
+		beego.BConfig.WebConfig.Session.SessionProviderConfig = beego.AppConfig.String("redisEndpoint")
+	}
 	beego.BConfig.WebConfig.Session.SessionGCMaxLifetime = 3600 * 24 * 365
 
 	service.Start()
