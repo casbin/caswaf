@@ -15,6 +15,7 @@
 package run
 
 import (
+	"runtime"
 	"strings"
 
 	"github.com/beego/beego"
@@ -22,6 +23,10 @@ import (
 )
 
 func InitSelfStart() {
+	if runtime.GOOS != "windows" {
+		return
+	}
+
 	hostname := util.GetHostname()
 	if strings.Count(hostname, "-") == 2 {
 		return
