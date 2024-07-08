@@ -16,7 +16,6 @@ package routers
 
 import (
 	"github.com/beego/beego"
-
 	"github.com/casbin/caswaf/controllers"
 )
 
@@ -61,4 +60,7 @@ func initAPI() {
 
 	beego.Router("/api/get-metrics", &controllers.ApiController{}, "GET:GetMetrics")
 	beego.Router("/api/get-metrics-over-time", &controllers.ApiController{}, "GET:GetMetricsOverTime")
+
+	beego.Router("/api/get-rules", &controllers.ApiController{}, "GET:GetRules")
+	beego.Router("/api/add-rule", &controllers.ApiController{}, "POST:AddRule")
 }
