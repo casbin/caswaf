@@ -16,6 +16,8 @@ package object
 
 type Rule struct {
 	Id          int64  `xorm:"id pk autoincr" json:"id"`
+	Owner       string `xorm:"varchar(100) notnull" json:"owner"`
+	Name        string `xorm:"varchar(100) notnull" json:"name"`
 	Rule        string `xorm:"varchar(512) notnull" json:"rule"`
 	IsActive    bool   `xorm:"bool" json:"isActive"`
 	CreatedTime string `xorm:"varchar(100) notnull" json:"createdTime"`
