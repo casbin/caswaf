@@ -62,5 +62,8 @@ func initAPI() {
 	beego.Router("/api/get-metrics-over-time", &controllers.ApiController{}, "GET:GetMetricsOverTime")
 
 	beego.Router("/api/get-rules", &controllers.ApiController{}, "GET:GetRules")
+	beego.Router("/api/get-rule", &controllers.ApiController{}, "GET:GetRule")
 	beego.Router("/api/add-rule", &controllers.ApiController{}, "POST:AddRule")
+	beego.Router("/api/update-rule", &controllers.ApiController{}, "POST:UpdateRule")
+	beego.Router("/api/delete-rule", &controllers.ApiController{}, "POST:DeleteRule")
 }

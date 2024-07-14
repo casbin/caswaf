@@ -37,6 +37,21 @@ func (c *ApiController) GetRules() {
 	c.ResponseOk(rules)
 }
 
+func (c *ApiController) GetRule() {
+	if c.RequireSignedIn() {
+		return
+	}
+
+	id := c.Input().Get("id")
+	rule, err := object.GetRule(id)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(rule)
+}
+
 func (c *ApiController) AddRule() {
 	if c.RequireSignedIn() {
 		return
@@ -52,8 +67,7 @@ func (c *ApiController) AddRule() {
 		c.ResponseError(err.Error())
 		return
 	}
-	scanner := parser.NewSecLangScannerFromString(rule.Rule)
-	_, err = scanner.AllDirective()
+	err = checkWAFRule(rule.Expressions)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
@@ -61,4 +75,56 @@ func (c *ApiController) AddRule() {
 	c.Data["json"] = wrapActionResponse(object.AddRule(&rule))
 	go service.UpdateWAF()
 	c.ServeJSON()
+}
+
+func (c *ApiController) UpdateRule() {
+	if c.RequireSignedIn() {
+		return
+	}
+
+	var rule object.Rule
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &rule)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	err = checkWAFRule(rule.Expressions)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	id := c.Input().Get("id")
+	c.Data["json"] = wrapActionResponse(object.UpdateRule(id, &rule))
+	go service.UpdateWAF()
+	c.ServeJSON()
+}
+
+func (c *ApiController) DeleteRule() {
+	if c.RequireSignedIn() {
+		return
+	}
+
+	var rule object.Rule
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &rule)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.Data["json"] = wrapActionResponse(object.DeleteRule(&rule))
+	go service.UpdateWAF()
+	c.ServeJSON()
+}
+
+func checkWAFRule(rules []string) error {
+	for _, rule := range rules {
+		scanner := parser.NewSecLangScannerFromString(rule)
+		_, err := scanner.AllDirective()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
