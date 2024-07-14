@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from "react";
-import {Button, Popconfirm, Table} from "antd";
+import {Button, Popconfirm, Table, Tag} from "antd";
 import moment from "moment";
 import * as Setting from "./Setting";
 import * as RuleBackend from "./backend/RuleBackend";
@@ -31,7 +31,7 @@ class RuleListPage extends BaseListPage {
     });
     RuleBackend.getRules().then((res) => {
       this.setState({
-        data: res,
+        data: res.data,
         loading: false,
       });
     });
@@ -52,9 +52,15 @@ class RuleListPage extends BaseListPage {
   }
 
   deleteRule(i) {
-    // TODO: wait for backend implementation
-    this.setState({
-      data: Setting.deleteRow(this.state.data, i),
+    RuleBackend.deleteRule(this.state.data[i]).then((res) => {
+      if (res.status === "error") {
+        Setting.showMessage("error", `Failed to delete: ${res.msg}`);
+      } else {
+        Setting.showMessage("success", "Deleted successfully");
+        this.setState({
+          data: Setting.deleteRow(this.state.data, i),
+        });
+      }
     });
   }
 
@@ -64,12 +70,24 @@ class RuleListPage extends BaseListPage {
       owner: this.props.account.name,
       name: `rule_${randomName}`,
       createdTime: moment().format(),
-      expression: "and key1 == value1 key2 == value2",
+      type: "waf",
+      expressions: [{
+        name: "waf rule demo",
+        operator: "match",
+        value: "SecRule REQUEST_HEADERS:user-agent \"@contains firefox\" \"id:1, pass, log, logdata:'someone used firefox to access'\"",
+      }],
     };
   }
 
   renderTable(data) {
     const columns = [
+      {
+        title: i18next.t("general:Owner"),
+        dataIndex: "owner",
+        key: "owner",
+        width: "200px",
+        sorter: (a, b) => a.owner.localeCompare(b.owner),
+      },
       {
         title: i18next.t("general:Name"),
         dataIndex: "name",
@@ -81,30 +99,45 @@ class RuleListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("general:Created Time"),
+        title: i18next.t("general:Create time"),
         dataIndex: "createdTime",
         key: "createdTime",
         width: "200px",
         sorter: (a, b) => a.createdTime.localeCompare(b.createdTime),
-        render: (text, record, index) => {
+        render: (text, rule, index) => {
           return Setting.getFormattedDate(text);
         },
       },
       {
-        title: i18next.t("general:Updated Time"),
+        title: i18next.t("general:Update time"),
         dataIndex: "updatedTime",
         key: "updatedTime",
         width: "200px",
         sorter: (a, b) => a.updatedTime.localeCompare(b.updatedTime),
-        render: (text, record, index) => {
+        render: (text, rule, index) => {
           return Setting.getFormattedDate(text);
         },
       },
       {
-        title: i18next.t("general:Expression"),
-        dataIndex: "expression",
-        key: "expression",
-        sorter: (a, b) => a.expression.localeCompare(b.expression),
+        title: i18next.t("general:Type"),
+        dataIndex: "type",
+        key: "type",
+        sorter: (a, b) => a.type.localeCompare(b.type),
+      },
+      {
+        title: i18next.t("general:Expressions"),
+        dataIndex: "expressions",
+        key: "expressions",
+        sorter: (a, b) => a.expressions.localeCompare(b.expressions),
+        render: (text, rule, index) => {
+          return rule.expressions.map((expression, i) => {
+            return (
+              <Tag key={expression} color={"success"}>
+                {expression.operator + " " + expression.value.slice(0, 20)}
+              </Tag>
+            );
+          });
+        },
       },
       {
         title: i18next.t("general:Action"),
@@ -112,13 +145,15 @@ class RuleListPage extends BaseListPage {
         key: "op",
         render: (text, rule, index) => {
           return (
-            <Popconfirm
-              title={`Sure to delete rule: ${rule.name} ?`}
-              onConfirm={() => this.deleteRule(index)}
-            >
-              <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="primary" onClick={() => this.props.history.push(`/rules/${rule.owner}/${rule.name}`)}>{i18next.t("general:Edit")}</Button>
-              <Button type="danger">{i18next.t("general:Delete")}</Button>
-            </Popconfirm>
+            <div>
+              <Popconfirm
+                title={`Sure to delete rule: ${rule.name} ?`}
+                onConfirm={() => this.deleteRule(index)}
+              >
+                <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="primary" onClick={() => this.props.history.push(`/rules/${rule.owner}/${rule.name}`)}>{i18next.t("general:Edit")}</Button>
+                <Button type="danger">{i18next.t("general:Delete")}</Button>
+              </Popconfirm>
+            </div>
           );
         },
       },

@@ -20,16 +20,18 @@ import (
 )
 
 type Expression struct {
-	Name string `json:"name"`
+	Name     string `json:"name"`
+	Operator string `json:"operator"`
+	Value    string `json:"value"`
 }
 
 type Rule struct {
-	Owner       string   `xorm:"varchar(100) notnull pk" json:"owner"`
-	Name        string   `xorm:"varchar(100) notnull pk" json:"name"`
-	Type        string   `xorm:"varchar(100) notnull" json:"type"`
-	Expressions []string `xorm:"mediumtext" json:"expressions"`
-	CreatedTime string   `xorm:"varchar(100) notnull" json:"createdTime"`
-	UpdatedTime string   `xorm:"varchar(100) notnull" json:"updatedTime"`
+	Owner       string       `xorm:"varchar(100) notnull pk" json:"owner"`
+	Name        string       `xorm:"varchar(100) notnull pk" json:"name"`
+	Type        string       `xorm:"varchar(100) notnull" json:"type"`
+	Expressions []Expression `xorm:"mediumtext" json:"expressions"`
+	CreatedTime string       `xorm:"varchar(100) notnull" json:"createdTime"`
+	UpdatedTime string       `xorm:"varchar(100) notnull" json:"updatedTime"`
 }
 
 func GetRules() ([]*Rule, error) {
@@ -100,7 +102,7 @@ func GetWAFRules() string {
 	// get all expressions from rules
 	for _, rule := range rules {
 		for _, expression := range rule.Expressions {
-			res += expression + "\n"
+			res += expression.Value + "\n"
 		}
 	}
 	return res

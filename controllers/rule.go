@@ -67,7 +67,7 @@ func (c *ApiController) AddRule() {
 		c.ResponseError(err.Error())
 		return
 	}
-	err = checkWAFRule(rule.Expressions)
+	err = checkWAFRule(makeWAFRules(rule.Expressions))
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
@@ -89,7 +89,7 @@ func (c *ApiController) UpdateRule() {
 		return
 	}
 
-	err = checkWAFRule(rule.Expressions)
+	err = checkWAFRule(makeWAFRules(rule.Expressions))
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
@@ -116,6 +116,14 @@ func (c *ApiController) DeleteRule() {
 	c.Data["json"] = wrapActionResponse(object.DeleteRule(&rule))
 	go service.UpdateWAF()
 	c.ServeJSON()
+}
+
+func makeWAFRules(expressions []object.Expression) []string {
+	rules := make([]string, len(expressions))
+	for i, expression := range expressions {
+		rules[i] = expression.Value
+	}
+	return rules
 }
 
 func checkWAFRule(rules []string) error {
