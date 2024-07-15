@@ -17,19 +17,16 @@ package service
 import (
 	"crypto/tls"
 	"fmt"
-	"math/rand"
+	"github.com/beego/beego"
+	"github.com/casbin/caswaf/object"
+	"github.com/casbin/caswaf/util"
+	httptx "github.com/corazawaf/coraza/v3/http"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"path/filepath"
 	"strings"
-	"time"
-
-	"github.com/beego/beego"
-	"github.com/casbin/caswaf/object"
-	"github.com/casbin/caswaf/util"
-	httptx "github.com/corazawaf/coraza/v3/http"
 )
 
 func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.Request) {
@@ -208,8 +205,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	host := site.GetHost()
-	hosts := site.GetHosts()
-	if host == "" && len(hosts) == 0 {
+	if host == "" {
 		responseError(w, "CasWAF error: targetUrl should not be empty for both host and hosts: %s, site = %v", r.Host, site)
 		return
 	}
@@ -226,11 +222,6 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 func nextHandle(w http.ResponseWriter, r *http.Request) {
 	site := getSiteByDomainWithWww(r.Host)
 	host := site.GetHost()
-	if len(site.Hosts) != 0 {
-		rand.Seed(time.Now().UnixNano())
-		host = site.Hosts[rand.Intn(len(site.Hosts))]
-	}
-
 	if site.SslMode == "Static Folder" {
 		var path string
 		if r.RequestURI != "/" {
@@ -246,8 +237,7 @@ func nextHandle(w http.ResponseWriter, r *http.Request) {
 		}
 		http.ServeFile(w, r, path)
 	} else {
-		//targetUrl := joinPath(site.GetHost(), r.RequestURI)
-		targetUrl := joinPath(host, r.RequestURI)
+		targetUrl := joinPath(site.GetHost(), r.RequestURI)
 		forwardHandler(targetUrl, w, r)
 	}
 }

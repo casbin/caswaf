@@ -16,7 +16,9 @@ package object
 
 import (
 	"fmt"
+	"math/rand"
 	"strings"
+	"time"
 
 	"github.com/casbin/caswaf/run"
 	"github.com/casbin/caswaf/util"
@@ -235,6 +237,12 @@ func (site *Site) GetChallengeMap() map[string]string {
 }
 
 func (site *Site) GetHost() string {
+
+	if len(site.Hosts) != 0 {
+		rand.Seed(time.Now().UnixNano())
+		return site.Hosts[rand.Intn(len(site.Hosts))]
+	}
+
 	if site.Host != "" {
 		return site.Host
 	}
@@ -245,13 +253,6 @@ func (site *Site) GetHost() string {
 
 	res := fmt.Sprintf("http://localhost:%d", site.Port)
 	return res
-}
-
-func (site *Site) GetHosts() []string {
-	if len(site.Hosts) != 0 {
-		return site.Hosts
-	}
-	return make([]string, 0)
 }
 
 func addErrorToMsg(msg string, function string, err error) string {

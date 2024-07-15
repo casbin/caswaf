@@ -58,7 +58,7 @@ class SiteListPage extends BaseListPage {
       challenges: [],
       host: "",
       port: 8000,
-      hosts: ["http://127.0.0.1:8077", "http://127.0.0.1:8078"],
+      hosts: [],
       sslMode: "HTTPS Only",
       sslCert: "",
       publicIp: "8.131.81.162",
