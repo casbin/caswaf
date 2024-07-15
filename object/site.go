@@ -51,6 +51,7 @@ type Site struct {
 	Challenges   []string   `xorm:"mediumtext" json:"challenges"`
 	Host         string     `xorm:"varchar(100)" json:"host"`
 	Port         int        `json:"port"`
+	Hosts        []string   `xorm:"mediumtext" json:"hosts"`
 	SslMode      string     `xorm:"varchar(100)" json:"sslMode"`
 	SslCert      string     `xorm:"-" json:"sslCert"`
 	PublicIp     string     `xorm:"varchar(100)" json:"publicIp"`
@@ -244,6 +245,13 @@ func (site *Site) GetHost() string {
 
 	res := fmt.Sprintf("http://localhost:%d", site.Port)
 	return res
+}
+
+func (site *Site) GetHosts() []string {
+	if len(site.Hosts) != 0 {
+		return site.Hosts
+	}
+	return make([]string, 0)
 }
 
 func addErrorToMsg(msg string, function string, err error) string {
