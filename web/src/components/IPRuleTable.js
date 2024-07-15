@@ -14,10 +14,12 @@
 
 import React from "react";
 import {DeleteOutlined, DownOutlined, UpOutlined} from "@ant-design/icons";
-import {Button, Col, Input, Row, Table, Tooltip} from "antd";
+import {Button, Col, Input, Row, Select, Table, Tooltip} from "antd";
 import * as Setting from "../Setting";
 
-class WafRuleTable extends React.Component {
+const {Option} = Select;
+
+class IPRuleTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -35,7 +37,7 @@ class WafRuleTable extends React.Component {
   }
 
   addRow(table) {
-    const row = {name: `New WAF Rule - ${table.length}`, operator: "match", value: ""};
+    const row = {name: `New IP Rule - ${table.length}`, operator: "is in", value: ""};
     if (table === undefined) {
       table = [];
     }
@@ -58,6 +60,7 @@ class WafRuleTable extends React.Component {
     table = Setting.swapRow(table, i, i + 1);
     this.updateTable(table);
   }
+
   renderTable(table) {
     const columns = [
       {
@@ -65,48 +68,62 @@ class WafRuleTable extends React.Component {
         dataIndex: "name",
         key: "name",
         width: "180px",
-        render: (text, record, index) => {
-          return (
-            <Input value={text} onChange={e => {
-              this.updateField(table, index, "name", e.target.value);
-            }} />
-          );
-        },
+        render: (text, record, index) => (
+          <Input value={text} onChange={e => {
+            this.updateField(table, index, "name", e.target.value);
+          }} />
+        ),
+      },
+      {
+        title: "Operator",
+        dataIndex: "operator",
+        key: "operator",
+        width: "180px",
+        render: (text, record, index) => (
+          <Select value={text} virtual={false} style={{width: "100%"}} onChange={value => {
+            this.updateField(table, index, "operator", value);
+          }}>
+            {
+              [
+                {value: "is in", text: "is in"},
+                {value: "is not in", text: "is not in"},
+              ].map((item, index) => <Option key={index} value={item.value}>{item.text}</Option>)
+            }
+          </Select>
+        ),
       },
       {
         title: "Value",
         dataIndex: "value",
         key: "value",
-        render: (text, record, index) => {
-          return (
-            <Input value={text} onChange={e => {
-              this.updateField(table, index, "value", e.target.value);
-            }} />
-          );
-        },
+        width: "100%",
+        render: (text, record, index) => (
+          <Input value={text} placeholder="Split with Space" onChange={e => {
+            this.updateField(table, index, "value", e.target.value);
+          }} onBlur={e => {
+            this.updateField(table, index, "value", e.target.value.replace(/\s+/g, " ").trim());
+          }} />
+        ),
       },
       {
         title: "Action",
         key: "action",
         width: "100px",
-        render: (text, record, index) => {
-          return (
-            <div>
-              <Tooltip placement="bottomLeft" title={"Up"}>
-                <Button style={{marginRight: "5px"}} disabled={index === 0} icon={<UpOutlined />} size="small" onClick={() => this.upRow(table, index)} />
-              </Tooltip>
-              <Tooltip placement="topLeft" title={"Down"}>
-                <Button style={{marginRight: "5px"}} disabled={index === table.length - 1} icon={<DownOutlined />} size="small" onClick={() => this.downRow(table, index)} />
-              </Tooltip>
-              <Tooltip placement="topLeft" title={"Delete"}>
-                <Button icon={<DeleteOutlined />} size="small" onClick={() => this.deleteRow(table, index)} />
-              </Tooltip>
-            </div>
-          );
-        },
+        render: (text, record, index) => (
+          <div>
+            <Tooltip placement="bottomLeft" title={"Up"}>
+              <Button style={{marginRight: "5px"}} disabled={index === 0} icon={<UpOutlined />} size="small" onClick={() => this.upRow(table, index)} />
+            </Tooltip>
+            <Tooltip placement="topLeft" title={"Down"}>
+              <Button style={{marginRight: "5px"}} disabled={index === table.length - 1} icon={<DownOutlined />} size="small" onClick={() => this.downRow(table, index)} />
+            </Tooltip>
+            <Tooltip placement="topLeft" title={"Delete"}>
+              <Button icon={<DeleteOutlined />} size="small" onClick={() => this.deleteRow(table, index)} />
+            </Tooltip>
+          </div>
+        ),
       },
     ];
-
     return (
       <Table rowKey="index" columns={columns} dataSource={table} size="middle" bordered pagination={false}
         title={() => (
@@ -134,4 +151,4 @@ class WafRuleTable extends React.Component {
   }
 }
 
-export default WafRuleTable;
+export default IPRuleTable;

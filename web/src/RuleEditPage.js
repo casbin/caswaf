@@ -18,6 +18,7 @@ import * as Setting from "./Setting";
 import * as RuleBackend from "./backend/RuleBackend";
 import i18next from "i18next";
 import WafRuleTable from "./components/WafRuleTable";
+import IPRuleTable from "./components/IPRuleTable";
 
 const {Option} = Select;
 
@@ -96,7 +97,18 @@ class RuleEditPage extends React.Component {
             {
               this.state.rule.type === "waf" ? (
                 <WafRuleTable
-                  title={"Expressions"}
+                  title={"Seclang"}
+                  table={this.state.rule.expressions}
+                  ruleName={this.state.rule.name}
+                  account={this.props.account}
+                  onUpdateTable={(value) => {this.updateRuleField("expressions", value);}}
+                />
+              ) : null
+            }
+            {
+              this.state.rule.type === "ip" ? (
+                <IPRuleTable
+                  title={"IPs"}
                   table={this.state.rule.expressions}
                   ruleName={this.state.rule.name}
                   account={this.props.account}

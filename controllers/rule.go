@@ -16,6 +16,9 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
+	"net"
+	"strings"
 
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/service"
@@ -67,7 +70,7 @@ func (c *ApiController) AddRule() {
 		c.ResponseError(err.Error())
 		return
 	}
-	err = checkWAFRule(makeWAFRules(rule.Expressions))
+	err = checkExpressions(rule.Expressions, rule.Type)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
@@ -89,7 +92,7 @@ func (c *ApiController) UpdateRule() {
 		return
 	}
 
-	err = checkWAFRule(makeWAFRules(rule.Expressions))
+	err = checkExpressions(rule.Expressions, rule.Type)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
@@ -118,12 +121,18 @@ func (c *ApiController) DeleteRule() {
 	c.ServeJSON()
 }
 
-func makeWAFRules(expressions []object.Expression) []string {
-	rules := make([]string, len(expressions))
+func checkExpressions(expressions []object.Expression, ruleType string) error {
+	values := make([]string, len(expressions))
 	for i, expression := range expressions {
-		rules[i] = expression.Value
+		values[i] = expression.Value
 	}
-	return rules
+	switch ruleType {
+	case "waf":
+		return checkWAFRule(values)
+	case "ip":
+		return checkIPRule(values)
+	}
+	return nil
 }
 
 func checkWAFRule(rules []string) error {
@@ -132,6 +141,17 @@ func checkWAFRule(rules []string) error {
 		_, err := scanner.AllDirective()
 		if err != nil {
 			return err
+		}
+	}
+	return nil
+}
+
+func checkIPRule(ipLists []string) error {
+	for _, ipList := range ipLists {
+		for _, ip := range strings.Split(ipList, " ") {
+			if net.ParseIP(ip) == nil {
+				return errors.New("Invalid IP address: " + ip)
+			}
 		}
 	}
 	return nil
