@@ -212,9 +212,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if site.EnableWaf {
-		if site.Waf == nil {
-			site.Waf = createWAF()
-		}
+		site.Waf = getWAF()
 		httptx.WrapHandler(site.Waf, http.HandlerFunc(nextHandle)).ServeHTTP(w, r)
 	} else {
 		nextHandle(w, r)

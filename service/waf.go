@@ -16,21 +16,37 @@ package service
 
 import (
 	"fmt"
+
 	"github.com/casbin/caswaf/conf"
+	"github.com/casbin/caswaf/object"
 	"github.com/corazawaf/coraza/v3"
 	"github.com/corazawaf/coraza/v3/types"
 )
+
+var waf coraza.WAF
 
 func createWAF() coraza.WAF {
 	waf, err := coraza.NewWAF(
 		coraza.NewWAFConfig().
 			WithErrorCallback(logError).
-			WithDirectives(conf.WafConf),
+			WithDirectives(conf.WafConf).
+			WithDirectives(object.GetWAFRules()),
 	)
 	if err != nil {
 		fmt.Printf("createWAF(): %s\n", err.Error())
 	}
 	return waf
+}
+
+func getWAF() coraza.WAF {
+	if waf == nil {
+		waf = createWAF()
+	}
+	return waf
+}
+
+func UpdateWAF() {
+	waf = createWAF()
 }
 
 func logError(error types.MatchedRule) {
