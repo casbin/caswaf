@@ -17,16 +17,17 @@ package service
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/beego/beego"
-	"github.com/casbin/caswaf/object"
-	"github.com/casbin/caswaf/util"
-	httptx "github.com/corazawaf/coraza/v3/http"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"path/filepath"
 	"strings"
+
+	"github.com/beego/beego"
+	"github.com/casbin/caswaf/object"
+	"github.com/casbin/caswaf/util"
+	httptx "github.com/corazawaf/coraza/v3/http"
 )
 
 func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.Request) {
@@ -144,6 +145,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		redirectToHost(w, r, hostNonWww)
 		return
 	}
+
 	if site.Domain != r.Host && site.NeedRedirect {
 		redirectToHost(w, r, site.Domain)
 		return
@@ -206,7 +208,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 	host := site.GetHost()
 	if host == "" {
-		responseError(w, "CasWAF error: targetUrl should not be empty for both host and hosts: %s, site = %v", r.Host, site)
+		responseError(w, "CasWAF error: targetUrl should not be empty for host: %s, site = %v", r.Host, site)
 		return
 	}
 	if site.EnableWaf {
