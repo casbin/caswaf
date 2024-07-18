@@ -53,7 +53,7 @@ type Site struct {
 	Challenges   []string   `xorm:"mediumtext" json:"challenges"`
 	Host         string     `xorm:"varchar(100)" json:"host"`
 	Port         int        `json:"port"`
-	Hosts        []string   `xorm:"mediumtext" json:"hosts"`
+	Hosts        []string   `xorm:"varchar(1000)" json:"hosts"`
 	SslMode      string     `xorm:"varchar(100)" json:"sslMode"`
 	SslCert      string     `xorm:"-" json:"sslCert"`
 	PublicIp     string     `xorm:"varchar(100)" json:"publicIp"`
@@ -237,7 +237,6 @@ func (site *Site) GetChallengeMap() map[string]string {
 }
 
 func (site *Site) GetHost() string {
-
 	if len(site.Hosts) != 0 {
 		rand.Seed(time.Now().UnixNano())
 		return site.Hosts[rand.Intn(len(site.Hosts))]
