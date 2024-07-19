@@ -116,6 +116,34 @@ func redirectToHost(w http.ResponseWriter, r *http.Request, host string) {
 	http.Redirect(w, r, targetUrl, http.StatusMovedPermanently)
 }
 
+func checkRules(wafRuleIds []string, r *http.Request, clientIp string) error {
+	rules := object.GetRulesByRuleIds(wafRuleIds)
+	for _, rule := range rules {
+		switch rule.Type {
+		case "ip":
+			err := checkIPRule(rule.Expressions, clientIp)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func checkIPRule(expressions []*object.Expression, clientIp string) error {
+	for _, expression := range expressions {
+		ips := strings.Split(expression.Value, " ")
+		op := expression.Operator == "is in"
+		for _, ip := range ips {
+			flag := ip == clientIp
+			if flag == op {
+				return fmt.Errorf("your IP (%s) has no permission to access the corresponding resource", clientIp)
+			}
+		}
+	}
+	return nil
+}
+
 func handleRequest(w http.ResponseWriter, r *http.Request) {
 	clientIp := getClientIp(r)
 	logRequest(clientIp, r)
@@ -212,7 +240,13 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if site.EnableWaf {
-		site.Waf = getWAF()
+		err := checkRules(site.WafRuleIds, r, clientIp)
+		if err != nil {
+			w.WriteHeader(http.StatusForbidden)
+			responseError(w, "CasWAF error: your IP (%s) has no permission to access the corresponding resource", clientIp)
+			return
+		}
+		getWAF(site)
 		httptx.WrapHandler(site.Waf, http.HandlerFunc(nextHandle)).ServeHTTP(w, r)
 	} else {
 		nextHandle(w, r)

@@ -33,6 +33,7 @@ func main() {
 	casdoor.InitCasdoorConfig()
 	proxy.InitHttpClient()
 	object.InitSiteMap()
+	object.InitRuleMap()
 	run.InitAppMap()
 	run.InitSelfStart()
 	object.StartMonitorSitesLoop()
@@ -48,7 +49,7 @@ func main() {
 	//beego.DelStaticPath("/static")
 	beego.SetStaticPath("/static", "web/build/static")
 	// https://studygolang.com/articles/2303
-	beego.InsertFilter("/", beego.BeforeRouter, routers.TransparentStatic) // must has this for default page
+	beego.InsertFilter("/", beego.BeforeRouter, routers.TransparentStatic) // must have this for default page
 	beego.InsertFilter("/*", beego.BeforeRouter, routers.TransparentStatic)
 	beego.InsertFilter("/api/*", beego.BeforeRouter, routers.ApiFilter)
 

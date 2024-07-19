@@ -76,7 +76,7 @@ func (c *ApiController) AddRule() {
 		return
 	}
 	c.Data["json"] = wrapActionResponse(object.AddRule(&rule))
-	go service.UpdateWAF()
+	go service.UpdateWAFs()
 	c.ServeJSON()
 }
 
@@ -100,7 +100,7 @@ func (c *ApiController) UpdateRule() {
 
 	id := c.Input().Get("id")
 	c.Data["json"] = wrapActionResponse(object.UpdateRule(id, &rule))
-	go service.UpdateWAF()
+	go service.UpdateWAFs()
 	c.ServeJSON()
 }
 
@@ -117,11 +117,11 @@ func (c *ApiController) DeleteRule() {
 	}
 
 	c.Data["json"] = wrapActionResponse(object.DeleteRule(&rule))
-	go service.UpdateWAF()
+	go service.UpdateWAFs()
 	c.ServeJSON()
 }
 
-func checkExpressions(expressions []object.Expression, ruleType string) error {
+func checkExpressions(expressions []*object.Expression, ruleType string) error {
 	values := make([]string, len(expressions))
 	for i, expression := range expressions {
 		values[i] = expression.Value

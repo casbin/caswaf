@@ -195,3 +195,32 @@ func GetCertByDomain(domain string) (*Cert, error) {
 
 	return nil, nil
 }
+
+func GetWAFRulesByIds(ids []string) string {
+	// Get rules by id (owner/name)
+	owners, names := util.GetOwnersAndNamesFromIds(ids)
+	var rules []*Rule
+	condition := ""
+	params := []interface{}{}
+	for i := range owners {
+		if i > 0 {
+			condition += " OR "
+		}
+		condition += "(owner = ? AND name = ?)"
+		params = append(params, owners[i], names[i])
+	}
+
+	err := ormer.Engine.Where(condition, params...).And("type = ?", "waf").Find(&rules)
+	if err != nil {
+		return ""
+	}
+
+	res := ""
+	// get all expressions from rules
+	for _, rule := range rules {
+		for _, expression := range rule.Expressions {
+			res += expression.Value + "\n"
+		}
+	}
+	return res
+}

@@ -72,6 +72,17 @@ func GetOwnerAndNameFromId(id string) (string, string) {
 	return tokens[0], tokens[1]
 }
 
+func GetOwnersAndNamesFromIds(ids []string) ([]string, []string) {
+	owners := make([]string, len(ids))
+	names := make([]string, len(ids))
+
+	for i, id := range ids {
+		owners[i], names[i] = GetOwnerAndNameFromId(id)
+	}
+
+	return owners, names
+}
+
 func GetOwnerAndNameFromId3(id string) (string, string, string) {
 	tokens := strings.Split(id, "/")
 	if len(tokens) != 3 {

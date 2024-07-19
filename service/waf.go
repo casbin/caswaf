@@ -23,30 +23,36 @@ import (
 	"github.com/corazawaf/coraza/v3/types"
 )
 
-var waf coraza.WAF
+var wafs = map[*object.Site]*coraza.WAF{}
+var sites []*object.Site
 
-func createWAF() coraza.WAF {
+func createWAF(site *object.Site) {
 	waf, err := coraza.NewWAF(
 		coraza.NewWAFConfig().
 			WithErrorCallback(logError).
 			WithDirectives(conf.WafConf).
-			WithDirectives(object.GetWAFRules()),
+			WithDirectives(object.GetWAFRulesByIds(site.WafRuleIds)),
 	)
 	if err != nil {
 		fmt.Printf("createWAF(): %s\n", err.Error())
 	}
-	return waf
+	wafs[site] = &waf
+	site.Waf = waf
 }
 
-func getWAF() coraza.WAF {
-	if waf == nil {
-		waf = createWAF()
+func getWAF(site *object.Site) {
+	if wafs[site] == nil {
+		createWAF(site)
+		sites = append(sites, site)
+	} else {
+		site.Waf = *wafs[site]
 	}
-	return waf
 }
 
-func UpdateWAF() {
-	waf = createWAF()
+func UpdateWAFs() {
+	for _, site := range sites {
+		createWAF(site)
+	}
 }
 
 func logError(error types.MatchedRule) {
