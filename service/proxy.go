@@ -116,32 +116,38 @@ func redirectToHost(w http.ResponseWriter, r *http.Request, host string) {
 	http.Redirect(w, r, targetUrl, http.StatusMovedPermanently)
 }
 
-func checkRules(wafRuleIds []string, r *http.Request, clientIp string) error {
+func checkRules(wafRuleIds []string, r *http.Request, clientIp string) (bool, error) {
 	rules := object.GetRulesByRuleIds(wafRuleIds)
 	for _, rule := range rules {
 		switch rule.Type {
 		case "ip":
-			err := checkIPRule(rule.Expressions, clientIp)
-			if err != nil {
-				return err
+			isMatch := checkIPRule(rule.Expressions, clientIp)
+			if !isMatch && rule.Action == "block" {
+				return false, fmt.Errorf(
+					"your IP (%s) has no permission to access the corresponding resource. The rule ID in violation is: %s",
+					clientIp,
+					rule.Owner+"/"+rule.Name,
+				)
+			} else if isMatch && rule.Action == "allow" {
+				return true, nil
 			}
 		}
 	}
-	return nil
+	return true, nil
 }
 
-func checkIPRule(expressions []*object.Expression, clientIp string) error {
+func checkIPRule(expressions []*object.Expression, clientIp string) bool {
 	for _, expression := range expressions {
 		ips := strings.Split(expression.Value, " ")
 		op := expression.Operator == "is in"
 		for _, ip := range ips {
 			flag := ip == clientIp
 			if flag == op {
-				return fmt.Errorf("your IP (%s) has no permission to access the corresponding resource", clientIp)
+				return false
 			}
 		}
 	}
-	return nil
+	return true
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
@@ -240,10 +246,10 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if site.EnableWaf {
-		err := checkRules(site.WafRuleIds, r, clientIp)
-		if err != nil {
+		isMatch, err := checkRules(site.WafRuleIds, r, clientIp)
+		if !isMatch {
 			w.WriteHeader(http.StatusForbidden)
-			responseError(w, "CasWAF error: your IP (%s) has no permission to access the corresponding resource", clientIp)
+			responseError(w, "Blocked by CasWAF: %v", err)
 			return
 		}
 		getWAF(site)

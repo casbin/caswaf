@@ -30,13 +30,20 @@ type Rule struct {
 	Name        string        `xorm:"varchar(100) notnull pk" json:"name"`
 	Type        string        `xorm:"varchar(100) notnull" json:"type"`
 	Expressions []*Expression `xorm:"mediumtext" json:"expressions"`
+	Action      string        `xorm:"varchar(100) notnull" json:"action"`
 	CreatedTime string        `xorm:"varchar(100) notnull" json:"createdTime"`
 	UpdatedTime string        `xorm:"varchar(100) notnull" json:"updatedTime"`
 }
 
-func GetRules() ([]*Rule, error) {
+func GetGlobalRules() ([]*Rule, error) {
 	rules := []*Rule{}
 	err := ormer.Engine.Asc("owner").Desc("created_time").Find(&rules)
+	return rules, err
+}
+
+func GetRules(owner string) ([]*Rule, error) {
+	rules := []*Rule{}
+	err := ormer.Engine.Desc("updated_time").Find(&rules, &Rule{Owner: owner})
 	return rules, err
 }
 

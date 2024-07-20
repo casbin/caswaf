@@ -29,7 +29,7 @@ func InitRuleMap() {
 
 func refreshRuleMap() error {
 	newRuleMap := map[string]*Rule{}
-	rules, err := GetRules()
+	rules, err := GetGlobalRules()
 	if err != nil {
 		return err
 	}

@@ -81,9 +81,9 @@ class RuleEditPage extends React.Component {
                 [
                   {value: "waf", text: "WAF"},
                   {value: "ip", text: "IP"},
-                  {value: "ua", text: "UA"},
-                  {value: "frequency", text: "Frequency"},
-                  {value: "complex", text: "Complex"},
+                  // {value: "ua", text: "User Agent"},
+                  // {value: "frequency", text: "Frequency"},
+                  // {value: "complex", text: "Complex"},
                 ].map((item, index) => <Option key={index} value={item.value}>{item.text}</Option>)
               }
             </Select>
@@ -120,25 +120,25 @@ class RuleEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}}>
           <Col span={2} style={{marginTop: "5px"}}>
-            {i18next.t("rule:Disruptive Action")}:
+            {i18next.t("rule:Action")}:
           </Col>
           <Col span={22}>
-            <Select virtual={false} value={this.state.rule.disruptiveAction} style={{width: "100%"}} onChange={value => {
-              this.updateRuleField("disruptiveAction", value);
+            <Select virtual={false} value={this.state.rule.action} defaultValue={"block"} style={{width: "100%"}} onChange={value => {
+              this.updateRuleField("action", value);
             }}>
               {
                 [
                   {value: "allow", text: "Allow"},
-                  {value: "redirect", text: "Redirect"},
-                  {value: "deny", text: "Deny"},
-                  {value: "drop", text: "Drop"},
+                  // {value: "redirect", text: "Redirect"},
+                  {value: "block", text: "Block"},
+                  // {value: "drop", text: "Drop"},
                 ].map((item, index) => <Option key={index} value={item.value}>{item.text}</Option>)
               }
             </Select>
           </Col>
         </Row>
-        {
-          this.state.rule.disruptiveAction === "redirect" && (
+        {/* {
+          this.state.rule.action === "redirect" && (
             <Row style={{marginTop: "20px"}}>
               <Col span={2} style={{marginTop: "5px"}}>
                 {i18next.t("rule:Redirect URL")}:
@@ -150,24 +150,25 @@ class RuleEditPage extends React.Component {
               </Col>
             </Row>
           )
-        }
+        } */}
         {
-          this.state.rule.disruptiveAction === "deny" && (
+          this.state.rule.action === "block" && (
             <Row style={{marginTop: "20px"}}>
               <Col span={2} style={{marginTop: "5px"}}>
                 {i18next.t("rule:Status Code")}:
               </Col>
               <Col span={22}>
-                <InputNumber value={this.state.rule.statusCode} defaultValue={403} onChange={e => {
-                  this.updateRuleField("statusCode", e.target.value);
-                }} />
+                <InputNumber value={this.state.rule.statusCode} defaultValue={403} disabled={true}
+                  onChange={e => {
+                    this.updateRuleField("statusCode", e.target.value);
+                  }} />
               </Col>
             </Row>
           )
         }
-        <Row style={{marginTop: "20px"}}>
+        {/* <Row style={{marginTop: "20px"}}>
           <Col span={2} style={{marginTop: "5px"}}>
-            {i18next.t("rule:LogAction")}:
+            {i18next.t("rule:Log action")}:
           </Col>
           <Col span={22}>
             <Select virtual={false} value={this.state.rule.logAction} style={{width: "100%"}} onChange={value => {
@@ -185,7 +186,7 @@ class RuleEditPage extends React.Component {
         {this.state.rule.logAction === "log" && (
           <Row style={{marginTop: "20px"}}>
             <Col span={2} style={{marginTop: "5px"}}>
-              {i18next.t("rule:Log Message")}:
+              {i18next.t("rule:Log message")}:
             </Col>
             <Col span={22}>
               <Input value={this.state.rule.logMessage} onChange={e => {
@@ -193,7 +194,7 @@ class RuleEditPage extends React.Component {
               }} />
             </Col>
           </Row>
-        )}
+        )} */}
       </Card>
     );
   }

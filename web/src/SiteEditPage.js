@@ -13,10 +13,11 @@
 // limitations under the License.
 
 import React from "react";
-import {Button, Card, Col, Input, InputNumber, Row, Select, Switch} from "antd";
+import {Button, Card, Checkbox, Col, Input, InputNumber, Row, Select, Switch} from "antd";
 import {LinkOutlined} from "@ant-design/icons";
 import * as SiteBackend from "./backend/SiteBackend";
 import * as CertBackend from "./backend/CertBackend";
+import {getRules} from "./backend/RuleBackend";
 import * as ApplicationBackend from "./backend/ApplicationBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
@@ -31,6 +32,7 @@ class SiteEditPage extends React.Component {
       classes: props,
       owner: props.match.params.owner,
       siteName: props.match.params.siteName,
+      rules: [],
       site: null,
       certs: null,
       applications: null,
@@ -41,6 +43,20 @@ class SiteEditPage extends React.Component {
     this.getSite();
     this.getCerts();
     this.getApplications();
+    this.getRules();
+  }
+
+  getRules() {
+    getRules(this.state.owner)
+      .then((res) => {
+        const rules = [];
+        res.data.forEach(e => {
+          rules.push(e.owner + "/" + e.name);
+        });
+        this.setState({
+          rules: rules,
+        });
+      });
   }
 
   getSite() {
@@ -179,6 +195,18 @@ class SiteEditPage extends React.Component {
             }} />
           </Col>
         </Row>
+        {
+          this.state.site.enableWaf && (
+            <Row style={{marginTop: "20px"}} >
+              <Col style={{marginTop: "5px"}} span={2}>
+                {i18next.t("site:WAF Rules")}:
+              </Col>
+              <Col span={22} >
+                <Checkbox.Group options={this.state.rules} value={this.state.site.wafRuleIds} onChange={v => this.updateSiteField("wafRuleIds", v)} />
+              </Col>
+            </Row>
+          )
+        }
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("site:Challenges")}:

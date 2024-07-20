@@ -30,8 +30,12 @@ func (c *ApiController) GetRules() {
 	if c.RequireSignedIn() {
 		return
 	}
+	owner := c.Input().Get("owner")
+	if owner == "admin" {
+		owner = ""
+	}
 
-	rules, err := object.GetRules()
+	rules, err := object.GetRules(owner)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return

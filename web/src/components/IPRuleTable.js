@@ -24,7 +24,16 @@ class IPRuleTable extends React.Component {
     super(props);
     this.state = {
       classes: props,
+      options: [],
     };
+    for (let i = 0; i < this.props.table.length; i++) {
+      const values = this.props.table[i].value.split(" ");
+      const options = [];
+      for (let j = 0; j < values.length; j++) {
+        options[j] = {value: values[j], label: values[j]};
+      }
+      this.state.options.push(options);
+    }
   }
 
   updateTable(table) {
@@ -32,12 +41,20 @@ class IPRuleTable extends React.Component {
   }
 
   updateField(table, index, key, value) {
-    table[index][key] = value;
+    if (key === "value") {
+      let v = "";
+      for (let i = 0; i < value.length; i++) {
+        v += value[i] + " ";
+      }
+      table[index][key] = v.trim();
+    } else {
+      table[index][key] = value;
+    }
     this.updateTable(table);
   }
 
   addRow(table) {
-    const row = {name: `New IP Rule - ${table.length}`, operator: "is in", value: ""};
+    const row = {name: `New IP Rule - ${table.length}`, operator: "is in", value: "127.0.0.1"};
     if (table === undefined) {
       table = [];
     }
@@ -98,11 +115,14 @@ class IPRuleTable extends React.Component {
         key: "value",
         width: "100%",
         render: (text, record, index) => (
-          <Input value={text} placeholder="Split with Space" onChange={e => {
-            this.updateField(table, index, "value", e.target.value);
-          }} onBlur={e => {
-            this.updateField(table, index, "value", e.target.value.replace(/\s+/g, " ").trim());
-          }} />
+          <Select
+            mode="tags"
+            style={{width: "100%"}}
+            placeholder="Input IP Addresses"
+            defaultValue={text.split(" ")}
+            onChange={value => this.updateField(table, index, "value", value)}
+            options={this.state.options[index]}
+          />
         ),
       },
       {

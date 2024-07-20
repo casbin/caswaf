@@ -29,7 +29,7 @@ class RuleListPage extends BaseListPage {
     this.setState({
       loading: true,
     });
-    RuleBackend.getRules().then((res) => {
+    RuleBackend.getRules(this.props.account.name).then((res) => {
       this.setState({
         data: res.data,
         loading: false,
@@ -76,6 +76,7 @@ class RuleListPage extends BaseListPage {
         operator: "match",
         value: "SecRule REQUEST_HEADERS:user-agent \"@contains firefox\" \"id:1, pass, log, logdata:'someone used firefox to access'\"",
       }],
+      action: "block",
     };
   }
 
