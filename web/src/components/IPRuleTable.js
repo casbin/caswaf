@@ -70,11 +70,13 @@ class IPRuleTable extends React.Component {
 
   upRow(table, i) {
     table = Setting.swapRow(table, i - 1, i);
+    Setting.swapRow(this.state.options, i - 1, i);
     this.updateTable(table);
   }
 
   downRow(table, i) {
     table = Setting.swapRow(table, i, i + 1);
+    Setting.swapRow(this.state.options, i, i + 1);
     this.updateTable(table);
   }
 
@@ -85,7 +87,7 @@ class IPRuleTable extends React.Component {
         dataIndex: "name",
         key: "name",
         width: "180px",
-        render: (text, record, index) => (
+        render: (text, rule, index) => (
           <Input value={text} onChange={e => {
             this.updateField(table, index, "name", e.target.value);
           }} />
@@ -96,7 +98,7 @@ class IPRuleTable extends React.Component {
         dataIndex: "operator",
         key: "operator",
         width: "180px",
-        render: (text, record, index) => (
+        render: (text, rule, index) => (
           <Select value={text} virtual={false} style={{width: "100%"}} onChange={value => {
             this.updateField(table, index, "operator", value);
           }}>
@@ -114,12 +116,12 @@ class IPRuleTable extends React.Component {
         dataIndex: "value",
         key: "value",
         width: "100%",
-        render: (text, record, index) => (
+        render: (text, rule, index) => (
           <Select
             mode="tags"
             style={{width: "100%"}}
             placeholder="Input IP Addresses"
-            defaultValue={text.split(" ")}
+            value={rule.value.split(" ")}
             onChange={value => this.updateField(table, index, "value", value)}
             options={this.state.options[index]}
           />
@@ -129,7 +131,7 @@ class IPRuleTable extends React.Component {
         title: "Action",
         key: "action",
         width: "100px",
-        render: (text, record, index) => (
+        render: (text, rule, index) => (
           <div>
             <Tooltip placement="bottomLeft" title={"Up"}>
               <Button style={{marginRight: "5px"}} disabled={index === 0} icon={<UpOutlined />} size="small" onClick={() => this.upRow(table, index)} />
