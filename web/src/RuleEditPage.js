@@ -19,6 +19,7 @@ import * as RuleBackend from "./backend/RuleBackend";
 import i18next from "i18next";
 import WafRuleTable from "./components/WafRuleTable";
 import IPRuleTable from "./components/IPRuleTable";
+import UARuleTable from "./components/UARuleTable";
 
 const {Option} = Select;
 
@@ -81,7 +82,7 @@ class RuleEditPage extends React.Component {
                 [
                   {value: "waf", text: "WAF"},
                   {value: "ip", text: "IP"},
-                  // {value: "ua", text: "User Agent"},
+                  {value: "ua", text: "User-Agent"},
                   // {value: "frequency", text: "Frequency"},
                   // {value: "complex", text: "Complex"},
                 ].map((item, index) => <Option key={index} value={item.value}>{item.text}</Option>)
@@ -109,6 +110,17 @@ class RuleEditPage extends React.Component {
               this.state.rule.type === "ip" ? (
                 <IPRuleTable
                   title={"IPs"}
+                  table={this.state.rule.expressions}
+                  ruleName={this.state.rule.name}
+                  account={this.props.account}
+                  onUpdateTable={(value) => {this.updateRuleField("expressions", value);}}
+                />
+              ) : null
+            }
+            {
+              this.state.rule.type === "ua" ? (
+                <UARuleTable
+                  title={"User Agents"}
                   table={this.state.rule.expressions}
                   ruleName={this.state.rule.name}
                   account={this.props.account}

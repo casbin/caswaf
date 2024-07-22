@@ -22,6 +22,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/beego/beego"
@@ -131,11 +132,57 @@ func checkRules(wafRuleIds []string, r *http.Request, clientIp string) (bool, er
 			} else if isMatch && rule.Action == "allow" {
 				return true, nil
 			}
+		case "ua":
+			isMatch := checkUARule(rule.Expressions, r.UserAgent())
+			if !isMatch && rule.Action == "block" {
+				return false, fmt.Errorf(
+					"your User-Agent (%s) has no permission to access the corresponding resource. The rule ID in violation is: %s",
+					r.UserAgent(),
+					rule.Owner+"/"+rule.Name,
+				)
+			} else if isMatch && rule.Action == "allow" {
+				return true, nil
+			}
 		}
 	}
 	return true, nil
 }
 
+func checkUARule(expressions []*object.Expression, userAgent string) bool {
+	for _, expression := range expressions {
+		ua := expression.Value
+		switch expression.Operator {
+		case "contains":
+			if strings.Contains(userAgent, ua) {
+				return false
+			}
+		case "does not contain":
+			if !strings.Contains(userAgent, ua) {
+				return false
+			}
+		case "equals":
+			if userAgent == ua {
+				return false
+			}
+		case "does not equal":
+			if strings.Compare(userAgent, ua) != 0 {
+				return false
+			}
+		case "match":
+			// regex match
+			isMatch, err := regexp.MatchString(ua, userAgent)
+			if err != nil || isMatch {
+				return false
+			}
+		}
+		op := expression.Operator == "is in"
+		flag := strings.Contains(userAgent, ua)
+		if flag == op {
+			return false
+		}
+	}
+	return true
+}
 func checkIPRule(expressions []*object.Expression, clientIp string) bool {
 	for _, expression := range expressions {
 		ips := strings.Split(expression.Value, " ")
