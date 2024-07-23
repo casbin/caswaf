@@ -153,7 +153,8 @@ func checkWAFRule(rules []string) error {
 func checkIPRule(ipLists []string) error {
 	for _, ipList := range ipLists {
 		for _, ip := range strings.Split(ipList, " ") {
-			if net.ParseIP(ip) == nil {
+			_, _, err := net.ParseCIDR(ip)
+			if net.ParseIP(ip) == nil && err != nil {
 				return errors.New("Invalid IP address: " + ip)
 			}
 		}

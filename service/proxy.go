@@ -175,11 +175,6 @@ func checkUARule(expressions []*object.Expression, userAgent string) bool {
 				return false
 			}
 		}
-		op := expression.Operator == "is in"
-		flag := strings.Contains(userAgent, ua)
-		if flag == op {
-			return false
-		}
 	}
 	return true
 }
@@ -188,9 +183,15 @@ func checkIPRule(expressions []*object.Expression, clientIp string) bool {
 		ips := strings.Split(expression.Value, " ")
 		op := expression.Operator == "is in"
 		for _, ip := range ips {
-			flag := ip == clientIp
-			if flag == op {
-				return false
+			if strings.Contains(ip, "/") {
+				_, ipNet, _ := net.ParseCIDR(ip)
+				if ipNet.Contains(net.ParseIP(clientIp)) == op {
+					return false
+				}
+			} else {
+				if (ip == clientIp) == op {
+					return false
+				}
 			}
 		}
 	}
