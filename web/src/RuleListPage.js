@@ -76,7 +76,7 @@ class RuleListPage extends BaseListPage {
         operator: "match",
         value: "SecRule REQUEST_HEADERS:user-agent \"@contains firefox\" \"id:1, pass, log, logdata:'someone used firefox to access'\"",
       }],
-      action: "block",
+      action: "allow",
     };
   }
 

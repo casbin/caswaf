@@ -130,25 +130,29 @@ class RuleEditPage extends React.Component {
             }
           </Col>
         </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col span={2} style={{marginTop: "5px"}}>
-            {i18next.t("rule:Action")}:
-          </Col>
-          <Col span={22}>
-            <Select virtual={false} value={this.state.rule.action} defaultValue={"block"} style={{width: "100%"}} onChange={value => {
-              this.updateRuleField("action", value);
-            }}>
-              {
-                [
-                  {value: "allow", text: "Allow"},
-                  // {value: "redirect", text: "Redirect"},
-                  {value: "block", text: "Block"},
-                  // {value: "drop", text: "Drop"},
-                ].map((item, index) => <Option key={index} value={item.value}>{item.text}</Option>)
-              }
-            </Select>
-          </Col>
-        </Row>
+        {
+          this.state.rule.type !== "waf" && (
+            <Row style={{marginTop: "20px"}}>
+              <Col span={2} style={{marginTop: "5px"}}>
+                {i18next.t("rule:Action")}:
+              </Col>
+              <Col span={22}>
+                <Select virtual={false} value={this.state.rule.action} defaultValue={"block"} style={{width: "100%"}} onChange={value => {
+                  this.updateRuleField("action", value);
+                }}>
+                  {
+                    [
+                      {value: "allow", text: "Allow"},
+                      // {value: "redirect", text: "Redirect"},
+                      {value: "block", text: "Block"},
+                      // {value: "drop", text: "Drop"},
+                    ].map((item, index) => <Option key={index} value={item.value}>{item.text}</Option>)
+                  }
+                </Select>
+              </Col>
+            </Row>
+          )
+        }
         {/* {
           this.state.rule.action === "redirect" && (
             <Row style={{marginTop: "20px"}}>

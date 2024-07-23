@@ -22,6 +22,28 @@ class WafRuleTable extends React.Component {
     super(props);
     this.state = {
       classes: props,
+      defaultRules: [
+        {
+          name: "Enable XML request body parser",
+          operator: "match",
+          value: "SecRule REQUEST_HEADERS:Content-Type \"^(?:application(?:/soap\\+|/)|text/)xml\" \"id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML\"",
+        },
+        {
+          name: "Enable JSON request body parser",
+          operator: "match",
+          value: "SecRule REQUEST_HEADERS:Content-Type \"^application/json\" \"id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+        },
+        {
+          name: "Verify that we've correctly processed the request body",
+          operator: "match",
+          value: "SecRule &REQUEST_BODY \"@eq 0\" \"id:'200002',phase:2,t:none,deny,status:400,msg:'Failed to parse request body.'\"",
+        },
+        {
+          name: "MULTIPART_UNMATCHED_BOUNDARY",
+          operator: "match",
+          value: "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'\"",
+        },
+      ],
     };
   }
 
@@ -57,6 +79,10 @@ class WafRuleTable extends React.Component {
   downRow(table, i) {
     table = Setting.swapRow(table, i, i + 1);
     this.updateTable(table);
+  }
+
+  restore() {
+    this.updateTable(this.state.defaultRules);
   }
   renderTable(table) {
     const columns = [
@@ -113,6 +139,7 @@ class WafRuleTable extends React.Component {
           <div>
             {this.props.title}&nbsp;&nbsp;&nbsp;&nbsp;
             <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.addRow(table)}>{"Add"}</Button>
+            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.restore()}>{"Restore Build-in WAF Rules"}</Button>
           </div>
         )}
       />
