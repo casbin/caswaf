@@ -206,13 +206,26 @@ func (site *Site) checkCerts() error {
 		}
 
 		if cert != nil {
-			var nearExpire bool
-			nearExpire, err = cert.isCertNearExpire()
+			var domainNearExpire, certNearExpire bool
+			domainNearExpire, err = cert.isDomainNearExpire()
+
 			if err != nil {
 				return err
 			}
 
-			if !nearExpire {
+			if domainNearExpire {
+				err = site.updateDomainExpireTimeForDomain(domain)
+				if err != nil {
+					return err
+				}
+			}
+
+			certNearExpire, err = cert.isCertNearExpire()
+			if err != nil {
+				return err
+			}
+
+			if !certNearExpire {
 				continue
 			}
 		}
@@ -221,6 +234,38 @@ func (site *Site) checkCerts() error {
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (site *Site) updateDomainExpireTimeForDomain(domain string) error {
+
+	domainExpireTime, err := getDomainExpireTime(domain)
+	if err != nil {
+		fmt.Printf("getDomainExpireTime() error: %v\n", err)
+		return err
+	}
+
+	cert, err := GetCertByDomain(domain)
+	if err != nil {
+		return fmt.Errorf("getCert() error: %v", err)
+	}
+	cert.DomainExpireTime = domainExpireTime
+
+	_, err = DeleteCert(cert)
+	if err != nil {
+		return err
+	}
+
+	_, err = AddCert(cert)
+	if err != nil {
+		return err
+	}
+
+	err = refreshSiteMap()
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -206,3 +206,27 @@ func (cert *Cert) isCertNearExpire() (bool, error) {
 
 	return res, nil
 }
+
+func (cert *Cert) isDomainNearExpire() (bool, error) {
+	if cert.DomainExpireTime == "" {
+		return true, nil
+	}
+
+	expireTime, err := time.Parse(time.RFC3339, cert.DomainExpireTime)
+	if err != nil {
+		return false, err
+	}
+
+	now := time.Now()
+	duration := expireTime.Sub(now)
+	nearExpire := duration <= 14*24*time.Hour
+
+	if nearExpire {
+		halfHour := 5 * time.Minute
+		if int64(duration)%int64(halfHour) == 0 {
+			return true, nil
+		}
+	}
+
+	return nearExpire, nil
+}
