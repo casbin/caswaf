@@ -69,3 +69,7 @@ func getDomainExpireTime(domainName string) (string, error) {
 	res := whoisInfo.Domain.ExpirationDateInTime.Local().Format(time.RFC3339)
 	return res, nil
 }
+
+func GetDomainExpireTime(domainName string) (string, error) {
+	return getDomainExpireTime(domainName)
+}
