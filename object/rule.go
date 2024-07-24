@@ -85,15 +85,17 @@ func UpdateRule(id string, rule *Rule) (bool, error) {
 }
 
 func AddRule(rule *Rule) (bool, error) {
-	_, err := ormer.Engine.Insert(rule)
+	affected, err := ormer.Engine.Insert(rule)
 	if err != nil {
 		return false, err
 	}
-	err = refreshRuleMap()
-	if err != nil {
-		return false, err
+	if affected != 0 {
+		err = refreshRuleMap()
+		if err != nil {
+			return false, err
+		}
 	}
-	return true, nil
+	return affected != 0, nil
 }
 
 func DeleteRule(rule *Rule) (bool, error) {
