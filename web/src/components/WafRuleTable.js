@@ -38,11 +38,6 @@ class WafRuleTable extends React.Component {
           operator: "match",
           value: "SecRule &REQUEST_BODY \"@eq 0\" \"id:'200002',phase:2,t:none,deny,status:400,msg:'Failed to parse request body.'\"",
         },
-        {
-          name: "MULTIPART_UNMATCHED_BOUNDARY",
-          operator: "match",
-          value: "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'\"",
-        },
       ],
     };
   }
