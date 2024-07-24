@@ -97,6 +97,27 @@ class CertListPage extends BaseListPage {
       });
   }
 
+  refreshCert(i) {
+    const cert = this.state.data[i];
+    CertBackend.refreshDomainExpire(cert.owner, cert.name)
+      .then((res) => {
+        if (res.status === "error") {
+          Setting.showMessage("error", `Failed to refresh domain expire: ${res.msg}`);
+        } else {
+          Setting.showMessage("success", "Domain expire refresh successfully");
+          const newData = [...this.state.data];
+          newData[i] = res.data;
+          this.setState({
+            data: newData,
+          });
+        }
+      }
+      )
+      .catch(error => {
+        Setting.showMessage("error", `Domain expire failed to refresh: ${error}`);
+      });
+  }
+
   renderTable(data) {
     const columns = [
       {
@@ -243,6 +264,9 @@ class CertListPage extends BaseListPage {
         render: (text, record, index) => {
           return (
             <div>
+              <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="default" onClick={() => this.refreshCert(index)}>
+                {i18next.t("general:Refresh")}
+              </Button>
               <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="primary" onClick={() => this.props.history.push(`/certs/${record.owner}/${record.name}`)}>{i18next.t("general:Edit")}</Button>
               <Popconfirm
                 title={`Sure to delete cert: ${record.name} ?`}

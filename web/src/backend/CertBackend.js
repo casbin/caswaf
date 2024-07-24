@@ -61,3 +61,10 @@ export function deleteCert(cert) {
     body: JSON.stringify(newCert),
   }).then(res => res.json());
 }
+
+export function refreshDomainExpire(owner, name) {
+  return fetch(`${Setting.ServerUrl}/api/update-cert-domain-expire?id=${owner}/${encodeURIComponent(name)}`, {
+    method: "POST",
+    credentials: "include",
+  }).then(res => res.json());
+}

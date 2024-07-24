@@ -117,3 +117,36 @@ func (c *ApiController) DeleteCert() {
 	c.Data["json"] = wrapActionResponse(object.DeleteCert(&cert))
 	c.ServeJSON()
 }
+
+func (c *ApiController) UpdateCertDomainExpire() {
+	if c.RequireSignedIn() {
+		return
+	}
+
+	id := c.Input().Get("id")
+	cert, err := object.GetCert(id)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	domainExpireTime, err := object.GetDomainExpireTime(cert.Name)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	if domainExpireTime == "" {
+		c.ResponseError("Domain expire time is empty")
+		return
+	}
+	cert.DomainExpireTime = domainExpireTime
+
+	_, err = object.UpdateCert(id, cert)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(object.GetMaskedCert(cert))
+}
