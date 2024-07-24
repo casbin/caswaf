@@ -19,7 +19,7 @@ import * as Setting from "../Setting";
 
 const {Option} = Select;
 
-class IPRuleTable extends React.Component {
+class IpRuleTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -173,4 +173,4 @@ class IPRuleTable extends React.Component {
   }
 }
 
-export default IPRuleTable;
+export default IpRuleTable;

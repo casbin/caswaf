@@ -19,7 +19,7 @@ import * as Setting from "../Setting";
 
 const {Option} = Select;
 
-class UARuleTable extends React.Component {
+class UaRuleTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -154,4 +154,4 @@ class UARuleTable extends React.Component {
   }
 }
 
-export default UARuleTable;
+export default UaRuleTable;
