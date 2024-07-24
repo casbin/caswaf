@@ -210,7 +210,7 @@ func GetWAFRulesByIds(ids []string) string {
 		params = append(params, owners[i], names[i])
 	}
 
-	err := ormer.Engine.Where(condition, params...).And("type = ?", "waf").Find(&rules)
+	err := ormer.Engine.Where(condition, params...).And("type = ?", "WAF").Find(&rules)
 	if err != nil {
 		return ""
 	}

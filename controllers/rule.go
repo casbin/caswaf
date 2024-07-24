@@ -131,9 +131,9 @@ func checkExpressions(expressions []*object.Expression, ruleType string) error {
 		values[i] = expression.Value
 	}
 	switch ruleType {
-	case "waf":
+	case "WAF":
 		return checkWAFRule(values)
-	case "ip":
+	case "IP":
 		return checkIPRule(values)
 	}
 	return nil

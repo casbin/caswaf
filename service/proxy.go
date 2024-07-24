@@ -121,26 +121,26 @@ func checkRules(wafRuleIds []string, r *http.Request, clientIp string) (bool, er
 	rules := object.GetRulesByRuleIds(wafRuleIds)
 	for _, rule := range rules {
 		switch rule.Type {
-		case "ip":
+		case "IP":
 			isMatch := checkIPRule(rule.Expressions, clientIp)
-			if !isMatch && rule.Action == "block" {
+			if !isMatch && rule.Action == "Block" {
 				return false, fmt.Errorf(
 					"your IP (%s) has no permission to access the corresponding resource. The rule ID in violation is: %s",
 					clientIp,
 					rule.Owner+"/"+rule.Name,
 				)
-			} else if isMatch && rule.Action == "allow" {
+			} else if isMatch && rule.Action == "Allow" {
 				return true, nil
 			}
-		case "ua":
+		case "User-Agent":
 			isMatch := checkUARule(rule.Expressions, r.UserAgent())
-			if !isMatch && rule.Action == "block" {
+			if !isMatch && rule.Action == "Block" {
 				return false, fmt.Errorf(
 					"your User-Agent (%s) has no permission to access the corresponding resource. The rule ID in violation is: %s",
 					r.UserAgent(),
 					rule.Owner+"/"+rule.Name,
 				)
-			} else if isMatch && rule.Action == "allow" {
+			} else if isMatch && rule.Action == "Allow" {
 				return true, nil
 			}
 		}

@@ -70,13 +70,13 @@ class RuleListPage extends BaseListPage {
       owner: this.props.account.name,
       name: `rule_${randomName}`,
       createdTime: moment().format(),
-      type: "waf",
+      type: "WAF",
       expressions: [{
-        name: "waf rule demo",
+        name: "WAF rule demo",
         operator: "match",
         value: "SecRule REQUEST_HEADERS:user-agent \"@contains firefox\" \"id:1, pass, log, logdata:'someone used firefox to access'\"",
       }],
-      action: "allow",
+      action: "Allow",
     };
   }
 

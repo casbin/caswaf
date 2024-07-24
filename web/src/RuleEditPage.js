@@ -80,9 +80,9 @@ class RuleEditPage extends React.Component {
             }}>
               {
                 [
-                  {value: "waf", text: "WAF"},
-                  {value: "ip", text: "IP"},
-                  {value: "ua", text: "User-Agent"},
+                  {value: "WAF", text: "WAF"},
+                  {value: "IP", text: "IP"},
+                  {value: "User-Agent", text: "User-Agent"},
                   // {value: "frequency", text: "Frequency"},
                   // {value: "complex", text: "Complex"},
                 ].map((item, index) => <Option key={index} value={item.value}>{item.text}</Option>)
@@ -96,7 +96,7 @@ class RuleEditPage extends React.Component {
           </Col>
           <Col span={22} >
             {
-              this.state.rule.type === "waf" ? (
+              this.state.rule.type === "WAF" ? (
                 <WafRuleTable
                   title={"Seclang"}
                   table={this.state.rule.expressions}
@@ -107,7 +107,7 @@ class RuleEditPage extends React.Component {
               ) : null
             }
             {
-              this.state.rule.type === "ip" ? (
+              this.state.rule.type === "IP" ? (
                 <IPRuleTable
                   title={"IPs"}
                   table={this.state.rule.expressions}
@@ -118,9 +118,9 @@ class RuleEditPage extends React.Component {
               ) : null
             }
             {
-              this.state.rule.type === "ua" ? (
+              this.state.rule.type === "User-Agent" ? (
                 <UARuleTable
-                  title={"User Agents"}
+                  title={"User-Agents"}
                   table={this.state.rule.expressions}
                   ruleName={this.state.rule.name}
                   account={this.props.account}
@@ -131,20 +131,20 @@ class RuleEditPage extends React.Component {
           </Col>
         </Row>
         {
-          this.state.rule.type !== "waf" && (
+          this.state.rule.type !== "WAF" && (
             <Row style={{marginTop: "20px"}}>
               <Col span={2} style={{marginTop: "5px"}}>
                 {i18next.t("rule:Action")}:
               </Col>
               <Col span={22}>
-                <Select virtual={false} value={this.state.rule.action} defaultValue={"block"} style={{width: "100%"}} onChange={value => {
+                <Select virtual={false} value={this.state.rule.action} defaultValue={"Block"} style={{width: "100%"}} onChange={value => {
                   this.updateRuleField("action", value);
                 }}>
                   {
                     [
-                      {value: "allow", text: "Allow"},
+                      {value: "Allow", text: "Allow"},
                       // {value: "redirect", text: "Redirect"},
-                      {value: "block", text: "Block"},
+                      {value: "Block", text: "Block"},
                       // {value: "drop", text: "Drop"},
                     ].map((item, index) => <Option key={index} value={item.value}>{item.text}</Option>)
                   }
@@ -168,7 +168,7 @@ class RuleEditPage extends React.Component {
           )
         } */}
         {
-          this.state.rule.action === "block" && (
+          this.state.rule.action === "Block" && (
             <Row style={{marginTop: "20px"}}>
               <Col span={2} style={{marginTop: "5px"}}>
                 {i18next.t("rule:Status Code")}:
