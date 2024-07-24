@@ -59,6 +59,7 @@ class SiteListPage extends BaseListPage {
       challenges: [],
       host: "",
       port: 8000,
+      hosts: [],
       sslMode: "HTTPS Only",
       sslCert: "",
       publicIp: "8.131.81.162",
@@ -229,6 +230,23 @@ class SiteListPage extends BaseListPage {
               {`${record.port}`}
             </Tag>
           );
+        },
+      },
+      {
+        title: i18next.t("site:Hosts"),
+        dataIndex: "hosts",
+        key: "hosts",
+        width: "200px",
+        sorter: (a, b) => a.hosts.length - b.hosts.length,
+        render: (hosts) => {
+          if (!Array.isArray(hosts)) {
+            return null;
+          }
+          return hosts.map((host, index) => (
+            <Tag color="blue" key={index}>
+              {host}
+            </Tag>
+          ));
         },
       },
       {
