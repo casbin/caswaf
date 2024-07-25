@@ -71,11 +71,7 @@ class RuleListPage extends BaseListPage {
       name: `rule_${randomName}`,
       createdTime: moment().format(),
       type: "WAF",
-      expressions: [{
-        name: "WAF rule demo",
-        operator: "match",
-        value: "SecRule REQUEST_HEADERS:user-agent \"@contains firefox\" \"id:1, pass, log, logdata:'someone used firefox to access'\"",
-      }],
+      expressions: [],
       action: "Allow",
     };
   }

@@ -49,6 +49,9 @@ class RuleEditPage extends React.Component {
   updateRuleField(key, value) {
     const rule = Setting.deepCopy(this.state.rule);
     rule[key] = value;
+    if (key === "type") {
+      rule.expressions = [];
+    }
     this.setState({
       rule: rule,
     });

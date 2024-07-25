@@ -40,6 +40,9 @@ class WafRuleTable extends React.Component {
         },
       ],
     };
+    if (this.props.table.length === 0) {
+      this.restore();
+    }
   }
 
   updateTable(table) {

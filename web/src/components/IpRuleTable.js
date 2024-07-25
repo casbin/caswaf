@@ -25,7 +25,22 @@ class IpRuleTable extends React.Component {
     this.state = {
       classes: props,
       options: [],
+      defaultRules: [
+        {
+          name: "loopback",
+          operator: "is in",
+          value: "127.0.0.1",
+        },
+        {
+          name: "lan cidr",
+          operator: "is in",
+          value: "0.0.0.0/8 10.0.0.0/8 100.64.0.0/10 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 192.0.0.0/24 192.0.2.0/24 192.88.99.0/24 192.168.0.0/16 198.18.0.0/15 198.51.100.0/24 203.0.113.0/24 224.0.0.0/3",
+        },
+      ],
     };
+    if (this.props.table.length === 0) {
+      this.restore();
+    }
     for (let i = 0; i < this.props.table.length; i++) {
       const values = this.props.table[i].value.split(" ");
       const options = [];
@@ -78,6 +93,10 @@ class IpRuleTable extends React.Component {
     table = Setting.swapRow(table, i, i + 1);
     Setting.swapRow(this.state.options, i, i + 1);
     this.updateTable(table);
+  }
+
+  restore() {
+    this.updateTable(this.state.defaultRules);
   }
 
   renderTable(table) {
@@ -152,6 +171,7 @@ class IpRuleTable extends React.Component {
           <div>
             {this.props.title}&nbsp;&nbsp;&nbsp;&nbsp;
             <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.addRow(table)}>{"Add"}</Button>
+            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.restore()}>{"Restore Build-in IP Rules"}</Button>
           </div>
         )}
       />

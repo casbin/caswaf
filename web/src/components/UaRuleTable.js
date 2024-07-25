@@ -24,7 +24,17 @@ class UaRuleTable extends React.Component {
     super(props);
     this.state = {
       classes: props,
+      defaultRules: [
+        {
+          name: "Current User-Agent",
+          operator: "equals",
+          value: window.navigator.userAgent,
+        },
+      ],
     };
+    if (this.props.table.length === 0) {
+      this.restore();
+    }
   }
 
   updateTable(table) {
@@ -59,6 +69,10 @@ class UaRuleTable extends React.Component {
   downRow(table, i) {
     table = Setting.swapRow(table, i, i + 1);
     this.updateTable(table);
+  }
+
+  restore() {
+    this.updateTable(this.state.defaultRules);
   }
 
   renderTable(table) {
@@ -133,6 +147,7 @@ class UaRuleTable extends React.Component {
           <div>
             {this.props.title}&nbsp;&nbsp;&nbsp;&nbsp;
             <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.addRow(table)}>{"Add"}</Button>
+            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.restore()}>{"Restore Build-in User-Agent Rules"}</Button>
           </div>
         )}
       />
