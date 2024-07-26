@@ -15,6 +15,8 @@
 package object
 
 import (
+	"fmt"
+
 	"github.com/casbin/caswaf/util"
 	"github.com/xorm-io/core"
 )
@@ -26,14 +28,15 @@ type Expression struct {
 }
 
 type Rule struct {
-	Owner       string        `xorm:"varchar(100) notnull pk" json:"owner"`
-	Name        string        `xorm:"varchar(100) notnull pk" json:"name"`
+	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
+	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
+	CreatedTime string `xorm:"varchar(100) notnull" json:"createdTime"`
+	UpdatedTime string `xorm:"varchar(100) notnull" json:"updatedTime"`
+
 	Type        string        `xorm:"varchar(100) notnull" json:"type"`
 	Expressions []*Expression `xorm:"mediumtext" json:"expressions"`
 	Action      string        `xorm:"varchar(100) notnull" json:"action"`
 	Reason      string        `xorm:"varchar(100) notnull" json:"reason"`
-	CreatedTime string        `xorm:"varchar(100) notnull" json:"createdTime"`
-	UpdatedTime string        `xorm:"varchar(100) notnull" json:"updatedTime"`
 }
 
 func GetGlobalRules() ([]*Rule, error) {
@@ -108,8 +111,6 @@ func DeleteRule(rule *Rule) (bool, error) {
 	return affected != 0, nil
 }
 
-func getWafRules() ([]*Rule, error) {
-	rules := []*Rule{}
-	err := ormer.Engine.Where("type = ?", "WAF").Find(&rules)
-	return rules, err
+func (rule *Rule) GetId() string {
+	return fmt.Sprintf("%s/%s", rule.Owner, rule.Name)
 }

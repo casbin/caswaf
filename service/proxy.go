@@ -26,6 +26,7 @@ import (
 
 	"github.com/beego/beego"
 	"github.com/casbin/caswaf/object"
+	"github.com/casbin/caswaf/rule"
 	"github.com/casbin/caswaf/util"
 	httptx "github.com/corazawaf/coraza/v3/http"
 )
@@ -114,27 +115,6 @@ func redirectToHost(w http.ResponseWriter, r *http.Request, host string) {
 
 	targetUrl := fmt.Sprintf("%s://%s", protocol, joinPath(host, r.RequestURI))
 	http.Redirect(w, r, targetUrl, http.StatusMovedPermanently)
-}
-
-func checkRules(wafRuleIds []string, r *http.Request) (bool, string, error) {
-	rules := object.GetRulesByRuleIds(wafRuleIds)
-	for _, rule := range rules {
-		switch rule.Type {
-		case "User-Agent":
-			uaRule := &UaRule{Rule: *rule}
-			action, reason, err := uaRule.checkRule(rule.Expressions, r)
-			if err != nil {
-				return false, "Internal Server Error", err
-			}
-			if action == "Block" {
-				return false, reason, nil
-			}
-			if action == "Allow" {
-				return true, "", nil
-			}
-		}
-	}
-	return true, "", nil
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
@@ -232,18 +212,21 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		responseError(w, "CasWAF error: targetUrl should not be empty for host: %s, site = %v", r.Host, site)
 		return
 	}
+
 	if site.EnableWaf {
-		isAllowed, reason, err := checkRules(site.Rules, r)
+		isAllowed, reason, err := rule.CheckRules(site.Rules, r)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			responseError(w, "Internal Server Error: %v", err)
 			return
 		}
+
 		if !isAllowed {
 			w.WriteHeader(http.StatusForbidden)
 			responseError(w, "Blocked by CasWAF: %s", reason)
 			return
 		}
+
 		getWaf(site)
 		httptx.WrapHandler(site.Waf, http.HandlerFunc(nextHandle)).ServeHTTP(w, r)
 	} else {
