@@ -14,8 +14,8 @@
 
 import * as Setting from "../Setting";
 
-export function getRules() {
-  return fetch(`${Setting.ServerUrl}/api/get-rules`, {
+export function getRules(owner) {
+  return fetch(`${Setting.ServerUrl}/api/get-rules?owner=${owner}`, {
     method: "GET",
     credentials: "include",
   }).then(res => res.json());

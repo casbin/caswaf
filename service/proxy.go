@@ -116,6 +116,27 @@ func redirectToHost(w http.ResponseWriter, r *http.Request, host string) {
 	http.Redirect(w, r, targetUrl, http.StatusMovedPermanently)
 }
 
+func checkRules(wafRuleIds []string, r *http.Request) (bool, string, error) {
+	rules := object.GetRulesByRuleIds(wafRuleIds)
+	for _, rule := range rules {
+		switch rule.Type {
+		case "User-Agent":
+			uaRule := &UaRule{Rule: *rule}
+			action, reason, err := uaRule.checkRule(rule.Expressions, r)
+			if err != nil {
+				return false, "Internal Server Error", err
+			}
+			if action == "Block" {
+				return false, reason, nil
+			}
+			if action == "Allow" {
+				return true, "", nil
+			}
+		}
+	}
+	return true, "", nil
+}
+
 func handleRequest(w http.ResponseWriter, r *http.Request) {
 	clientIp := getClientIp(r)
 	logRequest(clientIp, r)
@@ -212,7 +233,18 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if site.EnableWaf {
-		site.Waf = getWAF()
+		isAllowed, reason, err := checkRules(site.Rules, r)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			responseError(w, "Internal Server Error: %v", err)
+			return
+		}
+		if !isAllowed {
+			w.WriteHeader(http.StatusForbidden)
+			responseError(w, "Blocked by CasWAF: %s", reason)
+			return
+		}
+		getWaf(site)
 		httptx.WrapHandler(site.Waf, http.HandlerFunc(nextHandle)).ServeHTTP(w, r)
 	} else {
 		nextHandle(w, r)
