@@ -30,7 +30,7 @@ func (r *IpRule) checkRule(expressions []*object.Expression, req *http.Request) 
 	clientIp := util.GetClientIp(req)
 	for _, expression := range expressions {
 		reason := fmt.Sprintf("expression matched: \"%s %s %s\"", clientIp, expression.Operator, expression.Value)
-		ips := strings.Split(expression.Value, " ")
+		ips := strings.Split(expression.Value, ",")
 		for _, ip := range ips {
 			if strings.Contains(ip, "/") {
 				_, ipNet, err := net.ParseCIDR(ip)

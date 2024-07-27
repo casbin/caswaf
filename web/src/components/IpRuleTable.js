@@ -34,7 +34,7 @@ class IpRuleTable extends React.Component {
         {
           name: "lan cidr",
           operator: "is in",
-          value: "10.0.0.0/8 127.0.0.0/8 192.0.0.0/24",
+          value: "10.0.0.0/8,127.0.0.0/8,192.0.0.0/24",
         },
       ],
     };
@@ -42,7 +42,7 @@ class IpRuleTable extends React.Component {
       this.restore();
     }
     for (let i = 0; i < this.props.table.length; i++) {
-      const values = this.props.table[i].value.split(" ");
+      const values = this.props.table[i].value.split(",");
       const options = [];
       for (let j = 0; j < values.length; j++) {
         options[j] = {value: values[j], label: values[j]};
@@ -59,9 +59,9 @@ class IpRuleTable extends React.Component {
     if (key === "value") {
       let v = "";
       for (let i = 0; i < value.length; i++) {
-        v += value[i] + " ";
+        v += value[i].trim() + ",";
       }
-      table[index][key] = v.trim();
+      table[index][key] = v.slice(0, -1);
     } else {
       table[index][key] = value;
     }
@@ -140,7 +140,7 @@ class IpRuleTable extends React.Component {
             mode="tags"
             style={{width: "100%"}}
             placeholder="Input IP Addresses"
-            value={record.value.split(" ")}
+            value={record.value.split(",")}
             onChange={value => this.updateField(table, index, "value", value)}
             options={this.state.options[index]}
           />
