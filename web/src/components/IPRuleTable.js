@@ -19,12 +19,36 @@ import * as Setting from "../Setting";
 
 const {Option} = Select;
 
-class IPRuleTable extends React.Component {
+class IpRuleTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       classes: props,
+      options: [],
+      defaultRules: [
+        {
+          name: "loopback",
+          operator: "is in",
+          value: "127.0.0.1",
+        },
+        {
+          name: "lan cidr",
+          operator: "is in",
+          value: "0.0.0.0/8 10.0.0.0/8 100.64.0.0/10 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 192.0.0.0/24 192.0.2.0/24 192.88.99.0/24 192.168.0.0/16 198.18.0.0/15 198.51.100.0/24 203.0.113.0/24 224.0.0.0/3",
+        },
+      ],
     };
+    if (this.props.table.length === 0) {
+      this.restore();
+    }
+    for (let i = 0; i < this.props.table.length; i++) {
+      const values = this.props.table[i].value.split(" ");
+      const options = [];
+      for (let j = 0; j < values.length; j++) {
+        options[j] = {value: values[j], label: values[j]};
+      }
+      this.state.options.push(options);
+    }
   }
 
   updateTable(table) {
@@ -32,12 +56,20 @@ class IPRuleTable extends React.Component {
   }
 
   updateField(table, index, key, value) {
-    table[index][key] = value;
+    if (key === "value") {
+      let v = "";
+      for (let i = 0; i < value.length; i++) {
+        v += value[i] + " ";
+      }
+      table[index][key] = v.trim();
+    } else {
+      table[index][key] = value;
+    }
     this.updateTable(table);
   }
 
   addRow(table) {
-    const row = {name: `New IP Rule - ${table.length}`, operator: "is in", value: ""};
+    const row = {name: `New IP Rule - ${table.length}`, operator: "is in", value: "127.0.0.1"};
     if (table === undefined) {
       table = [];
     }
@@ -53,12 +85,18 @@ class IPRuleTable extends React.Component {
 
   upRow(table, i) {
     table = Setting.swapRow(table, i - 1, i);
+    Setting.swapRow(this.state.options, i - 1, i);
     this.updateTable(table);
   }
 
   downRow(table, i) {
     table = Setting.swapRow(table, i, i + 1);
+    Setting.swapRow(this.state.options, i, i + 1);
     this.updateTable(table);
+  }
+
+  restore() {
+    this.updateTable(this.state.defaultRules);
   }
 
   renderTable(table) {
@@ -68,7 +106,7 @@ class IPRuleTable extends React.Component {
         dataIndex: "name",
         key: "name",
         width: "180px",
-        render: (text, record, index) => (
+        render: (text, rule, index) => (
           <Input value={text} onChange={e => {
             this.updateField(table, index, "name", e.target.value);
           }} />
@@ -79,7 +117,7 @@ class IPRuleTable extends React.Component {
         dataIndex: "operator",
         key: "operator",
         width: "180px",
-        render: (text, record, index) => (
+        render: (text, rule, index) => (
           <Select value={text} virtual={false} style={{width: "100%"}} onChange={value => {
             this.updateField(table, index, "operator", value);
           }}>
@@ -97,19 +135,22 @@ class IPRuleTable extends React.Component {
         dataIndex: "value",
         key: "value",
         width: "100%",
-        render: (text, record, index) => (
-          <Input value={text} placeholder="Split with Space" onChange={e => {
-            this.updateField(table, index, "value", e.target.value);
-          }} onBlur={e => {
-            this.updateField(table, index, "value", e.target.value.replace(/\s+/g, " ").trim());
-          }} />
+        render: (text, rule, index) => (
+          <Select
+            mode="tags"
+            style={{width: "100%"}}
+            placeholder="Input IP Addresses"
+            value={rule.value.split(" ")}
+            onChange={value => this.updateField(table, index, "value", value)}
+            options={this.state.options[index]}
+          />
         ),
       },
       {
         title: "Action",
         key: "action",
         width: "100px",
-        render: (text, record, index) => (
+        render: (text, rule, index) => (
           <div>
             <Tooltip placement="bottomLeft" title={"Up"}>
               <Button style={{marginRight: "5px"}} disabled={index === 0} icon={<UpOutlined />} size="small" onClick={() => this.upRow(table, index)} />
@@ -130,6 +171,7 @@ class IPRuleTable extends React.Component {
           <div>
             {this.props.title}&nbsp;&nbsp;&nbsp;&nbsp;
             <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.addRow(table)}>{"Add"}</Button>
+            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.restore()}>{"Restore Build-in IP Rules"}</Button>
           </div>
         )}
       />
@@ -151,4 +193,4 @@ class IPRuleTable extends React.Component {
   }
 }
 
-export default IPRuleTable;
+export default IpRuleTable;

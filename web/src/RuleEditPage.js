@@ -18,7 +18,7 @@ import * as Setting from "./Setting";
 import * as RuleBackend from "./backend/RuleBackend";
 import i18next from "i18next";
 import WafRuleTable from "./components/WafRuleTable";
-import IPRuleTable from "./components/IPRuleTable";
+import IPRuleTable from "./components/IpRuleTable";
 import UaRuleTable from "./components/UaRuleTable";
 
 const {Option} = Select;
