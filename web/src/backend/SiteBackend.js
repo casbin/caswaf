@@ -21,8 +21,8 @@ export function getGlobalSites() {
   }).then(res => res.json());
 }
 
-export function getSites(owner) {
-  return fetch(`${Setting.ServerUrl}/api/get-sites?owner=${owner}`, {
+export function getSites(owner, page = "", pageSize = "", field = "", value = "", sortField = "", sortOrder = "") {
+  return fetch(`${Setting.ServerUrl}/api/get-sites?owner=${owner}&p=${page}&pageSize=${pageSize}&field=${field}&value=${value}&sortField=${sortField}&sortOrder=${sortOrder}`, {
     method: "GET",
     credentials: "include",
   }).then(res => res.json());

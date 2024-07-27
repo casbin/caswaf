@@ -16,8 +16,9 @@ package controllers
 
 import (
 	"encoding/json"
-
+	"github.com/beego/beego/utils/pagination"
 	"github.com/casbin/caswaf/object"
+	"github.com/casbin/caswaf/util"
 )
 
 func (c *ApiController) GetGlobalCerts() {
@@ -44,13 +45,38 @@ func (c *ApiController) GetCerts() {
 		owner = ""
 	}
 
-	certs, err := object.GetCerts(owner)
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
+	limit := c.Input().Get("pageSize")
+	page := c.Input().Get("p")
+	field := c.Input().Get("field")
+	value := c.Input().Get("value")
+	sortField := c.Input().Get("sortField")
+	sortOrder := c.Input().Get("sortOrder")
 
-	c.ResponseOk(object.GetMaskedCerts(certs))
+	if limit == "" || page == "" {
+		certs, err := object.GetCerts(owner)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		c.ResponseOk(object.GetMaskedCerts(certs))
+	} else {
+		limit := util.ParseInt(limit)
+		count, err := object.GetCertCount(owner, field, value)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		paginator := pagination.SetPaginator(c.Ctx, limit, count)
+		certs, err := object.GetPaginationCerts(owner, paginator.Offset(), limit, field, value, sortField, sortOrder)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		c.ResponseOk(object.GetMaskedCerts(certs), paginator.Nums())
+	}
 }
 
 func (c *ApiController) GetCert() {
@@ -142,11 +168,6 @@ func (c *ApiController) UpdateCertDomainExpire() {
 	}
 	cert.DomainExpireTime = domainExpireTime
 
-	_, err = object.UpdateCert(id, cert)
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-
-	c.ResponseOk(object.GetMaskedCert(cert))
+	c.Data["json"] = wrapActionResponse(object.UpdateCert(id, cert))
+	c.ServeJSON()
 }

@@ -23,27 +23,13 @@ import copy from "copy-to-clipboard";
 import BaseListPage from "./BaseListPage";
 
 class CertListPage extends BaseListPage {
+  constructor(props) {
+    super(props);
+  }
 
   UNSAFE_componentWillMount() {
     this.fetch();
   }
-
-  fetch = (params = {}) => {
-    this.setState({loading: true});
-    CertBackend.getCerts(this.props.account.name)
-      .then((res) => {
-        this.setState({
-          loading: false,
-        });
-        if (res.status === "ok") {
-          this.setState({
-            data: res.data,
-          });
-        } else {
-          Setting.showMessage("error", `Failed to get certs: ${res.msg}`);
-        }
-      });
-  };
 
   newCert() {
     const randomName = Setting.getRandomName();
@@ -105,11 +91,7 @@ class CertListPage extends BaseListPage {
           Setting.showMessage("error", `Failed to refresh domain expire: ${res.msg}`);
         } else {
           Setting.showMessage("success", "Domain expire refresh successfully");
-          const newData = [...this.state.data];
-          newData[i] = res.data;
-          this.setState({
-            data: newData,
-          });
+          this.fetch();
         }
       }
       )
@@ -145,7 +127,7 @@ class CertListPage extends BaseListPage {
         title: i18next.t("general:Create time"),
         dataIndex: "createdTime",
         key: "createdTime",
-        width: "150px",
+        width: "120px",
         sorter: (a, b) => a.createdTime.localeCompare(b.createdTime),
         render: (text, record, index) => {
           return Setting.getFormattedDate(text);
@@ -224,7 +206,7 @@ class CertListPage extends BaseListPage {
         title: i18next.t("cert:Certificate"),
         dataIndex: "certificate",
         key: "certificate",
-        width: "180px",
+        width: "120px",
         sorter: (a, b) => a.certificate.localeCompare(b.certificate),
         render: (text, record, index) => {
           return (
@@ -242,7 +224,7 @@ class CertListPage extends BaseListPage {
         title: i18next.t("cert:Private key"),
         dataIndex: "privateKey",
         key: "privateKey",
-        width: "180px",
+        width: "120px",
         sorter: (a, b) => a.privateKey.localeCompare(b.privateKey),
         render: (text, record, index) => {
           return (
@@ -260,21 +242,25 @@ class CertListPage extends BaseListPage {
         title: i18next.t("general:Action"),
         dataIndex: "action",
         key: "action",
-        width: "180px",
+        width: "200px",
         render: (text, record, index) => {
           return (
-            <div>
-              <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="default" onClick={() => this.refreshCert(index)}>
+            <div style={{display: "flex", alignItems: "center", flexWrap: "nowrap"}}>
+              <Button style={{margin: "10px 10px 10px 0"}} type="default" onClick={() => this.refreshCert(index)}>
                 {i18next.t("general:Refresh")}
               </Button>
-              <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="primary" onClick={() => this.props.history.push(`/certs/${record.owner}/${record.name}`)}>{i18next.t("general:Edit")}</Button>
+              <Button style={{margin: "10px 10px 10px 0"}} type="primary" onClick={() => this.props.history.push(`/certs/${record.owner}/${record.name}`)}>
+                {i18next.t("general:Edit")}
+              </Button>
               <Popconfirm
                 title={`Sure to delete cert: ${record.name} ?`}
                 onConfirm={() => this.deleteCert(index)}
                 okText="OK"
                 cancelText="Cancel"
               >
-                <Button style={{marginBottom: "10px"}} type="danger">{i18next.t("general:Delete")}</Button>
+                <Button style={{margin: "10px 0"}} type="danger">
+                  {i18next.t("general:Delete")}
+                </Button>
               </Popconfirm>
             </div>
           );
@@ -284,7 +270,13 @@ class CertListPage extends BaseListPage {
 
     return (
       <div>
-        <Table columns={columns} dataSource={data} rowKey="name" size="middle" bordered pagination={{pageSize: 100}}
+        <Table
+          columns={columns}
+          dataSource={data}
+          rowKey="name"
+          size="middle"
+          bordered
+          pagination={this.state.pagination}
           title={() => (
             <div>
               {i18next.t("general:Certs")}&nbsp;&nbsp;&nbsp;&nbsp;
@@ -294,9 +286,41 @@ class CertListPage extends BaseListPage {
           loading={this.state.loading}
           onChange={this.handleTableChange}
         />
+
       </div>
     );
   }
+
+  fetch = (params = {}) => {
+    const field = params.searchedColumn, value = params.searchText;
+    const sortField = params.sortField, sortOrder = params.sortOrder;
+    if (!params.pagination) {
+      params.pagination = {current: 1, pageSize: 10};
+    }
+    this.setState({loading: true});
+    CertBackend.getCerts(this.props.account.name, params.pagination.current, params.pagination.pageSize, field, value, sortField, sortOrder)
+      .then((res) => {
+        this.setState({
+          loading: false,
+        });
+        if (res.status === "ok") {
+          this.setState({
+            data: res.data,
+            pagination: {
+              ...params.pagination,
+              total: res.data2,
+            },
+            searchText: params.searchText,
+            searchedColumn: params.searchedColumn,
+            sortField: sortField,
+            sortOrder: sortOrder,
+          });
+        } else {
+          Setting.showMessage("error", `Failed to get certs: ${res.msg}`);
+        }
+      });
+  };
+
 }
 
 export default CertListPage;

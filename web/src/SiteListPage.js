@@ -27,23 +27,6 @@ class SiteListPage extends BaseListPage {
     this.fetch();
   }
 
-  fetch = (params = {}) => {
-    this.setState({loading: true});
-    SiteBackend.getSites(this.props.account.name)
-      .then((res) => {
-        this.setState({
-          loading: false,
-        });
-        if (res.status === "ok") {
-          this.setState({
-            data: res.data,
-          });
-        } else {
-          Setting.showMessage("error", `Failed to get sites: ${res.msg}`);
-        }
-      });
-  };
-
   newSite() {
     const randomName = Setting.getRandomName();
     return {
@@ -158,7 +141,7 @@ class SiteListPage extends BaseListPage {
         title: i18next.t("general:Display name"),
         dataIndex: "displayName",
         key: "displayName",
-        // width: "200px",
+        width: "150px",
         sorter: (a, b) => a.displayName.localeCompare(b.displayName),
       },
       {
@@ -235,7 +218,7 @@ class SiteListPage extends BaseListPage {
         title: i18next.t("site:Hosts"),
         dataIndex: "hosts",
         key: "hosts",
-        width: "200px",
+        width: "100px",
         sorter: (a, b) => a.hosts.length - b.hosts.length,
         render: (hosts) => {
           if (!Array.isArray(hosts)) {
@@ -252,8 +235,8 @@ class SiteListPage extends BaseListPage {
         title: i18next.t("site:Nodes"),
         dataIndex: "nodes",
         key: "nodes",
-        // width: "200px",
-        sorter: (a, b) => a.nodes.localeCompare(b.nodes),
+        width: "100px",
+        sorter: (a, b) => a.nodes.length - b.nodes.length,
         render: (text, record, index) => {
           return record.nodes.map(node => {
             const versionInfo = Setting.getVersionInfo(node.version, record.name);
@@ -335,7 +318,7 @@ class SiteListPage extends BaseListPage {
         title: i18next.t("site:SSL cert"),
         dataIndex: "sslCert",
         key: "sslCert",
-        width: "130px",
+        width: "100px",
         sorter: (a, b) => a.sslCert.localeCompare(b.sslCert),
         render: (text, record, index) => {
           return (
@@ -403,6 +386,27 @@ class SiteListPage extends BaseListPage {
     );
   }
 
+  fetch = (params = {}) => {
+    const field = params.searchedColumn, value = params.searchText;
+    const sortField = params.sortField, sortOrder = params.sortOrder;
+    if (!params.pagination) {
+      params.pagination = {current: 1, pageSize: 10};
+    }
+    this.setState({loading: true});
+    SiteBackend.getSites(this.props.account.name, params.pagination.current, params.pagination.pageSize, field, value, sortField, sortOrder)
+      .then((res) => {
+        this.setState({
+          loading: false,
+        });
+        if (res.status === "ok") {
+          this.setState({
+            data: res.data,
+          });
+        } else {
+          Setting.showMessage("error", `Failed to get sites: ${res.msg}`);
+        }
+      });
+  };
 }
 
 export default SiteListPage;
