@@ -106,7 +106,7 @@ class IpRuleTable extends React.Component {
         dataIndex: "name",
         key: "name",
         width: "180px",
-        render: (text, rule, index) => (
+        render: (text, record, index) => (
           <Input value={text} onChange={e => {
             this.updateField(table, index, "name", e.target.value);
           }} />
@@ -117,7 +117,7 @@ class IpRuleTable extends React.Component {
         dataIndex: "operator",
         key: "operator",
         width: "180px",
-        render: (text, rule, index) => (
+        render: (text, record, index) => (
           <Select value={text} virtual={false} style={{width: "100%"}} onChange={value => {
             this.updateField(table, index, "operator", value);
           }}>
@@ -135,12 +135,12 @@ class IpRuleTable extends React.Component {
         dataIndex: "value",
         key: "value",
         width: "100%",
-        render: (text, rule, index) => (
+        render: (text, record, index) => (
           <Select
             mode="tags"
             style={{width: "100%"}}
             placeholder="Input IP Addresses"
-            value={rule.value.split(" ")}
+            value={record.value.split(" ")}
             onChange={value => this.updateField(table, index, "value", value)}
             options={this.state.options[index]}
           />
@@ -150,7 +150,7 @@ class IpRuleTable extends React.Component {
         title: "Action",
         key: "action",
         width: "100px",
-        render: (text, rule, index) => (
+        render: (text, record, index) => (
           <div>
             <Tooltip placement="bottomLeft" title={"Up"}>
               <Button style={{marginRight: "5px"}} disabled={index === 0} icon={<UpOutlined />} size="small" onClick={() => this.upRow(table, index)} />
