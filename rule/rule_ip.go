@@ -31,15 +31,21 @@ func (r *IpRule) checkRule(expressions []*object.Expression, req *http.Request) 
 	for _, expression := range expressions {
 		reason := fmt.Sprintf("expression matched: \"%s %s %s\"", clientIp, expression.Operator, expression.Value)
 		ips := strings.Split(expression.Value, " ")
-		op := expression.Operator == "is in"
 		for _, ip := range ips {
-			_, ipNet, err := net.ParseCIDR(ip)
-			// use err to determine if ip is a CIDR
-			if err == nil && ipNet.Contains(net.ParseIP(clientIp)) == op {
-				return true, reason, nil
-			}
-			if err != nil && (ip == clientIp) == op {
-				return true, reason, nil
+			if strings.Contains(ip, "/") {
+				_, ipNet, err := net.ParseCIDR(ip)
+				if err != nil {
+					return false, "", err
+				}
+				if ipNet.Contains(net.ParseIP(clientIp)) == (expression.Operator == "is in") {
+					return true, reason, nil
+				}
+			} else if strings.ContainsAny(ip, ".:") {
+				if (ip == clientIp) == (expression.Operator == "is in") {
+					return true, reason, nil
+				}
+			} else {
+				return false, "", fmt.Errorf("invalid ip: %s", ip)
 			}
 		}
 	}
