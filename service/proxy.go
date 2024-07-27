@@ -67,25 +67,6 @@ func getHostNonWww(host string) string {
 	return res
 }
 
-func getClientIp(r *http.Request) string {
-	forwarded := r.Header.Get("X-Forwarded-For")
-	if forwarded != "" {
-		clientIP := strings.Split(forwarded, ",")[0]
-		return strings.TrimSpace(clientIP)
-	}
-
-	realIP := r.Header.Get("X-Real-IP")
-	if realIP != "" {
-		return realIP
-	}
-
-	ip, _, err := net.SplitHostPort(r.RemoteAddr)
-	if err != nil {
-		return r.RemoteAddr
-	}
-	return ip
-}
-
 func logRequest(clientIp string, r *http.Request) {
 	if !strings.Contains(r.UserAgent(), "Uptime-Kuma") {
 		fmt.Printf("handleRequest: %s\t%s\t%s\t%s\t%s\n", r.RemoteAddr, r.Method, r.Host, r.RequestURI, r.UserAgent())
@@ -118,7 +99,7 @@ func redirectToHost(w http.ResponseWriter, r *http.Request, host string) {
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
-	clientIp := getClientIp(r)
+	clientIp := util.GetClientIp(r)
 	logRequest(clientIp, r)
 
 	site := getSiteByDomainWithWww(r.Host)
