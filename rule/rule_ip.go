@@ -28,6 +28,10 @@ type IpRule struct{}
 
 func (r *IpRule) checkRule(expressions []*object.Expression, req *http.Request) (bool, string, error) {
 	clientIp := util.GetClientIp(req)
+	netIp, err := parseIp(clientIp)
+	if err != nil {
+		return false, "", err
+	}
 	for _, expression := range expressions {
 		reason := fmt.Sprintf("expression matched: \"%s %s %s\"", clientIp, expression.Operator, expression.Value)
 		ips := strings.Split(expression.Value, ",")
@@ -37,17 +41,40 @@ func (r *IpRule) checkRule(expressions []*object.Expression, req *http.Request) 
 				if err != nil {
 					return false, "", err
 				}
-				if ipNet.Contains(net.ParseIP(clientIp)) == (expression.Operator == "is in") {
-					return true, reason, nil
+
+				switch expression.Operator {
+				case "is in":
+					if ipNet.Contains(netIp) {
+						return true, reason, nil
+					}
+				case "is not in":
+					if !ipNet.Contains(netIp) {
+						return true, reason, nil
+					}
 				}
 			} else if strings.ContainsAny(ip, ".:") {
-				if (ip == clientIp) == (expression.Operator == "is in") {
-					return true, reason, nil
+				switch expression.Operator {
+				case "is in":
+					if ip == clientIp {
+						return true, reason, nil
+					}
+				case "is not in":
+					if ip != clientIp {
+						return true, reason, nil
+					}
 				}
 			} else {
-				return false, "", fmt.Errorf("invalid ip: %s", ip)
+				return false, "", fmt.Errorf("unknown IP or CIDR format: %s", ip)
 			}
 		}
 	}
 	return false, "", nil
+}
+
+func parseIp(ipStr string) (net.IP, error) {
+	ip := net.ParseIP(ipStr)
+	if ip == nil {
+		return nil, fmt.Errorf("unknown IP or CIDR format: %s", ipStr)
+	}
+	return ip, nil
 }
