@@ -51,6 +51,8 @@ func (r *IpRule) checkRule(expressions []*object.Expression, req *http.Request) 
 					if !ipNet.Contains(netIp) {
 						return true, reason, nil
 					}
+				default:
+					return false, "", fmt.Errorf("unknown operator: %s", expression.Operator)
 				}
 			} else if strings.ContainsAny(ip, ".:") {
 				switch expression.Operator {
@@ -62,6 +64,8 @@ func (r *IpRule) checkRule(expressions []*object.Expression, req *http.Request) 
 					if ip != clientIp {
 						return true, reason, nil
 					}
+				default:
+					return false, "", fmt.Errorf("unknown operator: %s", expression.Operator)
 				}
 			} else {
 				return false, "", fmt.Errorf("unknown IP or CIDR format: %s", ip)
