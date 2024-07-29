@@ -32,6 +32,8 @@ func CheckRules(wafRuleIds []string, r *http.Request) (bool, string, error) {
 		switch rule.Type {
 		case "User-Agent":
 			ruleObj = &UaRule{}
+		case "IP":
+			ruleObj = &IpRule{}
 		default:
 			return false, "", fmt.Errorf("unknown rule type: %s for rule: %s", rule.Type, rule.GetId())
 		}
