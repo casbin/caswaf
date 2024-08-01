@@ -233,7 +233,7 @@ class CertListPage extends BaseListPage {
               Setting.showMessage("success", i18next.t("cert:Certificate copied to clipboard successfully"));
             }}
             >
-              {Setting.getShortText(text)}
+              {Setting.getShortText(text.replace(/^-----BEGIN CERTIFICATE-----/, ""), 15)}
             </Button>
           );
         },
@@ -251,7 +251,7 @@ class CertListPage extends BaseListPage {
               Setting.showMessage("success", i18next.t("cert:Private key copied to clipboard successfully"));
             }}
             >
-              {Setting.getShortText(text)}
+              {Setting.getShortText(text.replace(/^-----BEGIN RSA PRIVATE KEY-----/, ""), 15)}
             </Button>
           );
         },
@@ -260,7 +260,7 @@ class CertListPage extends BaseListPage {
         title: i18next.t("general:Action"),
         dataIndex: "action",
         key: "action",
-        width: "180px",
+        width: "260px",
         render: (text, record, index) => {
           return (
             <div>
