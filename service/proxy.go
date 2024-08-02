@@ -208,10 +208,10 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 			responseError(w, "Blocked by CasWAF: %s", reason)
 			w.WriteHeader(http.StatusForbidden)
 		case "Drop":
-			responseError(w, "Blocked by CasWAF: %s", reason)
+			responseError(w, "Dropped by CasWAF: %s", reason)
 			w.WriteHeader(http.StatusBadRequest)
 		default:
-			responseError(w, "Blocked by CasWAF: %s", reason)
+			responseError(w, "Error in CasWAF: %s", reason)
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 		nextHandle(w, r)
