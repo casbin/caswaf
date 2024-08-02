@@ -15,6 +15,8 @@
 package object
 
 import (
+	"fmt"
+
 	"github.com/casbin/caswaf/util"
 	"github.com/xorm-io/core"
 )
@@ -26,17 +28,26 @@ type Expression struct {
 }
 
 type Rule struct {
-	Owner       string       `xorm:"varchar(100) notnull pk" json:"owner"`
-	Name        string       `xorm:"varchar(100) notnull pk" json:"name"`
-	Type        string       `xorm:"varchar(100) notnull" json:"type"`
-	Expressions []Expression `xorm:"mediumtext" json:"expressions"`
-	CreatedTime string       `xorm:"varchar(100) notnull" json:"createdTime"`
-	UpdatedTime string       `xorm:"varchar(100) notnull" json:"updatedTime"`
+	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
+	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
+	CreatedTime string `xorm:"varchar(100) notnull" json:"createdTime"`
+	UpdatedTime string `xorm:"varchar(100) notnull" json:"updatedTime"`
+
+	Type        string        `xorm:"varchar(100) notnull" json:"type"`
+	Expressions []*Expression `xorm:"mediumtext" json:"expressions"`
+	Action      string        `xorm:"varchar(100) notnull" json:"action"`
+	Reason      string        `xorm:"varchar(100) notnull" json:"reason"`
 }
 
-func GetRules() ([]*Rule, error) {
+func GetGlobalRules() ([]*Rule, error) {
 	rules := []*Rule{}
 	err := ormer.Engine.Asc("owner").Desc("created_time").Find(&rules)
+	return rules, err
+}
+
+func GetRules(owner string) ([]*Rule, error) {
+	rules := []*Rule{}
+	err := ormer.Engine.Desc("updated_time").Find(&rules, &Rule{Owner: owner})
 	return rules, err
 }
 
@@ -70,15 +81,25 @@ func UpdateRule(id string, rule *Rule) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	err = refreshRuleMap()
+	if err != nil {
+		return false, err
+	}
 	return true, nil
 }
 
 func AddRule(rule *Rule) (bool, error) {
-	if _, err := ormer.Engine.Insert(rule); err != nil {
+	affected, err := ormer.Engine.Insert(rule)
+	if err != nil {
 		return false, err
-	} else {
-		return true, nil
 	}
+	if affected != 0 {
+		err = refreshRuleMap()
+		if err != nil {
+			return false, err
+		}
+	}
+	return affected != 0, nil
 }
 
 func DeleteRule(rule *Rule) (bool, error) {
@@ -90,20 +111,6 @@ func DeleteRule(rule *Rule) (bool, error) {
 	return affected != 0, nil
 }
 
-func GetWAFRules() string {
-	// Get all rules of type "waf".
-	rules := []*Rule{}
-	err := ormer.Engine.Where("type = ?", "waf").Find(&rules)
-	if err != nil {
-		return ""
-	}
-
-	res := ""
-	// get all expressions from rules
-	for _, rule := range rules {
-		for _, expression := range rule.Expressions {
-			res += expression.Value + "\n"
-		}
-	}
-	return res
+func (rule *Rule) GetId() string {
+	return fmt.Sprintf("%s/%s", rule.Owner, rule.Name)
 }

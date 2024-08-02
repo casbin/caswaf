@@ -29,7 +29,7 @@ class RuleListPage extends BaseListPage {
     this.setState({
       loading: true,
     });
-    RuleBackend.getRules().then((res) => {
+    RuleBackend.getRules(this.props.account.name).then((res) => {
       this.setState({
         data: res.data,
         loading: false,
@@ -70,12 +70,10 @@ class RuleListPage extends BaseListPage {
       owner: this.props.account.name,
       name: `rule_${randomName}`,
       createdTime: moment().format(),
-      type: "waf",
-      expressions: [{
-        name: "waf rule demo",
-        operator: "match",
-        value: "SecRule REQUEST_HEADERS:user-agent \"@contains firefox\" \"id:1, pass, log, logdata:'someone used firefox to access'\"",
-      }],
+      type: "User-Agent",
+      expressions: [],
+      action: "Block",
+      reason: "Your request is blocked.",
     };
   }
 

@@ -26,8 +26,8 @@ import (
 
 	"github.com/beego/beego"
 	"github.com/casbin/caswaf/object"
+	"github.com/casbin/caswaf/rule"
 	"github.com/casbin/caswaf/util"
-	httptx "github.com/corazawaf/coraza/v3/http"
 )
 
 func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.Request) {
@@ -66,25 +66,6 @@ func getHostNonWww(host string) string {
 	return res
 }
 
-func getClientIp(r *http.Request) string {
-	forwarded := r.Header.Get("X-Forwarded-For")
-	if forwarded != "" {
-		clientIP := strings.Split(forwarded, ",")[0]
-		return strings.TrimSpace(clientIP)
-	}
-
-	realIP := r.Header.Get("X-Real-IP")
-	if realIP != "" {
-		return realIP
-	}
-
-	ip, _, err := net.SplitHostPort(r.RemoteAddr)
-	if err != nil {
-		return r.RemoteAddr
-	}
-	return ip
-}
-
 func logRequest(clientIp string, r *http.Request) {
 	if !strings.Contains(r.UserAgent(), "Uptime-Kuma") {
 		fmt.Printf("handleRequest: %s\t%s\t%s\t%s\t%s\n", r.RemoteAddr, r.Method, r.Host, r.RequestURI, r.UserAgent())
@@ -117,7 +98,7 @@ func redirectToHost(w http.ResponseWriter, r *http.Request, host string) {
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
-	clientIp := getClientIp(r)
+	clientIp := util.GetClientIp(r)
 	logRequest(clientIp, r)
 
 	site := getSiteByDomainWithWww(r.Host)
@@ -211,9 +192,30 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		responseError(w, "CasWAF error: targetUrl should not be empty for host: %s, site = %v", r.Host, site)
 		return
 	}
-	if site.EnableWaf {
-		site.Waf = getWAF()
-		httptx.WrapHandler(site.Waf, http.HandlerFunc(nextHandle)).ServeHTTP(w, r)
+
+	if site.Rules != nil && len(site.Rules) > 0 {
+		action, reason, err := rule.CheckRules(site.Rules, r)
+		if err != nil {
+			responseError(w, "Internal Server Error: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		switch action {
+		case "", "Allow":
+			w.WriteHeader(http.StatusOK)
+		case "Block":
+			responseError(w, "Blocked by CasWAF: %s", reason)
+			w.WriteHeader(http.StatusForbidden)
+		case "Drop":
+			responseError(w, "Dropped by CasWAF: %s", reason)
+			w.WriteHeader(http.StatusBadRequest)
+		default:
+			responseError(w, "Error in CasWAF: %s", reason)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		nextHandle(w, r)
+		return
 	} else {
 		nextHandle(w, r)
 	}
