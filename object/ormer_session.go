@@ -16,6 +16,7 @@ package object
 
 import (
 	"fmt"
+
 	"github.com/casbin/caswaf/util"
 	"github.com/xorm-io/xorm"
 )
