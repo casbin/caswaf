@@ -249,7 +249,7 @@ class CertListPage extends BaseListPage {
               <Button style={{margin: "10px 10px 10px 0"}} type="default" onClick={() => this.refreshCert(index)}>
                 {i18next.t("general:Refresh")}
               </Button>
-               <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="primary" onClick={() => this.props.history.push(`/certs/${record.owner}/${record.name}`)}>{i18next.t("general:Edit")}</Button>
+              <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="primary" onClick={() => this.props.history.push(`/certs/${record.owner}/${record.name}`)}>{i18next.t("general:Edit")}</Button>
               <Popconfirm
                 title={`Sure to delete cert: ${record.name} ?`}
                 onConfirm={() => this.deleteCert(index)}
