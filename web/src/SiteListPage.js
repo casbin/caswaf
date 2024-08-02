@@ -141,7 +141,7 @@ class SiteListPage extends BaseListPage {
         title: i18next.t("general:Display name"),
         dataIndex: "displayName",
         key: "displayName",
-        width: "150px",
+        // width: "200px",
         sorter: (a, b) => a.displayName.localeCompare(b.displayName),
       },
       {
@@ -218,7 +218,7 @@ class SiteListPage extends BaseListPage {
         title: i18next.t("site:Hosts"),
         dataIndex: "hosts",
         key: "hosts",
-        width: "100px",
+        width: "200px",
         sorter: (a, b) => a.hosts.length - b.hosts.length,
         render: (hosts) => {
           if (!Array.isArray(hosts)) {
@@ -235,7 +235,7 @@ class SiteListPage extends BaseListPage {
         title: i18next.t("site:Nodes"),
         dataIndex: "nodes",
         key: "nodes",
-        width: "100px",
+        // width: "200px",
         sorter: (a, b) => a.nodes.length - b.nodes.length,
         render: (text, record, index) => {
           return record.nodes.map(node => {
@@ -318,7 +318,7 @@ class SiteListPage extends BaseListPage {
         title: i18next.t("site:SSL cert"),
         dataIndex: "sslCert",
         key: "sslCert",
-        width: "100px",
+        width: "130px",
         sorter: (a, b) => a.sslCert.localeCompare(b.sslCert),
         render: (text, record, index) => {
           return (
