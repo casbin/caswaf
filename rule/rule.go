@@ -22,10 +22,10 @@ import (
 )
 
 type Rule interface {
-	checkRule(expressions []*object.Expression, req *http.Request) (bool, string, error)
+	checkRule(expressions []*object.Expression, req *http.Request) (bool, string, string, error)
 }
 
-func CheckRules(wafRuleIds []string, r *http.Request) (bool, string, error) {
+func CheckRules(wafRuleIds []string, r *http.Request) (string, string, error) {
 	rules := object.GetRulesByRuleIds(wafRuleIds)
 	for _, rule := range rules {
 		var ruleObj Rule
@@ -34,29 +34,32 @@ func CheckRules(wafRuleIds []string, r *http.Request) (bool, string, error) {
 			ruleObj = &UaRule{}
 		case "IP":
 			ruleObj = &IpRule{}
+		case "WAF":
+			ruleObj = &WafRule{}
 		default:
-			return false, "", fmt.Errorf("unknown rule type: %s for rule: %s", rule.Type, rule.GetId())
+			return "", "", fmt.Errorf("unknown rule type: %s for rule: %s", rule.Type, rule.GetId())
 		}
 
-		isHit, reason, err := ruleObj.checkRule(rule.Expressions, r)
+		isHit, action, reason, err := ruleObj.checkRule(rule.Expressions, r)
 		if err != nil {
-			return false, "", err
+			return "", "", err
 		}
-
+		if action == "" {
+			action = rule.Action
+		}
 		if isHit {
-			if rule.Action == "Block" {
+			if action == "Block" || action == "Drop" {
 				if rule.Reason != "" {
 					reason = rule.Reason
 				}
-
-				return false, reason, nil
-			} else if rule.Action == "Allow" {
-				return true, "", nil
+				return action, reason, nil
+			} else if action == "Allow" {
+				return action, reason, nil
 			} else {
-				return false, "", fmt.Errorf("unknown rule action: %s for rule: %s", rule.Action, rule.GetId())
+				return "", "", fmt.Errorf("unknown rule action: %s for rule: %s", action, rule.GetId())
 			}
 		}
 	}
 
-	return true, "", nil
+	return "", "", nil
 }

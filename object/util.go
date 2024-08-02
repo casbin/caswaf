@@ -195,15 +195,3 @@ func GetCertByDomain(domain string) (*Cert, error) {
 
 	return nil, nil
 }
-
-func GetWafRulesByIds(ids []string) string {
-	var res string
-	for _, id := range ids {
-		if rule, ok := ruleMap[id]; ok {
-			for _, expression := range rule.Expressions {
-				res += expression.Value + "\n"
-			}
-		}
-	}
-	return res
-}

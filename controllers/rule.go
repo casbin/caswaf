@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	"github.com/casbin/caswaf/object"
-	"github.com/casbin/caswaf/service"
 	"github.com/casbin/caswaf/util"
 	"github.com/hsluoyz/modsecurity-go/seclang/parser"
 )
@@ -80,7 +79,6 @@ func (c *ApiController) AddRule() {
 		return
 	}
 	c.Data["json"] = wrapActionResponse(object.AddRule(&rule))
-	go service.UpdateWafs()
 	c.ServeJSON()
 }
 
@@ -104,7 +102,6 @@ func (c *ApiController) UpdateRule() {
 
 	id := c.Input().Get("id")
 	c.Data["json"] = wrapActionResponse(object.UpdateRule(id, &rule))
-	go service.UpdateWafs()
 	c.ServeJSON()
 }
 
@@ -121,7 +118,6 @@ func (c *ApiController) DeleteRule() {
 	}
 
 	c.Data["json"] = wrapActionResponse(object.DeleteRule(&rule))
-	go service.UpdateWafs()
 	c.ServeJSON()
 }
 
