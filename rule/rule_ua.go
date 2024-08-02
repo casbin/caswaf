@@ -25,7 +25,7 @@ import (
 
 type UaRule struct{}
 
-func (r *UaRule) checkRule(expressions []*object.Expression, req *http.Request) (bool, string, error) {
+func (r *UaRule) checkRule(expressions []*object.Expression, req *http.Request) (bool, string, string, error) {
 	userAgent := req.UserAgent()
 	for _, expression := range expressions {
 		ua := expression.Value
@@ -33,31 +33,31 @@ func (r *UaRule) checkRule(expressions []*object.Expression, req *http.Request) 
 		switch expression.Operator {
 		case "contains":
 			if strings.Contains(userAgent, ua) {
-				return true, reason, nil
+				return true, "", reason, nil
 			}
 		case "does not contain":
 			if !strings.Contains(userAgent, ua) {
-				return true, reason, nil
+				return true, "", reason, nil
 			}
 		case "equals":
 			if userAgent == ua {
-				return true, reason, nil
+				return true, "", reason, nil
 			}
 		case "does not equal":
 			if strings.Compare(userAgent, ua) != 0 {
-				return true, reason, nil
+				return true, "", reason, nil
 			}
 		case "match":
 			// regex match
 			isHit, err := regexp.MatchString(ua, userAgent)
 			if err != nil {
-				return false, "", err
+				return false, "", "", err
 			}
 			if isHit {
-				return true, reason, nil
+				return true, "", reason, nil
 			}
 		}
 	}
 
-	return false, "", nil
+	return false, "", "", nil
 }

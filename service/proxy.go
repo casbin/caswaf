@@ -28,7 +28,6 @@ import (
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/rule"
 	"github.com/casbin/caswaf/util"
-	httptx "github.com/corazawaf/coraza/v3/http"
 )
 
 func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.Request) {
@@ -194,22 +193,29 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if site.EnableWaf {
-		isAllowed, reason, err := rule.CheckRules(site.Rules, r)
+	if site.Rules != nil && len(site.Rules) > 0 {
+		action, reason, err := rule.CheckRules(site.Rules, r)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
 			responseError(w, "Internal Server Error: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		if !isAllowed {
-			w.WriteHeader(http.StatusForbidden)
+		switch action {
+		case "", "Allow":
+			w.WriteHeader(http.StatusOK)
+		case "Block":
 			responseError(w, "Blocked by CasWAF: %s", reason)
-			return
+			w.WriteHeader(http.StatusForbidden)
+		case "Drop":
+			responseError(w, "Blocked by CasWAF: %s", reason)
+			w.WriteHeader(http.StatusBadRequest)
+		default:
+			responseError(w, "Blocked by CasWAF: %s", reason)
+			w.WriteHeader(http.StatusInternalServerError)
 		}
-
-		getWaf(site)
-		httptx.WrapHandler(site.Waf, http.HandlerFunc(nextHandle)).ServeHTTP(w, r)
+		nextHandle(w, r)
+		return
 	} else {
 		nextHandle(w, r)
 	}
