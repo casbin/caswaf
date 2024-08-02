@@ -44,19 +44,19 @@ func CheckRules(wafRuleIds []string, r *http.Request) (string, string, error) {
 		if err != nil {
 			return "", "", err
 		}
-		if action != "" {
-			rule.Action = action
+		if action == "" {
+			action = rule.Action
 		}
 		if isHit {
-			if rule.Action == "Block" || rule.Action == "Drop" {
+			if action == "Block" || action == "Drop" {
 				if rule.Reason != "" {
 					reason = rule.Reason
 				}
-				return rule.Action, reason, nil
-			} else if rule.Action == "Allow" {
-				return rule.Action, reason, nil
+				return action, reason, nil
+			} else if action == "Allow" {
+				return action, reason, nil
 			} else {
-				return "", "", fmt.Errorf("unknown rule action: %s for rule: %s", rule.Action, rule.GetId())
+				return "", "", fmt.Errorf("unknown rule action: %s for rule: %s", action, rule.GetId())
 			}
 		}
 	}
