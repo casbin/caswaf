@@ -33,6 +33,7 @@ func main() {
 	casdoor.InitCasdoorConfig()
 	proxy.InitHttpClient()
 	object.InitSiteMap()
+	object.InitRuleMap()
 	run.InitAppMap()
 	run.InitSelfStart()
 	object.StartMonitorSitesLoop()

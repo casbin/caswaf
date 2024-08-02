@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	"github.com/casbin/caswaf/object"
-	"github.com/casbin/caswaf/service"
 	"github.com/casbin/caswaf/util"
 	"github.com/hsluoyz/modsecurity-go/seclang/parser"
 )
@@ -30,8 +29,12 @@ func (c *ApiController) GetRules() {
 	if c.RequireSignedIn() {
 		return
 	}
+	owner := c.Input().Get("owner")
+	if owner == "admin" {
+		owner = ""
+	}
 
-	rules, err := object.GetRules()
+	rules, err := object.GetRules(owner)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
@@ -76,7 +79,6 @@ func (c *ApiController) AddRule() {
 		return
 	}
 	c.Data["json"] = wrapActionResponse(object.AddRule(&rule))
-	go service.UpdateWAF()
 	c.ServeJSON()
 }
 
@@ -100,7 +102,6 @@ func (c *ApiController) UpdateRule() {
 
 	id := c.Input().Get("id")
 	c.Data["json"] = wrapActionResponse(object.UpdateRule(id, &rule))
-	go service.UpdateWAF()
 	c.ServeJSON()
 }
 
@@ -117,25 +118,24 @@ func (c *ApiController) DeleteRule() {
 	}
 
 	c.Data["json"] = wrapActionResponse(object.DeleteRule(&rule))
-	go service.UpdateWAF()
 	c.ServeJSON()
 }
 
-func checkExpressions(expressions []object.Expression, ruleType string) error {
+func checkExpressions(expressions []*object.Expression, ruleType string) error {
 	values := make([]string, len(expressions))
 	for i, expression := range expressions {
 		values[i] = expression.Value
 	}
 	switch ruleType {
-	case "waf":
-		return checkWAFRule(values)
-	case "ip":
-		return checkIPRule(values)
+	case "WAF":
+		return checkWafRule(values)
+	case "IP":
+		return checkIpRule(values)
 	}
 	return nil
 }
 
-func checkWAFRule(rules []string) error {
+func checkWafRule(rules []string) error {
 	for _, rule := range rules {
 		scanner := parser.NewSecLangScannerFromString(rule)
 		_, err := scanner.AllDirective()
@@ -146,10 +146,11 @@ func checkWAFRule(rules []string) error {
 	return nil
 }
 
-func checkIPRule(ipLists []string) error {
+func checkIpRule(ipLists []string) error {
 	for _, ipList := range ipLists {
-		for _, ip := range strings.Split(ipList, " ") {
-			if net.ParseIP(ip) == nil {
+		for _, ip := range strings.Split(ipList, ",") {
+			_, _, err := net.ParseCIDR(ip)
+			if net.ParseIP(ip) == nil && err != nil {
 				return errors.New("Invalid IP address: " + ip)
 			}
 		}
