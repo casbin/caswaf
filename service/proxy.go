@@ -201,8 +201,8 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if site.DisableVerbose {
-			reason = "illegal request"
+		if reason != "" && site.DisableVerbose {
+			reason = "the rule has been hit"
 		}
 
 		switch action {
