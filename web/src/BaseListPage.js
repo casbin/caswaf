@@ -32,11 +32,19 @@ class BaseListPage extends React.Component {
   }
 
   UNSAFE_componentWillMount() {
-    this.fetch();
+    const {pagination} = this.state;
+    this.fetch({pagination});
   }
 
-  handleTableChange = () => {
-    this.fetch();
+  handleTableChange = (pagination, filters, sorter) => {
+    this.fetch({
+      sortField: sorter.field,
+      sortOrder: sorter.order,
+      pagination,
+      ...filters,
+      searchText: this.state.searchText,
+      searchedColumn: this.state.searchedColumn,
+    });
   };
 
   render() {

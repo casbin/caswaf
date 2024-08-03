@@ -17,6 +17,7 @@ package controllers
 import (
 	"encoding/json"
 
+	"github.com/beego/beego/utils/pagination"
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/util"
 )
@@ -45,13 +46,38 @@ func (c *ApiController) GetSites() {
 		owner = ""
 	}
 
-	sites, err := object.GetSites(owner)
+	limit := c.Input().Get("pageSize")
+	page := c.Input().Get("p")
+	field := c.Input().Get("field")
+	value := c.Input().Get("value")
+	sortField := c.Input().Get("sortField")
+	sortOrder := c.Input().Get("sortOrder")
+
+	if limit == "" || page == "" {
+		sites, err := object.GetSites(owner)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+		c.ResponseOk(object.GetMaskedSites(sites, util.GetHostname()))
+		return
+	}
+
+	limitInt := util.ParseInt(limit)
+	count, err := object.GetSiteCount(owner, field, value)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
 
-	c.ResponseOk(object.GetMaskedSites(sites, util.GetHostname()))
+	paginator := pagination.SetPaginator(c.Ctx, limitInt, count)
+	sites, err := object.GetPaginationSites(owner, paginator.Offset(), limitInt, field, value, sortField, sortOrder)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(object.GetMaskedSites(sites, util.GetHostname()), paginator.Nums())
 }
 
 func (c *ApiController) GetSite() {

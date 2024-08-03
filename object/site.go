@@ -333,3 +333,19 @@ func (site *Site) checkNodes() error {
 
 	return nil
 }
+
+func GetSiteCount(owner, field, value string) (int64, error) {
+	session := GetSession(owner, -1, -1, field, value, "", "")
+	return session.Count(&Site{})
+}
+
+func GetPaginationSites(owner string, offset, limit int, field, value, sortField, sortOrder string) ([]*Site, error) {
+	sites := []*Site{}
+	session := GetSession(owner, offset, limit, field, value, sortField, sortOrder)
+	err := session.Where("owner = ? or owner = ?", "admin", owner).Find(&sites)
+	if err != nil {
+		return sites, err
+	}
+
+	return sites, nil
+}

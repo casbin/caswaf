@@ -206,3 +206,19 @@ func (cert *Cert) isCertNearExpire() (bool, error) {
 
 	return res, nil
 }
+
+func GetCertCount(owner, field, value string) (int64, error) {
+	session := GetSession(owner, -1, -1, field, value, "", "")
+	return session.Count(&Cert{})
+}
+
+func GetPaginationCerts(owner string, offset, limit int, field, value, sortField, sortOrder string) ([]*Cert, error) {
+	certs := []*Cert{}
+	session := GetSession(owner, offset, limit, field, value, sortField, sortOrder)
+	err := session.Where("owner = ? or owner = ?", "admin", owner).Find(&certs)
+	if err != nil {
+		return certs, err
+	}
+
+	return certs, nil
+}
