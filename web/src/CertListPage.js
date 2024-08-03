@@ -246,8 +246,7 @@ class CertListPage extends BaseListPage {
         render: (text, record, index) => {
           return (
             <div style={{display: "flex", alignItems: "center", flexWrap: "nowrap"}}>
-              <Button style={{margin: "10px 10px 10px 0"}} type="default" onClick={() => this.refreshCert(index)}>
-                {i18next.t("general:Refresh")}
+              <Button style={{margin: "10px 10px 10px 0"}} type="default" onClick={() => this.refreshCert(index)}>{i18next.t("general:Refresh")}
               </Button>
               <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="primary" onClick={() => this.props.history.push(`/certs/${record.owner}/${record.name}`)}>{i18next.t("general:Edit")}</Button>
               <Popconfirm
@@ -267,12 +266,7 @@ class CertListPage extends BaseListPage {
     return (
       <div>
         <Table
-          columns={columns}
-          dataSource={data}
-          rowKey="name"
-          size="middle"
-          bordered
-          pagination={this.state.pagination}
+          columns={columns} dataSource={data} rowKey="name" size="middle" bordered pagination={this.state.pagination}
           title={() => (
             <div>
               {i18next.t("general:Certs")}&nbsp;&nbsp;&nbsp;&nbsp;
@@ -282,7 +276,6 @@ class CertListPage extends BaseListPage {
           loading={this.state.loading}
           onChange={this.handleTableChange}
         />
-
       </div>
     );
   }
