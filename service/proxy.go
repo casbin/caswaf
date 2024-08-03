@@ -201,6 +201,10 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		if reason != "" && site.DisableVerbose {
+			reason = "the rule has been hit"
+		}
+
 		switch action {
 		case "", "Allow":
 			w.WriteHeader(http.StatusOK)

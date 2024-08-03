@@ -25,9 +25,9 @@ type Rule interface {
 	checkRule(expressions []*object.Expression, req *http.Request) (bool, string, string, error)
 }
 
-func CheckRules(wafRuleIds []string, r *http.Request) (string, string, error) {
-	rules := object.GetRulesByRuleIds(wafRuleIds)
-	for _, rule := range rules {
+func CheckRules(ruleIds []string, r *http.Request) (string, string, error) {
+	rules := object.GetRulesByRuleIds(ruleIds)
+	for i, rule := range rules {
 		var ruleObj Rule
 		switch rule.Type {
 		case "User-Agent":
@@ -51,6 +51,8 @@ func CheckRules(wafRuleIds []string, r *http.Request) (string, string, error) {
 			if action == "Block" || action == "Drop" {
 				if rule.Reason != "" {
 					reason = rule.Reason
+				} else {
+					reason = fmt.Sprintf("hit rule %s: %s", ruleIds[i], reason)
 				}
 				return action, reason, nil
 			} else if action == "Allow" {
