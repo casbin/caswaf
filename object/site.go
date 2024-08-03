@@ -47,7 +47,6 @@ type Site struct {
 	Domain         string   `xorm:"varchar(100)" json:"domain"`
 	OtherDomains   []string `xorm:"varchar(500)" json:"otherDomains"`
 	NeedRedirect   bool     `json:"needRedirect"`
-	EnableWaf      bool     `json:"enableWaf"`
 	DisableVerbose bool     `json:"disableVerbose"`
 	Rules          []string `xorm:"varchar(500)" json:"wafRuleIds"`
 	Challenges     []string `xorm:"mediumtext" json:"challenges"`
