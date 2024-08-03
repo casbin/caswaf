@@ -171,16 +171,6 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("site:Enable WAF")}:
-          </Col>
-          <Col span={1} >
-            <Switch checked={this.state.site.enableWaf} onChange={checked => {
-              this.updateSiteField("enableWaf", checked);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("site:Disable verbose")}:
           </Col>
           <Col span={1} >
