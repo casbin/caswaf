@@ -201,6 +201,10 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		if site.DisableVerbose {
+			reason = "illegal request"
+		}
+
 		switch action {
 		case "", "Allow":
 			w.WriteHeader(http.StatusOK)

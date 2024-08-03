@@ -181,6 +181,16 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("site:Disable Verbose")}:
+          </Col>
+          <Col span={1} >
+            <Switch checked={this.state.site.disableVerbose} onChange={checked => {
+              this.updateSiteField("disableVerbose", checked);
+            }} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("site:Challenges")}:
           </Col>
           <Col span={22} >
