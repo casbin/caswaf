@@ -298,3 +298,8 @@ export function getVersionInfo(text, siteName) {
 
   return {text: versionText, link: link};
 }
+
+export function getDeduplicatedArray(sourceTable, filterTable, key) {
+  const res = sourceTable.filter(item => !filterTable.some(arrayItem => arrayItem[key] === item[key]));
+  return res;
+}

@@ -17,10 +17,12 @@ import {Button, Card, Col, Input, InputNumber, Row, Select, Switch} from "antd";
 import {LinkOutlined} from "@ant-design/icons";
 import * as SiteBackend from "./backend/SiteBackend";
 import * as CertBackend from "./backend/CertBackend";
+import * as RuleBackend from "./backend/RuleBackend";
 import * as ApplicationBackend from "./backend/ApplicationBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
 import NodeTable from "./NodeTable";
+import RuleTable from "./components/RuleTable";
 
 const {Option} = Select;
 
@@ -31,6 +33,7 @@ class SiteEditPage extends React.Component {
       classes: props,
       owner: props.match.params.owner,
       siteName: props.match.params.siteName,
+      rules: [],
       site: null,
       certs: null,
       applications: null,
@@ -40,6 +43,7 @@ class SiteEditPage extends React.Component {
   UNSAFE_componentWillMount() {
     this.getSite();
     this.getCerts();
+    this.getRules();
     this.getApplications();
   }
 
@@ -65,6 +69,19 @@ class SiteEditPage extends React.Component {
           });
         } else {
           Setting.showMessage("error", `Failed to get certs: ${res.msg}`);
+        }
+      });
+  }
+
+  getRules() {
+    RuleBackend.getRules(this.props.account.name)
+      .then((res) => {
+        if (res.status === "ok") {
+          this.setState({
+            rules: res.data,
+          });
+        } else {
+          Setting.showMessage("error", `Failed to get rules: ${res.msg}`);
         }
       });
   }
@@ -177,6 +194,20 @@ class SiteEditPage extends React.Component {
             <Switch checked={this.state.site.disableVerbose} onChange={checked => {
               this.updateSiteField("disableVerbose", checked);
             }} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("site:Rules")}:
+          </Col>
+          <Col span={22} >
+            <RuleTable
+              title={"Rules"}
+              account={this.props.account}
+              sources={this.state.rules}
+              rules={this.state.site.rules}
+              onUpdateRules={(value) => this.updateSiteField("rules", value)}
+            />
           </Col>
         </Row>
         <Row style={{marginTop: "20px"}} >
