@@ -157,7 +157,7 @@ class RuleEditPage extends React.Component {
           )
         }
         {
-          this.state.rule.action === "Block" && this.state.rule.type !== "WAF" && (
+          (this.state.rule.action === "Block" && this.state.rule.type !== "WAF") && (
             <Row style={{marginTop: "20px"}}>
               <Col span={2} style={{marginTop: "5px"}}>
                 {i18next.t("rule:Status Code")}:
@@ -172,7 +172,7 @@ class RuleEditPage extends React.Component {
           )
         }
         {
-          this.state.rule.action === "Block" && this.state.rule.type !== "WAF" && (
+          (this.state.rule.action === "Block" || this.state.rule.type === "WAF") && (
             <Row style={{marginTop: "20px"}}>
               <Col span={2} style={{marginTop: "5px"}}>
                 {i18next.t("rule:Reason")}:
