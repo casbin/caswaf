@@ -36,6 +36,10 @@ func CheckRules(ruleIds []string, r *http.Request) (string, string, error) {
 			ruleObj = &IpRule{}
 		case "WAF":
 			ruleObj = &WafRule{}
+		case "IpRate":
+			ruleObj = &IpRateRule{
+				ruleName: rule.GetId(),
+			}
 		default:
 			return "", "", fmt.Errorf("unknown rule type: %s for rule: %s", rule.Type, rule.GetId())
 		}
