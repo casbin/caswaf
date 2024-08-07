@@ -5,7 +5,7 @@
   "dependencies": {
     "@ant-design/icons": "4.6.2",
     "@craco/craco": "6.4.5",
-    "antd": "~4.24.0",
+    "antd": "4.24.12",
     "casdoor-js-sdk": "^0.2.7",
     "copy-to-clipboard": "^3.3.3",
     "craco-less": "2.0.0",
