@@ -167,12 +167,10 @@ class App extends Component {
   renderRightDropdown() {
     const menu = (
       <Menu onClick={this.handleRightDropdownClick.bind(this)}>
-        <Menu.Item key="/account">
-          <SettingOutlined />
+        <Menu.Item key="/account" icon={<SettingOutlined />}>
           {i18next.t("account:My Account")}
         </Menu.Item>
-        <Menu.Item key="/logout">
-          <LogoutOutlined />
+        <Menu.Item key="/logout" icon={<LogoutOutlined />}>
           {i18next.t("account:Sign Out")}
         </Menu.Item>
       </Menu>
@@ -237,7 +235,7 @@ class App extends Component {
         </div>
       );
       return (
-        <div style={{float: "right", margin: "0px", padding: "0px"}}>
+        <div style={{margin: "0px", padding: "0px"}}>
           {
             res
           }
@@ -328,7 +326,7 @@ class App extends Component {
   renderContent() {
     return (
       <div>
-        <Header style={{padding: "0", marginBottom: "3px"}}>
+        <Header style={{padding: "0", marginBottom: "3px", backgroundColor: "white", width: "100%"}} mode={"horizontal"}>
           {
             Setting.isMobile() ? null : (
               <Link to={"/"}>
@@ -340,16 +338,16 @@ class App extends Component {
             // theme="dark"
             mode={"horizontal"}
             selectedKeys={[`${this.state.selectedMenuKey}`]}
-            style={{lineHeight: "64px"}}
+            style={{lineHeight: "64px", position: "absolute", left: 138, right: "300px"}}
           >
             {
               this.renderMenu()
             }
-            {
-              this.renderAccount()
-            }
             {/* <SelectLanguageBox /> */}
           </Menu>
+          {
+            this.renderAccount()
+          }
         </Header>
         <Switch>
           <Route exact path="/callback" component={AuthCallback} />
