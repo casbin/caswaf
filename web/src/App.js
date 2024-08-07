@@ -345,14 +345,9 @@ class App extends Component {
             }
             {/* <SelectLanguageBox /> */}
           </Menu>
-          {/* <Menu
-            mode="horizontal"
-            style={{lineHeight: "64px", float: "right", marginRight: "20px"}}
-          > */}
           {
             this.renderAccount()
           }
-          {/* </Menu> */}
         </Header>
         <Switch>
           <Route exact path="/callback" component={AuthCallback} />

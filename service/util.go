@@ -91,7 +91,7 @@ func getSiteByDomainWithWww(domain string) *object.Site {
 func getX509CertByDomain(domain string) (*tls.Certificate, error) {
 	cert, err := object.GetCertByDomain(domain)
 	if err != nil {
-		return nil, fmt.Errorf("getX509CertByDomain() error: %v", err)
+		return nil, fmt.Errorf("getX509CertByDomain() error: %v, domain: [%s]", err, domain)
 	}
 	if cert == nil {
 		return nil, fmt.Errorf("getX509CertByDomain() error: cert not found for domain: [%s]", domain)
