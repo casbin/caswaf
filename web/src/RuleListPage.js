@@ -25,17 +25,21 @@ class RuleListPage extends BaseListPage {
     this.fetch();
   }
 
-  fetch() {
+  fetch = (params = {}) => {
+    const sortField = params.sortField, sortOrder = params.sortOrder;
+    if (!params.pagination) {
+      params.pagination = {current: 1, pageSize: 10};
+    }
     this.setState({
       loading: true,
     });
-    RuleBackend.getRules(this.props.account.name).then((res) => {
+    RuleBackend.getRules(this.props.account.name, params.pagination.current, params.pagination.pageSize, sortField, sortOrder).then((res) => {
       this.setState({
         data: res.data,
         loading: false,
       });
     });
-  }
+  };
 
   addRule() {
     const newRule = this.newRule();

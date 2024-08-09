@@ -143,3 +143,19 @@ func timeType2Format(timeType string) string {
 	}
 	return "%Y-%m-%d %H"
 }
+
+func GetRecordCount(owner, field, value string) (int64, error) {
+	session := GetSession(owner, -1, -1, field, value, "", "")
+	return session.Count(&Record{})
+}
+
+func GetPaginationRecords(owner string, offset, limit int, field, value, sortField, sortOrder string) ([]*Record, error) {
+	records := []*Record{}
+	session := GetSession(owner, offset, limit, field, value, sortField, sortOrder)
+	err := session.Where("owner = ? or owner = ?", "admin", owner).Find(&records)
+	if err != nil {
+		return records, err
+	}
+
+	return records, nil
+}
