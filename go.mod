@@ -21,5 +21,6 @@ require (
 	github.com/xorm-io/core v0.7.4
 	github.com/xorm-io/xorm v1.1.6
 	golang.org/x/net v0.21.0
+	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	modernc.org/sqlite v1.11.2
 )

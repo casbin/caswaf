@@ -147,7 +147,7 @@ class UaRuleTable extends React.Component {
           <div>
             {this.props.title}&nbsp;&nbsp;&nbsp;&nbsp;
             <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.addRow(table)}>{"Add"}</Button>
-            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.restore()}>{"Restore Build-in User-Agent Rules"}</Button>
+            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.restore()}>{"Restore"}</Button>
           </div>
         )}
       />

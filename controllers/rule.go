@@ -156,6 +156,8 @@ func checkExpressions(expressions []*object.Expression, ruleType string) error {
 		return checkWafRule(values)
 	case "IP":
 		return checkIpRule(values)
+	case "IpRate":
+		return checkIpRateRule(expressions)
 	}
 	return nil
 }
@@ -179,6 +181,22 @@ func checkIpRule(ipLists []string) error {
 				return errors.New("Invalid IP address: " + ip)
 			}
 		}
+	}
+	return nil
+}
+
+func checkIpRateRule(expressions []*object.Expression) error {
+	if len(expressions) != 1 {
+		return errors.New("IpRate rule should have only one expression")
+	}
+	expression := expressions[0]
+	_, err := util.ParseIntWithError(expression.Operator)
+	if err != nil {
+		return err
+	}
+	_, err = util.ParseIntWithError(expression.Value)
+	if err != nil {
+		return err
 	}
 	return nil
 }
