@@ -21,10 +21,9 @@ import (
 	"strings"
 
 	"github.com/beego/beego/utils/pagination"
-	"github.com/hsluoyz/modsecurity-go/seclang/parser"
-
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/util"
+	"github.com/hsluoyz/modsecurity-go/seclang/parser"
 )
 
 func (c *ApiController) GetRules() {
