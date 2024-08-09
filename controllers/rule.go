@@ -20,9 +20,11 @@ import (
 	"net"
 	"strings"
 
+	"github.com/beego/beego/utils/pagination"
+	"github.com/hsluoyz/modsecurity-go/seclang/parser"
+
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/util"
-	"github.com/hsluoyz/modsecurity-go/seclang/parser"
 )
 
 func (c *ApiController) GetRules() {
@@ -33,14 +35,38 @@ func (c *ApiController) GetRules() {
 	if owner == "admin" {
 		owner = ""
 	}
+	limit := c.Input().Get("pageSize")
+	page := c.Input().Get("p")
+	field := c.Input().Get("field")
+	value := c.Input().Get("value")
+	sortField := c.Input().Get("sortField")
+	sortOrder := c.Input().Get("sortOrder")
 
-	rules, err := object.GetRules(owner)
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
+	if limit == "" || page == "" {
+		rules, err := object.GetRules(owner)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		c.ResponseOk(rules)
+	} else {
+		limit := util.ParseInt(limit)
+		count, err := object.GetRuleCount(owner, field, value)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		paginator := pagination.SetPaginator(c.Ctx, limit, count)
+		rules, err := object.GetPaginationRules(owner, paginator.Offset(), limit, field, value, sortField, sortOrder)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		c.ResponseOk(rules, paginator.Nums())
 	}
-
-	c.ResponseOk(rules)
 }
 
 func (c *ApiController) GetRule() {

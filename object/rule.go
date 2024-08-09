@@ -114,3 +114,19 @@ func DeleteRule(rule *Rule) (bool, error) {
 func (rule *Rule) GetId() string {
 	return fmt.Sprintf("%s/%s", rule.Owner, rule.Name)
 }
+
+func GetRuleCount(owner, field, value string) (int64, error) {
+	session := GetSession(owner, -1, -1, field, value, "", "")
+	return session.Count(&Rule{})
+}
+
+func GetPaginationRules(owner string, offset, limit int, field, value, sortField, sortOrder string) ([]*Rule, error) {
+	rules := []*Rule{}
+	session := GetSession(owner, offset, limit, field, value, sortField, sortOrder)
+	err := session.Where("owner = ? or owner = ?", "admin", owner).Find(&rules)
+	if err != nil {
+		return rules, err
+	}
+
+	return rules, nil
+}

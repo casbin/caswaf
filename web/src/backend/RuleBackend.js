@@ -14,8 +14,8 @@
 
 import * as Setting from "../Setting";
 
-export function getRules(owner) {
-  return fetch(`${Setting.ServerUrl}/api/get-rules?owner=${owner}`, {
+export function getRules(owner, page = "", pageSize = "", sortField = "", sortOrder = "") {
+  return fetch(`${Setting.ServerUrl}/api/get-rules?owner=${owner}&p=${page}&pageSize=${pageSize}&sortField=${sortField}&sortOrder=${sortOrder}`, {
     method: "GET",
     credentials: "include",
   }).then(res => res.json());
