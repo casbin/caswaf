@@ -18,9 +18,8 @@ import (
 	"encoding/json"
 
 	"github.com/beego/beego/utils/pagination"
-	"github.com/casbin/caswaf/util"
-
 	"github.com/casbin/caswaf/object"
+	"github.com/casbin/caswaf/util"
 )
 
 func (c *ApiController) GetRecords() {
