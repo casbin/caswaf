@@ -20,6 +20,7 @@ import i18next from "i18next";
 import WafRuleTable from "./components/WafRuleTable";
 import IpRuleTable from "./components/IpRuleTable";
 import UaRuleTable from "./components/UaRuleTable";
+import IpRateRuleTable from "./components/IpRateRuleTable";
 
 const {Option} = Select;
 
@@ -57,12 +58,21 @@ class RuleEditPage extends React.Component {
     });
   }
 
+  updateRuleFieldInExpressions(index, key, value) {
+    const rule = Setting.deepCopy(this.state.rule);
+    rule.expressions[index][key] = value;
+    this.updateRuleField("expressions", rule.expressions);
+    this.setState({
+      rule: rule,
+    });
+  }
+
   renderRule() {
     return (
       <Card size="small" title={
         <div>
-          Edit Rule&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button type="primary" onClick={this.submitRuleEdit.bind(this)}>Save</Button>
+          {i18next.t("rule:Edit Rule")}&nbsp;&nbsp;&nbsp;&nbsp;
+          <Button type="primary" onClick={this.submitRuleEdit.bind(this)}>{i18next.t("general:Save")}</Button>
         </div>
       } style={{marginTop: 10}} type="inner">
         <Row style={{marginTop: "20px"}}>
@@ -86,7 +96,7 @@ class RuleEditPage extends React.Component {
                   {value: "WAF", text: "WAF"},
                   {value: "IP", text: "IP"},
                   {value: "User-Agent", text: "User-Agent"},
-                  // {value: "frequency", text: "Frequency"},
+                  {value: "IP Rate Limiting", text: "IP Rate Limiting"},
                   // {value: "complex", text: "Complex"},
                 ].map((item, index) => <Option key={index} value={item.value}>{item.text}</Option>)
               }
@@ -124,6 +134,17 @@ class RuleEditPage extends React.Component {
               this.state.rule.type === "User-Agent" ? (
                 <UaRuleTable
                   title={"User-Agents"}
+                  table={this.state.rule.expressions}
+                  ruleName={this.state.rule.name}
+                  account={this.props.account}
+                  onUpdateTable={(value) => {this.updateRuleField("expressions", value);}}
+                />
+              ) : null
+            }
+            {
+              this.state.rule.type === "IP Rate Limiting" ? (
+                <IpRateRuleTable
+                  title={"IP Rate Limiting"}
                   table={this.state.rule.expressions}
                   ruleName={this.state.rule.name}
                   account={this.props.account}
