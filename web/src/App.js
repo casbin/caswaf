@@ -222,6 +222,13 @@ class App extends Component {
           </a>
         </Menu.Item>
       );
+      return (
+        <Menu>
+          {
+            res
+          }
+        </Menu>
+      );
     } else {
       res.push(
         <div style={{float: "right", display: "flex", alignItems: "center"}}>
@@ -242,8 +249,6 @@ class App extends Component {
         </div>
       );
     }
-
-    return res;
   }
 
   renderMenu() {
