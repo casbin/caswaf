@@ -50,7 +50,7 @@ class IpRateRuleTable extends React.Component {
   renderTable(table) {
     const columns = [
       {
-        title: i18next.t("rule:Name"),
+        title: i18next.t("general:Name"),
         dataIndex: "name",
         key: "name",
         width: "20%",
@@ -77,7 +77,7 @@ class IpRateRuleTable extends React.Component {
         key: "value",
         width: "100%",
         render: (text, record, index) => (
-          <InputNumber style={{"width": "100%"}} value={Number(record.value)} addonAfter={i18next.t("rule:seconds")} onChange={e => {
+          <InputNumber style={{"width": "100%"}} value={Number(record.value)} addonAfter={i18next.t("usage:seconds")} onChange={e => {
             this.updateField(table, index, "value", e);
           }} />
         ),

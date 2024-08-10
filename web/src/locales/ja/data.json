@@ -51,6 +51,8 @@
     "Owner": "Owner",
     "Path": "Path",
     "Records": "Records",
+    "Restore": "Restore",
+    "Rules": "Rules",
     "Save": "Save",
     "Self": "Self",
     "Sites": "Sites",
@@ -61,9 +63,31 @@
     "Top 10 User-Agents": "Top 10 User-Agents",
     "Total Request Count": "Total Request Count",
     "Unique IP Count": "Unique IP Count",
-    "User agent": "User agent",
     "User-Agent": "User-Agent",
-    "UserAgent": "UserAgent"
+    "Update time": "Update time"
+  },
+  "rule": {
+    "Allow": "Allow",
+    "Block": "Block",
+    "Block Duration": "Block Duration",
+    "Edit Rule": "Edit Rule",
+    "Expression": "Expression",
+    "Expressions": "Expressions",
+    "IP List": "IP List",
+    "IP Rate Limiting": "IP Rate Limiting",
+    "Operator": "Operator",
+    "Rate": "Rate",
+    "Reason": "Reason",
+    "Status Code": "Status Code",
+    "Type": "Type",
+    "Value": "Value",
+    "contains": "contains",
+    "does not contain": "does not contain",
+    "does not equal": "does not equal",
+    "equals": "equals",
+    "regex match": "regex match",
+    "is in": "is in",
+    "is not in": "is not in"
   },
   "site": {
     "Casdoor app": "Casdoor app",
@@ -87,6 +111,7 @@
     "Day": "Day",
     "Hour": "Hour",
     "Month": "Month",
-    "Week": "Week"
+    "Week": "Week",
+    "seconds": "seconds"
   }
 }

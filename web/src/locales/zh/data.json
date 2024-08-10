@@ -51,6 +51,8 @@
     "Owner": "所有者",
     "Path": "路径",
     "Records": "日志",
+    "Restore": "复原",
+    "Rules": "规则",
     "Save": "保存",
     "Self": "自己",
     "Sites": "站点",
@@ -58,12 +60,34 @@
     "Tag": "标签",
     "This is a read-only demo site!": "这是一个只读演示站点！",
     "Top 10 IP Addresses": "前10名IP地址",
-    "Top 10 User-Agents": "前10名用户代理",
+    "Top 10 User-Agents": "前10名 User-Agent",
     "Total Request Count": "总请求数",
-    "Unique IP Count": "唯一IP计数",
-    "User agent": "用户代理",
-    "User-Agent": "用户代理",
-    "UserAgent": "用户代理"
+    "Unique IP Count": "独立IP统计",
+    "User-Agent": "User-Agent",
+    "Update time": "创建时间"
+  },
+  "rule": {
+    "Allow": "允许",
+    "Block": "阻止",
+    "Block Duration": "阻断时间",
+    "Edit Rule": "编辑规则",
+    "Expression": "表达式",
+    "Expressions": "表达式",
+    "IP List": "IP 列表",
+    "IP Rate Limiting": "IP 速率限制",
+    "Operator": "操作符",
+    "Rate": "速率",
+    "Reason": "原因",
+    "Status Code": "状态码",
+    "Type": "类型",
+    "Value": "值",
+    "contains": "包含",
+    "does not contain": "不包含",
+    "does not equal": "不等于",
+    "equals": "等于",
+    "regex match": "正则表达式匹配",
+    "is in": "包含",
+    "is not in": "不包含于"
   },
   "site": {
     "Casdoor app": "Casdoor应用",
@@ -87,6 +111,7 @@
     "Day": "天",
     "Hour": "小时",
     "Month": "月",
-    "Week": "周"
+    "Week": "周",
+    "seconds": "秒"
   }
 }
