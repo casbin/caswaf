@@ -147,7 +147,7 @@ class RecordEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "10px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
-            {i18next.t("general:UserAgent")}:
+            {i18next.t("general:User-Agent")}:
           </Col>
           <Col span={22} >
             <Input value={this.state.record.userAgent} onChange={e => {

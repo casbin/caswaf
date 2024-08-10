@@ -153,7 +153,7 @@ class RecordListPage extends BaseListPage {
         sorter: (a, b) => a.clientIp.localeCompare(b.clientIp),
       },
       {
-        title: i18next.t("general:User agent"),
+        title: i18next.t("general:User-Agent"),
         dataIndex: "userAgent",
         key: "userAgent",
         width: "240px",
