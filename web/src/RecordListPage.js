@@ -27,8 +27,12 @@ class RecordListPage extends BaseListPage {
   }
 
   fetch = (params = {}) => {
+    const sortField = params.sortField, sortOrder = params.sortOrder;
+    if (!params.pagination) {
+      params.pagination = {current: 1, pageSize: 10};
+    }
     this.setState({loading: true});
-    RecordBackend.getRecords(this.props.account.name)
+    RecordBackend.getRecords(this.props.account.name, params.pagination.current, params.pagination.pageSize, sortField, sortOrder)
       .then((res) => {
         this.setState({
           loading: false,
