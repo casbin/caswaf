@@ -16,6 +16,7 @@ import React from "react";
 import {DeleteOutlined, DownOutlined, UpOutlined} from "@ant-design/icons";
 import {Button, Col, Input, Row, Select, Table, Tooltip} from "antd";
 import * as Setting from "../Setting";
+import i18next from "i18next";
 
 const {Option} = Select;
 
@@ -102,7 +103,7 @@ class IpRuleTable extends React.Component {
   renderTable(table) {
     const columns = [
       {
-        title: "Name",
+        title: i18next.t("general:Name"),
         dataIndex: "name",
         key: "name",
         width: "180px",
@@ -113,7 +114,7 @@ class IpRuleTable extends React.Component {
         ),
       },
       {
-        title: "Operator",
+        title: i18next.t("rule:Operator"),
         dataIndex: "operator",
         key: "operator",
         width: "180px",
@@ -123,18 +124,17 @@ class IpRuleTable extends React.Component {
           }}>
             {
               [
-                {value: "is in", text: "is in"},
-                {value: "is not in", text: "is not in"},
+                {value: "is in", text: i18next.t("rule:is in")},
+                {value: "is not in", text: i18next.t("rule:is not in")},
               ].map((item, index) => <Option key={index} value={item.value}>{item.text}</Option>)
             }
           </Select>
         ),
       },
       {
-        title: "Value",
+        title: i18next.t("rule:IP List"),
         dataIndex: "value",
         key: "value",
-        width: "100%",
         render: (text, record, index) => (
           <Select
             mode="tags"
@@ -147,7 +147,7 @@ class IpRuleTable extends React.Component {
         ),
       },
       {
-        title: "Action",
+        title: i18next.t("general:Action"),
         key: "action",
         width: "100px",
         render: (text, record, index) => (
@@ -170,8 +170,8 @@ class IpRuleTable extends React.Component {
         title={() => (
           <div>
             {this.props.title}&nbsp;&nbsp;&nbsp;&nbsp;
-            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.addRow(table)}>{"Add"}</Button>
-            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.restore()}>{"Restore"}</Button>
+            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.addRow(table)}>{i18next.t("general:Add")}</Button>
+            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.restore()}>{i18next.t("general:Restore")}</Button>
           </div>
         )}
       />

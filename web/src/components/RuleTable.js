@@ -16,6 +16,7 @@ import React from "react";
 import {DeleteOutlined, DownOutlined, UpOutlined} from "@ant-design/icons";
 import {Button, Col, Row, Select, Table, Tooltip} from "antd";
 import * as Setting from "../Setting";
+import i18next from "i18next";
 
 const {Option} = Select;
 
@@ -68,7 +69,7 @@ class RuleTable extends React.Component {
   renderTable(table) {
     const columns = [
       {
-        title: "Name",
+        title: i18next.t("general:Name"),
         dataIndex: "name",
         key: "name",
         width: "180px",
@@ -108,7 +109,7 @@ class RuleTable extends React.Component {
         title={() => (
           <div>
             {this.props.title}&nbsp;&nbsp;&nbsp;&nbsp;
-            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.addRow(table)}>{"Add"}</Button>
+            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.addRow(table)}>{i18next.t("general:Add")}</Button>
           </div>
         )}
       />

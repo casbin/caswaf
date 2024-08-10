@@ -121,13 +121,20 @@ class RuleListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("general:Type"),
+        title: i18next.t("rule:Type"),
         dataIndex: "type",
         key: "type",
         sorter: (a, b) => a.type.localeCompare(b.type),
+        render: (text, rule, index) => {
+          return (
+            <Tag color="blue">
+              {i18next.t(`rule:${text}`)}
+            </Tag>
+          );
+        },
       },
       {
-        title: i18next.t("general:Expressions"),
+        title: i18next.t("rule:Expressions"),
         dataIndex: "expressions",
         key: "expressions",
         sorter: (a, b) => a.expressions.localeCompare(b.expressions),
@@ -173,7 +180,7 @@ class RuleListPage extends BaseListPage {
         bordered
         title={() => (
           <div>
-            {i18next.t("general:Rule")}&nbsp;&nbsp;&nbsp;&nbsp;
+            {i18next.t("general:Rules")}&nbsp;&nbsp;&nbsp;&nbsp;
             <Button type="primary" size="small" onClick={() => this.addRule()}>{i18next.t("general:Add")}</Button>
           </div>
         )}

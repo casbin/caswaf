@@ -79,7 +79,7 @@ class UaRuleTable extends React.Component {
   renderTable(table) {
     const columns = [
       {
-        title: i18next.t("rule:Name"),
+        title: i18next.t("general:Name"),
         dataIndex: "name",
         key: "name",
         width: "180px",
@@ -100,11 +100,11 @@ class UaRuleTable extends React.Component {
           }}>
             {
               [
-                {value: "equals", text: "equals"},
-                {value: "does not equal", text: "does not equal"},
-                {value: "contains", text: "contains"},
-                {value: "does not contain", text: "does not contain"},
-                {value: "match", text: "regex match"},
+                {value: "equals", text: i18next.t("rule:equals")},
+                {value: "does not equal", text: i18next.t("rule:does not equal")},
+                {value: "contains", text: i18next.t("rule:contains")},
+                {value: "does not contain", text: i18next.t("rule:does not contain")},
+                {value: "match", text: i18next.t("rule:regex match")},
               ].map((item, index) => <Option key={index} value={item.value}>{item.text}</Option>)
             }
           </Select>
@@ -114,9 +114,8 @@ class UaRuleTable extends React.Component {
         title: i18next.t("rule:Value"),
         dataIndex: "value",
         key: "value",
-        width: "100%",
         render: (text, record, index) => (
-          <Input value={text} placeholder="Split with Space" onChange={e => {
+          <Input value={text} onChange={e => {
             this.updateField(table, index, "value", e.target.value);
           }} onBlur={e => {
             this.updateField(table, index, "value", e.target.value.replace(/\s+/g, " ").trim());

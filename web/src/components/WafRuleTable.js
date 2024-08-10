@@ -16,6 +16,7 @@ import React from "react";
 import {DeleteOutlined, DownOutlined, UpOutlined} from "@ant-design/icons";
 import {Button, Col, Input, Row, Table, Tooltip} from "antd";
 import * as Setting from "../Setting";
+import i18next from "i18next";
 
 class WafRuleTable extends React.Component {
   constructor(props) {
@@ -86,7 +87,7 @@ class WafRuleTable extends React.Component {
   renderTable(table) {
     const columns = [
       {
-        title: "Name",
+        title: i18next.t("general:Name"),
         dataIndex: "name",
         key: "name",
         width: "180px",
@@ -99,7 +100,7 @@ class WafRuleTable extends React.Component {
         },
       },
       {
-        title: "Value",
+        title: i18next.t("rule:Expression"),
         dataIndex: "value",
         key: "value",
         render: (text, record, index) => {
@@ -111,7 +112,7 @@ class WafRuleTable extends React.Component {
         },
       },
       {
-        title: "Action",
+        title: i18next.t("general:Action"),
         key: "action",
         width: "100px",
         render: (text, record, index) => {
@@ -137,8 +138,8 @@ class WafRuleTable extends React.Component {
         title={() => (
           <div>
             {this.props.title}&nbsp;&nbsp;&nbsp;&nbsp;
-            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.addRow(table)}>{"Add"}</Button>
-            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.restore()}>{"Restore"}</Button>
+            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.addRow(table)}>{i18next.t("general:Add")}</Button>
+            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.restore()}>{i18next.t("general:Restore")}</Button>
           </div>
         )}
       />
