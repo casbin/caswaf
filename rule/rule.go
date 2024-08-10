@@ -36,7 +36,7 @@ func CheckRules(ruleIds []string, r *http.Request) (string, string, error) {
 			ruleObj = &IpRule{}
 		case "WAF":
 			ruleObj = &WafRule{}
-		case "IpRate":
+		case "IP Rate Limiting":
 			ruleObj = &IpRateRule{
 				ruleName: rule.GetId(),
 			}

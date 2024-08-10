@@ -71,8 +71,8 @@ class RuleEditPage extends React.Component {
     return (
       <Card size="small" title={
         <div>
-          Edit Rule&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button type="primary" onClick={this.submitRuleEdit.bind(this)}>Save</Button>
+          {i18next.t("rule:Edit Rule")}&nbsp;&nbsp;&nbsp;&nbsp;
+          <Button type="primary" onClick={this.submitRuleEdit.bind(this)}>{i18next.t("general:Save")}</Button>
         </div>
       } style={{marginTop: 10}} type="inner">
         <Row style={{marginTop: "20px"}}>
@@ -96,7 +96,7 @@ class RuleEditPage extends React.Component {
                   {value: "WAF", text: "WAF"},
                   {value: "IP", text: "IP"},
                   {value: "User-Agent", text: "User-Agent"},
-                  {value: "IpRate", text: "IP Rate"},
+                  {value: "IP Rate Limiting", text: "IP Rate Limiting"},
                   // {value: "complex", text: "Complex"},
                 ].map((item, index) => <Option key={index} value={item.value}>{item.text}</Option>)
               }
@@ -142,9 +142,9 @@ class RuleEditPage extends React.Component {
               ) : null
             }
             {
-              this.state.rule.type === "IpRate" ? (
+              this.state.rule.type === "IP Rate Limiting" ? (
                 <IpRateRuleTable
-                  title={"IP Rate"}
+                  title={"IP Rate Limiting"}
                   table={this.state.rule.expressions}
                   ruleName={this.state.rule.name}
                   account={this.props.account}

@@ -156,7 +156,7 @@ func checkExpressions(expressions []*object.Expression, ruleType string) error {
 		return checkWafRule(values)
 	case "IP":
 		return checkIpRule(values)
-	case "IpRate":
+	case "IP Rate Limiting":
 		return checkIpRateRule(expressions)
 	}
 	return nil
@@ -187,7 +187,7 @@ func checkIpRule(ipLists []string) error {
 
 func checkIpRateRule(expressions []*object.Expression) error {
 	if len(expressions) != 1 {
-		return errors.New("IpRate rule should have only one expression")
+		return errors.New("IP Rate Limiting rule must have exactly one expression")
 	}
 	expression := expressions[0]
 	_, err := util.ParseIntWithError(expression.Operator)

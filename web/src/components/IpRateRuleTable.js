@@ -14,6 +14,7 @@
 
 import React from "react";
 import {Button, Col, Input, InputNumber, Row, Table} from "antd";
+import i18next from "i18next";
 
 class IpRateRuleTable extends React.Component {
   constructor(props) {
@@ -49,7 +50,7 @@ class IpRateRuleTable extends React.Component {
   renderTable(table) {
     const columns = [
       {
-        title: "Name",
+        title: i18next.t("rule:Name"),
         dataIndex: "name",
         key: "name",
         width: "20%",
@@ -60,7 +61,7 @@ class IpRateRuleTable extends React.Component {
         ),
       },
       {
-        title: "Rate",
+        title: i18next.t("rule:Rate"),
         dataIndex: "operator",
         key: "operator",
         width: "40%",
@@ -71,12 +72,12 @@ class IpRateRuleTable extends React.Component {
         ),
       },
       {
-        title: "Block Duration",
+        title: i18next.t("rule:Block Duration"),
         dataIndex: "value",
         key: "value",
         width: "100%",
         render: (text, record, index) => (
-          <InputNumber style={{"width": "100%"}} value={Number(record.value)} addonAfter="seconds" onChange={e => {
+          <InputNumber style={{"width": "100%"}} value={Number(record.value)} addonAfter={i18next.t("rule:seconds")} onChange={e => {
             this.updateField(table, index, "value", e);
           }} />
         ),
@@ -88,7 +89,7 @@ class IpRateRuleTable extends React.Component {
         title={() => (
           <div>
             {this.props.title}&nbsp;&nbsp;&nbsp;&nbsp;
-            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.restore()}>{"Restore"}</Button>
+            <Button style={{marginRight: "5px"}} type="primary" size="small" onClick={() => this.restore()}>{i18next.t("general:Restore")}</Button>
           </div>
         )}
       />
