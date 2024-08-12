@@ -23,7 +23,14 @@ import BaseListPage from "./BaseListPage";
 class RecordListPage extends BaseListPage {
 
   UNSAFE_componentWillMount() {
-    this.fetch();
+    this.setState({
+      pagination: {
+        ...this.state.pagination,
+        current: 1,
+        pageSize: 10,
+      },
+    });
+    this.fetch({pagination: this.state.pagination});
   }
 
   fetch = (params = {}) => {
@@ -40,6 +47,10 @@ class RecordListPage extends BaseListPage {
         if (res.status === "ok") {
           this.setState({
             data: res.data,
+            pagination: {
+              ...params.pagination,
+              total: res.data2,
+            },
           });
         } else {
           Setting.showMessage("error", `Failed to get records: ${res.msg}`);
@@ -184,7 +195,7 @@ class RecordListPage extends BaseListPage {
 
     return (
       <div>
-        <Table columns={columns} dataSource={data} rowKey="name" size="middle" bordered pagination={{pageSize: 1000}}
+        <Table columns={columns} dataSource={data} rowKey="name" size="middle" bordered pagination={this.state.pagination}
           title={() => (
             <div>
               {i18next.t("general:Records")}&nbsp;&nbsp;&nbsp;&nbsp;
