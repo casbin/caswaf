@@ -28,7 +28,14 @@ class CertListPage extends BaseListPage {
   }
 
   UNSAFE_componentWillMount() {
-    this.fetch();
+    this.setState({
+      pagination: {
+        ...this.state.pagination,
+        current: 1,
+        pageSize: 10,
+      },
+    });
+    this.fetch({pagination: this.state.pagination});
   }
 
   newCert() {
@@ -248,14 +255,14 @@ class CertListPage extends BaseListPage {
             <div style={{display: "flex", alignItems: "center", flexWrap: "nowrap"}}>
               <Button style={{margin: "10px 10px 10px 0"}} type="default" onClick={() => this.refreshCert(index)}>{i18next.t("general:Refresh")}
               </Button>
-              <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="primary" onClick={() => this.props.history.push(`/certs/${record.owner}/${record.name}`)}>{i18next.t("general:Edit")}</Button>
+              <Button style={{margin: "10px 10px 10px 0"}} type="primary" onClick={() => this.props.history.push(`/certs/${record.owner}/${record.name}`)}>{i18next.t("general:Edit")}</Button>
               <Popconfirm
                 title={`Sure to delete cert: ${record.name} ?`}
                 onConfirm={() => this.deleteCert(index)}
                 okText="OK"
                 cancelText="Cancel"
               >
-                <Button style={{marginBottom: "10px"}} type="danger">{i18next.t("general:Delete")}</Button>
+                <Button style={{margin: "10px 10px 10px 0"}} type="danger">{i18next.t("general:Delete")}</Button>
               </Popconfirm>
             </div>
           );

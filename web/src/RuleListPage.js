@@ -22,7 +22,14 @@ import BaseListPage from "./BaseListPage";
 
 class RuleListPage extends BaseListPage {
   UNSAFE_componentWillMount() {
-    this.fetch();
+    this.setState({
+      pagination: {
+        ...this.state.pagination,
+        current: 1,
+        pageSize: 10,
+      },
+    });
+    this.fetch({pagination: this.state.pagination});
   }
 
   fetch = (params = {}) => {
@@ -35,9 +42,19 @@ class RuleListPage extends BaseListPage {
     });
     RuleBackend.getRules(this.props.account.name, params.pagination.current, params.pagination.pageSize, sortField, sortOrder).then((res) => {
       this.setState({
-        data: res.data,
         loading: false,
       });
+      if (res.status === "ok") {
+        this.setState({
+          data: res.data,
+          pagination: {
+            ...params.pagination,
+            total: res.data2,
+          },
+        });
+      } else {
+        this.setState({loading: false});
+      }
     });
   };
 
@@ -173,7 +190,7 @@ class RuleListPage extends BaseListPage {
         dataSource={data}
         columns={columns}
         rowKey="name"
-        pagination={{pageSize: 1000}}
+        pagination={this.state.pagination}
         loading={this.state.loading}
         onChange={this.handleTableChange}
         size="middle"
