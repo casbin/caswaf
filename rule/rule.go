@@ -40,6 +40,8 @@ func CheckRules(ruleIds []string, r *http.Request) (string, string, error) {
 			ruleObj = &IpRateRule{
 				ruleName: rule.GetId(),
 			}
+		case "Compound":
+			ruleObj = &CompoundRule{}
 		default:
 			return "", "", fmt.Errorf("unknown rule type: %s for rule: %s", rule.Type, rule.GetId())
 		}

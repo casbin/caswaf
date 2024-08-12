@@ -9,6 +9,7 @@ require (
 	github.com/casdoor/casdoor-go-sdk v0.28.4
 	github.com/corazawaf/coraza/v3 v3.1.0
 	github.com/denisenkom/go-mssqldb v0.10.0
+	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-git/go-billy/v5 v5.5.0 // indirect
 	github.com/go-git/go-git/v5 v5.9.0
 	github.com/go-mysql-org/go-mysql v1.7.0
