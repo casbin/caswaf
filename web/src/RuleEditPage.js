@@ -21,6 +21,7 @@ import WafRuleTable from "./components/WafRuleTable";
 import IpRuleTable from "./components/IpRuleTable";
 import UaRuleTable from "./components/UaRuleTable";
 import IpRateRuleTable from "./components/IpRateRuleTable";
+import CompoundRule from "./components/CompoundRule";
 
 const {Option} = Select;
 
@@ -97,7 +98,7 @@ class RuleEditPage extends React.Component {
                   {value: "IP", text: "IP"},
                   {value: "User-Agent", text: "User-Agent"},
                   {value: "IP Rate Limiting", text: i18next.t("rule:IP Rate Limiting")},
-                  // {value: "complex", text: "Complex"},
+                  {value: "Compound", text: i18next.t("rule:Compound")},
                 ].map((item, index) => <Option key={index} value={item.value}>{item.text}</Option>)
               }
             </Select>
@@ -150,6 +151,16 @@ class RuleEditPage extends React.Component {
                   account={this.props.account}
                   onUpdateTable={(value) => {this.updateRuleField("expressions", value);}}
                 />
+              ) : null
+            }
+            {
+              this.state.rule.type === "Compound" ? (
+                <CompoundRule
+                  title={i18next.t("rule:Compound")}
+                  table={this.state.rule.expressions}
+                  ruleName={this.state.rule.name}
+                  owner={this.state.owner}
+                  onUpdateTable={(value) => {this.updateRuleField("expressions", value);}} />
               ) : null
             }
           </Col>

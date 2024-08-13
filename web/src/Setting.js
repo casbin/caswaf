@@ -303,3 +303,7 @@ export function getDeduplicatedArray(sourceTable, filterTable, key) {
   const res = sourceTable.filter(item => !filterTable.some(arrayItem => arrayItem[key] === item[key]));
   return res;
 }
+
+export function getItemId(item) {
+  return item.owner + "/" + item.name;
+}

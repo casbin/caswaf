@@ -158,6 +158,8 @@ func checkExpressions(expressions []*object.Expression, ruleType string) error {
 		return checkIpRule(values)
 	case "IP Rate Limiting":
 		return checkIpRateRule(expressions)
+	case "Compound":
+		return checkCompoundRules(values)
 	}
 	return nil
 }
@@ -195,6 +197,14 @@ func checkIpRateRule(expressions []*object.Expression) error {
 		return err
 	}
 	_, err = util.ParseIntWithError(expression.Value)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func checkCompoundRules(rules []string) error {
+	_, err := object.GetRulesByRuleIds(rules)
 	if err != nil {
 		return err
 	}
