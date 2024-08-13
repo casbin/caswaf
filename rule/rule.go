@@ -26,7 +26,10 @@ type Rule interface {
 }
 
 func CheckRules(ruleIds []string, r *http.Request) (string, string, error) {
-	rules := object.GetRulesByRuleIds(ruleIds)
+	rules, err := object.GetRulesByRuleIds(ruleIds)
+	if err != nil {
+		return "", "", err
+	}
 	for i, rule := range rules {
 		var ruleObj Rule
 		switch rule.Type {

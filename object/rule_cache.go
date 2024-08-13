@@ -15,6 +15,8 @@
 package object
 
 import (
+	"fmt"
+
 	"github.com/casbin/caswaf/util"
 )
 
@@ -42,12 +44,14 @@ func refreshRuleMap() error {
 	return nil
 }
 
-func GetRulesByRuleIds(ids []string) []*Rule {
+func GetRulesByRuleIds(ids []string) ([]*Rule, error) {
 	var res []*Rule
 	for _, id := range ids {
-		if rule, ok := ruleMap[id]; ok {
-			res = append(res, rule)
+		rule, ok := ruleMap[id]
+		if !ok {
+			return nil, fmt.Errorf("rule: %s not found", id)
 		}
+		res = append(res, rule)
 	}
-	return res
+	return res, nil
 }

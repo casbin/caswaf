@@ -204,8 +204,9 @@ func checkIpRateRule(expressions []*object.Expression) error {
 }
 
 func checkCompoundRules(rules []string) error {
-	if len(object.GetRulesByRuleIds(rules)) != len(rules) {
-		return errors.New("invalid compound rule")
+	_, err := object.GetRulesByRuleIds(rules)
+	if err != nil {
+		return err
 	}
 	return nil
 }
