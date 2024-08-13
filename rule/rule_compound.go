@@ -19,13 +19,13 @@ import (
 	"net/http"
 
 	"github.com/casbin/caswaf/object"
-	"github.com/emirpasic/gods/stacks/arraystack"
+	"github.com/casbin/caswaf/util"
 )
 
 type CompoundRule struct{}
 
 func (r *CompoundRule) checkRule(expressions []*object.Expression, req *http.Request) (bool, string, string, error) {
-	operators := arraystack.New()
+	operators := util.NewStack()
 	res := true
 	for _, expression := range expressions {
 		isHit := true
