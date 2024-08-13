@@ -14,7 +14,7 @@
 
 import React from "react";
 import {DeleteOutlined, DownOutlined, UpOutlined} from "@ant-design/icons";
-import {Button, Col, Input, Row, Select, Table, Tooltip} from "antd";
+import {Button, Col, Row, Select, Table, Tooltip} from "antd";
 import {getRules} from "../backend/RuleBackend";
 import * as Setting from "../Setting";
 import i18next from "i18next";
@@ -104,17 +104,6 @@ class CompoundRule extends React.Component {
 
   renderTable(table) {
     const columns = [
-      {
-        title: i18next.t("general:Name"),
-        dataIndex: "name",
-        key: "name",
-        width: "180px",
-        render: (text, record, index) => (
-          <Input value={text} onChange={e => {
-            this.updateField(table, index, "name", e.target.value);
-          }} />
-        ),
-      },
       {
         title: i18next.t("rule:Logic"),
         dataIndex: "operator",
