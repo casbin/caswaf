@@ -44,6 +44,8 @@ class SiteListPage extends BaseListPage {
       domain: "door.casdoor.com",
       otherDomains: [],
       needRedirect: false,
+      disableVerbose: false,
+      rules: [],
       challenges: [],
       host: "",
       port: 8000,

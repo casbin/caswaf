@@ -26,6 +26,10 @@ class RuleTable extends React.Component {
     this.state = {
       classes: props,
     };
+    if (this.props.rules === null) {
+      // rerender
+      this.props.onUpdateRules([]);
+    }
   }
 
   updateTable(table) {
@@ -122,7 +126,7 @@ class RuleTable extends React.Component {
         <Row style={{marginTop: "20px"}} >
           <Col span={24}>
             {
-              this.renderTable(this.props.rules.map((item, index) => {
+              this.props.rules === null ? null : this.renderTable(this.props.rules.map((item, index) => {
                 const values = item.split("/");
                 return {owner: values[0], name: values[1]};
               }))
