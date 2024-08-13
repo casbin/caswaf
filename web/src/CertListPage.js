@@ -64,6 +64,7 @@ class CertListPage extends BaseListPage {
           this.setState({
             data: Setting.prependRow(this.state.data, newCert),
           });
+          this.fetch();
         }
       }
       )
@@ -79,8 +80,11 @@ class CertListPage extends BaseListPage {
           Setting.showMessage("error", `Failed to delete: ${res.msg}`);
         } else {
           Setting.showMessage("success", "Cert deleted successfully");
-          this.setState({
-            data: Setting.deleteRow(this.state.data, i),
+          this.fetch({
+            pagination: {
+              ...this.state.pagination,
+              current: this.state.pagination.current > 1 && this.state.data.length === 1 ? this.state.pagination.current - 1 : this.state.pagination.current,
+            },
           });
         }
       }
