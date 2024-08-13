@@ -85,8 +85,11 @@ class SiteListPage extends BaseListPage {
           Setting.showMessage("error", `Failed to delete: ${res.msg}`);
         } else {
           Setting.showMessage("success", "Site deleted successfully");
-          this.setState({
-            data: Setting.deleteRow(this.state.data, i),
+          this.fetch({
+            pagination: {
+              ...this.state.pagination,
+              current: this.state.pagination.current > 1 && this.state.data.length === 1 ? this.state.pagination.current - 1 : this.state.pagination.current,
+            },
           });
         }
       }
