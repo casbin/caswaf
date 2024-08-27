@@ -29,10 +29,7 @@ func getSigninUrl(casdoorClient *casdoorsdk.Client, callbackUrl string, original
 }
 
 func redirectToCasdoor(casdoorClient *casdoorsdk.Client, w http.ResponseWriter, r *http.Request) {
-	scheme := r.URL.Scheme
-	if scheme == "" {
-		scheme = "http"
-	}
+	scheme := getScheme(r)
 
 	callbackUrl := fmt.Sprintf("%s://%s/caswaf-handler", scheme, r.Host)
 	originalPath := r.RequestURI
