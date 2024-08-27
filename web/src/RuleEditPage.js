@@ -181,6 +181,7 @@ class RuleEditPage extends React.Component {
                       // {value: "redirect", text: "Redirect"},
                       {value: "Block", text: i18next.t("rule:Block")},
                       // {value: "drop", text: "Drop"},
+                      {value: "Captcha", text: i18next.t("rule:Captcha")},
                     ].map((item, index) => <Option key={index} value={item.value}>{item.text}</Option>)
                   }
                 </Select>

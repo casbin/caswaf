@@ -66,6 +66,8 @@ func CheckRules(ruleIds []string, r *http.Request) (string, string, error) {
 				return action, reason, nil
 			} else if action == "Allow" {
 				return action, reason, nil
+			} else if action == "Captcha" {
+				return action, reason, nil
 			} else {
 				return "", "", fmt.Errorf("unknown rule action: %s for rule: %s", action, rule.GetId())
 			}

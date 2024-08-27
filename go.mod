@@ -13,6 +13,7 @@ require (
 	github.com/go-git/go-git/v5 v5.9.0
 	github.com/go-mysql-org/go-mysql v1.7.0
 	github.com/go-sql-driver/mysql v1.6.0
+	github.com/google/uuid v1.6.0
 	github.com/hsluoyz/modsecurity-go v0.0.7
 	github.com/lib/pq v1.10.2
 	github.com/likexian/whois v1.15.1

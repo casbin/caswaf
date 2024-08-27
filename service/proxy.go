@@ -214,6 +214,16 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		case "Drop":
 			responseError(w, "Dropped by CasWAF: %s", reason)
 			w.WriteHeader(http.StatusBadRequest)
+		case "Captcha":
+			ok := isVerifiedSession(r)
+			if ok {
+				w.WriteHeader(http.StatusOK)
+				nextHandle(w, r)
+				return
+			}
+			w.Header().Set("Set-Cookie", "casdoor_captcha_token=; Path=/; Max-Age=-1")
+			redirectToCaptcha(w, r)
+			return
 		default:
 			responseError(w, "Error in CasWAF: %s", reason)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -251,6 +261,7 @@ func nextHandle(w http.ResponseWriter, r *http.Request) {
 func Start() {
 	http.HandleFunc("/", handleRequest)
 	http.HandleFunc("/caswaf-handler", handleAuthCallback)
+	http.HandleFunc("/caswaf-captcha-verify", handleCaptchaCallback)
 
 	gatewayEnabled, err := beego.AppConfig.Bool("gatewayEnabled")
 	if err != nil {

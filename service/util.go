@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/beego/beego"
+	"github.com/casbin/caswaf/conf"
 	"github.com/casbin/caswaf/object"
 	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
@@ -122,4 +123,20 @@ func getCasdoorClientFromSite(site *object.Site) (*casdoorsdk.Client, error) {
 
 	res := casdoorsdk.NewClient(casdoorEndpoint, clientId, clientSecret, certificate, site.ApplicationObj.Organization, site.CasdoorApplication)
 	return res, nil
+}
+
+func getScheme(r *http.Request) string {
+	scheme := r.URL.Scheme
+	if scheme == "" {
+		scheme = "http"
+	}
+	return scheme
+}
+
+func getCasdoorEndpoint() string {
+	endpoint := conf.GetConfigString("casdoorEndpoint")
+	if endpoint == "http://localhost:8000" {
+		endpoint = "http://localhost:7001"
+	}
+	return endpoint
 }
