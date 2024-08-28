@@ -28,6 +28,8 @@ import CertListPage from "./CertListPage";
 import CertEditPage from "./CertEditPage";
 import RuleListPage from "./RuleListPage";
 import RuleEditPage from "./RuleEditPage";
+import ActionListPage from "./ActionListPage";
+import ActionEditPage from "./ActionEditPage";
 import SigninPage from "./SigninPage";
 import RecordListPage from "./RecordListPage";
 import RecordEditPage from "./RecordEditPage";
@@ -83,6 +85,8 @@ class App extends Component {
       this.setState({selectedMenuKey: "/records"});
     } else if (uri.includes("/rules")) {
       this.setState({selectedMenuKey: "/rules"});
+    } else if (uri.includes("/actions")) {
+      this.setState({selectedMenuKey: "/actions"});
     } else {
       this.setState({selectedMenuKey: "null"});
     }
@@ -306,6 +310,14 @@ class App extends Component {
         </Link>
       </Menu.Item>
     );
+
+    res.push(
+      <Menu.Item key="/actions">
+        <Link to="/actions">
+          {i18next.t("general:Actions")}
+        </Link>
+      </Menu.Item>
+    );
     return res;
   }
 
@@ -368,6 +380,8 @@ class App extends Component {
           <Route exact path="/records/:owner/:id" render={(props) => this.renderSigninIfNotSignedIn(<RecordEditPage account={this.state.account} {...props} />)} />
           <Route exact path="/rules" render={(props) => this.renderSigninIfNotSignedIn(<RuleListPage account={this.state.account} {...props} />)} />
           <Route exact path="/rules/:owner/:ruleName" render={(props) => this.renderSigninIfNotSignedIn(<RuleEditPage account={this.state.account} {...props} />)} />
+          <Route exact path="/actions" render={(props) => this.renderSigninIfNotSignedIn(<ActionListPage account={this.state.account} {...props} />)} />
+          <Route exact path="/actions/:owner/:actionName" render={(props) => this.renderSigninIfNotSignedIn(<ActionEditPage account={this.state.account} {...props} />)} />
           <Route exact path="/dashboard" render={(props) => this.renderSigninIfNotSignedIn(<DashboardPage account={this.state.account} {...props} />)} />
         </Switch>
       </div>
