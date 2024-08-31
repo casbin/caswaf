@@ -14,6 +14,7 @@
 
 import React from "react";
 import {Button, Popconfirm, Table, Tag} from "antd";
+import moment from "moment";
 import * as Setting from "./Setting";
 import * as ActionBackend from "./backend/ActionBackend";
 import i18next from "i18next";
@@ -73,6 +74,7 @@ class ActionListPage extends BaseListPage {
     return {
       owner: this.props.account.name,
       name: `action_${randomName}`,
+      createdTime: moment().format(),
       type: "CAPTCHA",
       statusCode: 302,
       immunityTimes: 30,
@@ -104,16 +106,6 @@ class ActionListPage extends BaseListPage {
         key: "createdTime",
         width: "200px",
         sorter: (a, b) => a.createdTime.localeCompare(b.createdTime),
-        render: (text, action, index) => {
-          return Setting.getFormattedDate(text);
-        },
-      },
-      {
-        title: i18next.t("general:Update time"),
-        dataIndex: "updatedTime",
-        key: "updatedTime",
-        width: "200px",
-        sorter: (a, b) => a.updatedTime.localeCompare(b.updatedTime),
         render: (text, action, index) => {
           return Setting.getFormattedDate(text);
         },

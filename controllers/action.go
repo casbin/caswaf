@@ -18,7 +18,6 @@ import (
 	"encoding/json"
 
 	"github.com/casbin/caswaf/object"
-	"github.com/casbin/caswaf/util"
 )
 
 func (c *ApiController) GetActions() {
@@ -59,11 +58,7 @@ func (c *ApiController) AddAction() {
 		return
 	}
 
-	time := util.GetCurrentTime()
-	action := object.Action{
-		CreatedTime: time,
-		UpdatedTime: time,
-	}
+	var action object.Action
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &action)
 	if err != nil {
 		c.ResponseError(err.Error())
@@ -78,10 +73,7 @@ func (c *ApiController) UpdateAction() {
 		return
 	}
 
-	time := util.GetCurrentTime()
-	action := object.Action{
-		UpdatedTime: time,
-	}
+	var action object.Action
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &action)
 	if err != nil {
 		c.ResponseError(err.Error())
