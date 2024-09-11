@@ -25,10 +25,10 @@ type Rule interface {
 	checkRule(expressions []*object.Expression, req *http.Request) (bool, string, string, error)
 }
 
-func CheckRules(ruleIds []string, r *http.Request) (string, string, error) {
+func CheckRules(ruleIds []string, r *http.Request) (actionObj *object.Action, reason string, err error) {
 	rules, err := object.GetRulesByRuleIds(ruleIds)
 	if err != nil {
-		return "", "", err
+		return nil, "", err
 	}
 	for i, rule := range rules {
 		var ruleObj Rule
@@ -46,15 +46,36 @@ func CheckRules(ruleIds []string, r *http.Request) (string, string, error) {
 		case "Compound":
 			ruleObj = &CompoundRule{}
 		default:
-			return "", "", fmt.Errorf("unknown rule type: %s for rule: %s", rule.Type, rule.GetId())
+			return nil, "", fmt.Errorf("unknown rule type: %s for rule: %s", rule.Type, rule.GetId())
 		}
 
 		isHit, action, reason, err := ruleObj.checkRule(rule.Expressions, r)
 		if err != nil {
-			return "", "", err
+			return nil, "", err
 		}
 		if action == "" {
 			action = rule.Action
+			actionObj, err = object.GetActionByActionId(rule.Action)
+			if err != nil {
+				return nil, "", err
+			}
+		} else {
+			switch action {
+			case "Block":
+				actionObj.Type = "Block"
+				actionObj.StatusCode = 403
+			case "Drop":
+				actionObj.Type = "Drop"
+				actionObj.StatusCode = 400
+			case "Allow":
+				actionObj.Type = "Allow"
+				actionObj.StatusCode = 200
+			case "Captcha":
+				actionObj.Type = "Captcha"
+				actionObj.StatusCode = 302
+			default:
+				return nil, "", fmt.Errorf("unknown rule action: %s for rule: %s", action, rule.GetId())
+			}
 		}
 		if isHit {
 			if action == "Block" || action == "Drop" {
@@ -63,16 +84,17 @@ func CheckRules(ruleIds []string, r *http.Request) (string, string, error) {
 				} else {
 					reason = fmt.Sprintf("hit rule %s: %s", ruleIds[i], reason)
 				}
-				return action, reason, nil
+				return actionObj, reason, nil
 			} else if action == "Allow" {
-				return action, reason, nil
+				return actionObj, reason, nil
 			} else if action == "Captcha" {
-				return action, reason, nil
+				return actionObj, reason, nil
 			} else {
-				return "", "", fmt.Errorf("unknown rule action: %s for rule: %s", action, rule.GetId())
+				return nil, "", fmt.Errorf("unknown rule action: %s for rule: %s", action, rule.GetId())
 			}
 		}
 	}
-
-	return "", "", nil
+	actionObj.Type = ""
+	actionObj.StatusCode = 200
+	return nil, "", nil
 }

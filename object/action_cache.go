@@ -55,3 +55,11 @@ func GetActionsByActionIds(ids []string) ([]*Action, error) {
 	}
 	return res, nil
 }
+
+func GetActionByActionId(id string) (*Action, error) {
+	action, ok := actionMap[id]
+	if !ok {
+		return nil, fmt.Errorf("action: %s not found", id)
+	}
+	return action, nil
+}
