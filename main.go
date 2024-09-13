@@ -34,6 +34,7 @@ func main() {
 	proxy.InitHttpClient()
 	object.InitSiteMap()
 	object.InitRuleMap()
+	object.InitActionMap()
 	run.InitAppMap()
 	run.InitSelfStart()
 	object.StartMonitorSitesLoop()

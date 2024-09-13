@@ -13,9 +13,10 @@
 // limitations under the License.
 
 import React from "react";
-import {Button, Card, Col, Input, InputNumber, Row, Select} from "antd";
+import {Button, Card, Col, Input, Row, Select} from "antd";
 import * as Setting from "./Setting";
 import * as RuleBackend from "./backend/RuleBackend";
+import * as ActionBackend from "./backend/ActionBackend";
 import i18next from "i18next";
 import WafRuleTable from "./components/WafRuleTable";
 import IpRuleTable from "./components/IpRuleTable";
@@ -33,17 +34,27 @@ class RuleEditPage extends React.Component {
       owner: props.match.params.owner,
       ruleName: props.match.params.ruleName,
       rule: null,
+      actions: [],
     };
   }
 
   UNSAFE_componentWillMount() {
     this.getRule();
+    this.getActions();
   }
 
   getRule() {
     RuleBackend.getRule(this.state.owner, this.state.ruleName).then((res) => {
       this.setState({
         rule: res.data,
+      });
+    });
+  }
+
+  getActions() {
+    ActionBackend.getActions(this.state.owner).then((res) => {
+      this.setState({
+        actions: res.data,
       });
     });
   }
@@ -172,17 +183,14 @@ class RuleEditPage extends React.Component {
                 {i18next.t("general:Action")}:
               </Col>
               <Col span={22}>
-                <Select virtual={false} value={this.state.rule.action} defaultValue={"Block"} style={{width: "100%"}} onChange={value => {
+                <Select virtual={false} value={this.state.rule.action} defaultValue={"Block"} style={{width: "100%"}} onChange={(value, index) => {
+                  this.setState({
+                    action: this.state.actions[index],
+                  });
                   this.updateRuleField("action", value);
                 }}>
                   {
-                    [
-                      {value: "Allow", text: i18next.t("rule:Allow")},
-                      // {value: "redirect", text: "Redirect"},
-                      {value: "Block", text: i18next.t("rule:Block")},
-                      // {value: "drop", text: "Drop"},
-                      {value: "Captcha", text: i18next.t("rule:Captcha")},
-                    ].map((item, index) => <Option key={index} value={item.value}>{item.text}</Option>)
+                    this.state.actions.map((action, index) => <Option key={index} value={action.owner + "/" + action.name} label={action.type}></Option>)
                   }
                 </Select>
               </Col>
@@ -190,34 +198,17 @@ class RuleEditPage extends React.Component {
           )
         }
         {
-          (this.state.rule.action === "Block" && this.state.rule.type !== "WAF") && (
-            <Row style={{marginTop: "20px"}}>
-              <Col span={2} style={{marginTop: "5px"}}>
-                {i18next.t("rule:Status Code")}:
-              </Col>
-              <Col span={22}>
-                <InputNumber value={this.state.rule.statusCode} defaultValue={403} disabled={true}
-                  onChange={e => {
-                    this.updateRuleField("statusCode", e.target.value);
-                  }} />
-              </Col>
-            </Row>
-          )
-        }
-        {
-          (this.state.rule.action === "Block" || this.state.rule.type === "WAF") && (
-            <Row style={{marginTop: "20px"}}>
-              <Col span={2} style={{marginTop: "5px"}}>
-                {i18next.t("rule:Reason")}:
-              </Col>
-              <Col span={22}>
-                <Input value={this.state.rule.reason}
-                  onChange={e => {
-                    this.updateRuleField("reason", e.target.value);
-                  }} />
-              </Col>
-            </Row>
-          )
+          <Row style={{marginTop: "20px"}}>
+            <Col span={2} style={{marginTop: "5px"}}>
+              {i18next.t("rule:Reason")}:
+            </Col>
+            <Col span={22}>
+              <Input value={this.state.rule.reason}
+                onChange={e => {
+                  this.updateRuleField("reason", e.target.value);
+                }} />
+            </Col>
+          </Row>
         }
       </Card>
     );

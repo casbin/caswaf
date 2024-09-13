@@ -54,11 +54,11 @@ func CheckRules(ruleIds []string, r *http.Request) (actionObj *object.Action, re
 			return nil, "", err
 		}
 		if action == "" {
-			action = rule.Action
 			actionObj, err = object.GetActionByActionId(rule.Action)
 			if err != nil {
 				return nil, "", err
 			}
+			action = actionObj.Type
 		} else {
 			switch action {
 			case "Block":
