@@ -25,7 +25,8 @@ type Rule interface {
 	checkRule(expressions []*object.Expression, req *http.Request) (bool, string, string, error)
 }
 
-func CheckRules(ruleIds []string, r *http.Request) (actionObj *object.Action, reason string, err error) {
+func CheckRules(ruleIds []string, r *http.Request) (*object.Action, string, error) {
+	var actionObj *object.Action
 	rules, err := object.GetRulesByRuleIds(ruleIds)
 	if err != nil {
 		return nil, "", err
@@ -54,7 +55,7 @@ func CheckRules(ruleIds []string, r *http.Request) (actionObj *object.Action, re
 			return nil, "", err
 		}
 		if action == "" {
-			actionObj, err = object.GetActionByActionId(rule.Action)
+			actionObj, err = object.GetActionById(rule.Action)
 			if err != nil {
 				return nil, "", err
 			}
@@ -94,7 +95,7 @@ func CheckRules(ruleIds []string, r *http.Request) (actionObj *object.Action, re
 			}
 		}
 	}
-	actionObj.Type = ""
+	actionObj.Type = "Allow"
 	actionObj.StatusCode = 200
-	return nil, "", nil
+	return actionObj, "", nil
 }
