@@ -205,15 +205,15 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 			reason = "the rule has been hit"
 		}
 
-		switch action {
+		switch action.Type {
 		case "", "Allow":
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(action.StatusCode)
 		case "Block":
 			responseError(w, "Blocked by CasWAF: %s", reason)
-			w.WriteHeader(http.StatusForbidden)
+			w.WriteHeader(action.StatusCode)
 		case "Drop":
 			responseError(w, "Dropped by CasWAF: %s", reason)
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(action.StatusCode)
 		case "Captcha":
 			ok := isVerifiedSession(r)
 			if ok {

@@ -44,7 +44,7 @@ func refreshActionMap() error {
 	return nil
 }
 
-func GetActionsByActionIds(ids []string) ([]*Action, error) {
+func GetActionsByIds(ids []string) ([]*Action, error) {
 	var res []*Action
 	for _, id := range ids {
 		action, ok := actionMap[id]
@@ -54,4 +54,12 @@ func GetActionsByActionIds(ids []string) ([]*Action, error) {
 		res = append(res, action)
 	}
 	return res, nil
+}
+
+func GetActionById(id string) (*Action, error) {
+	action, ok := actionMap[id]
+	if !ok {
+		return nil, fmt.Errorf("action: %s not found", id)
+	}
+	return action, nil
 }

@@ -33,7 +33,7 @@ func (r *CompoundRule) checkRule(expressions []*object.Expression, req *http.Req
 		if err != nil {
 			return false, "", "", err
 		}
-		if action == "" {
+		if action.Type == "" {
 			isHit = false
 		}
 		switch expression.Operator {
