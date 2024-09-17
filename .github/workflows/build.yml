@@ -126,6 +126,6 @@ jobs:
         with:
           context: .
           target: STANDARD
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: casbin/caswaf:${{steps.get-current-tag.outputs.tag }},casbin/caswaf:latest
