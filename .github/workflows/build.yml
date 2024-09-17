@@ -100,10 +100,8 @@ jobs:
           elif [ ${old_array[1]} != ${new_array[1]} ]
           then 
               echo ::set-output name=push::'true'
-          
           else
               echo ::set-output name=push::'false'
-          
           fi
 
       - name: Set up QEMU
