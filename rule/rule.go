@@ -71,8 +71,8 @@ func CheckRules(ruleIds []string, r *http.Request) (*object.Action, string, erro
 			case "Allow":
 				actionObj.Type = "Allow"
 				actionObj.StatusCode = 200
-			case "Captcha":
-				actionObj.Type = "Captcha"
+			case "CAPTCHA":
+				actionObj.Type = "CAPTCHA"
 				actionObj.StatusCode = 302
 			default:
 				return nil, "", fmt.Errorf("unknown rule action: %s for rule: %s", action, rule.GetId())
@@ -88,7 +88,7 @@ func CheckRules(ruleIds []string, r *http.Request) (*object.Action, string, erro
 				return actionObj, reason, nil
 			} else if action == "Allow" {
 				return actionObj, reason, nil
-			} else if action == "Captcha" {
+			} else if action == "CAPTCHA" {
 				return actionObj, reason, nil
 			} else {
 				return nil, "", fmt.Errorf("unknown rule action: %s for rule: %s", action, rule.GetId())
