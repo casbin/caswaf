@@ -214,7 +214,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		case "Drop":
 			responseError(w, "Dropped by CasWAF: %s", reason)
 			w.WriteHeader(action.StatusCode)
-		case "Captcha":
+		case "CAPTCHA":
 			ok := isVerifiedSession(r)
 			if ok {
 				w.WriteHeader(http.StatusOK)
