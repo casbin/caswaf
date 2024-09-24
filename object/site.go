@@ -49,6 +49,10 @@ type Site struct {
 	NeedRedirect   bool     `json:"needRedirect"`
 	DisableVerbose bool     `json:"disableVerbose"`
 	Rules          []string `xorm:"varchar(500)" json:"rules"`
+	EnableAlert    bool     `json:"enableAlert"`
+	AlertInterval  int      `json:"alertInterval"`
+	AlertTryTimes  int      `json:"alertTryTimes"`
+	AlertProviders []string `xorm:"varchar(500)" json:"alertProviders"`
 	Challenges     []string `xorm:"mediumtext" json:"challenges"`
 	Host           string   `xorm:"varchar(100)" json:"host"`
 	Port           int      `json:"port"`

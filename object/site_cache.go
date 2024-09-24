@@ -23,6 +23,7 @@ import (
 
 var siteMap = map[string]*Site{}
 var certMap = map[string]*Cert{}
+var healthCheckNeededDomains []string
 
 func InitSiteMap() {
 	err := refreshSiteMap()
@@ -105,6 +106,9 @@ func refreshSiteMap() error {
 		}
 
 		newSiteMap[strings.ToLower(site.Domain)] = site
+		if site.EnableAlert {
+			healthCheckNeededDomains = append(healthCheckNeededDomains, site.Domain)
+		}
 		for _, domain := range site.OtherDomains {
 			if domain != "" {
 				newSiteMap[strings.ToLower(domain)] = site

@@ -59,3 +59,13 @@ func (c *ApiController) GetAccount() {
 
 	c.ResponseOk(claims, hostname)
 }
+
+func (c *ApiController) GetProviders() {
+	providers, err := casdoorsdk.GetProviders()
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(providers)
+}

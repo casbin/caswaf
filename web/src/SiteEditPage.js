@@ -15,6 +15,7 @@
 import React from "react";
 import {Button, Card, Col, Input, InputNumber, Row, Select, Switch} from "antd";
 import {LinkOutlined} from "@ant-design/icons";
+import * as AccountBackend from "./backend/AccountBackend";
 import * as SiteBackend from "./backend/SiteBackend";
 import * as CertBackend from "./backend/CertBackend";
 import * as RuleBackend from "./backend/RuleBackend";
@@ -34,6 +35,7 @@ class SiteEditPage extends React.Component {
       owner: props.match.params.owner,
       siteName: props.match.params.siteName,
       rules: [],
+      providers: [],
       site: null,
       certs: null,
       applications: null,
@@ -45,6 +47,7 @@ class SiteEditPage extends React.Component {
     this.getCerts();
     this.getRules();
     this.getApplications();
+    this.getAlertProviders();
   }
 
   getSite() {
@@ -99,6 +102,26 @@ class SiteEditPage extends React.Component {
       });
   }
 
+  getAlertProviders() {
+    AccountBackend.getProviders()
+      .then((res) => {
+        if (res.status === "ok") {
+          const data = [];
+          for (let i = 0; i < res.data.length; i++) {
+            const provider = res.data[i];
+            if (provider.category === "SMS" || provider.category === "Email") {
+              data.push(provider.category + "/" + provider.name);
+            }
+          }
+          this.setState({
+            providers: data,
+          });
+        } else {
+          Setting.showMessage("error", `Failed to get providers: ${res.msg}`);
+        }
+      });
+  }
+
   parseSiteField(key, value) {
     if (["score"].includes(key)) {
       value = Setting.myParseInt(value);
@@ -111,6 +134,16 @@ class SiteEditPage extends React.Component {
 
     const site = this.state.site;
     site[key] = value;
+    this.setState({
+      site: site,
+    });
+  }
+
+  updateHealthCheckField(key, value) {
+    value = this.parseSiteField(key, value);
+
+    const site = this.state.site;
+    site.healthCheck[key] = value;
     this.setState({
       site: site,
     });
@@ -210,6 +243,60 @@ class SiteEditPage extends React.Component {
             />
           </Col>
         </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col span={2} style={{marginTop: "5px"}}>
+            {i18next.t("site:Enable alert")}:
+          </Col>
+          <Col span={22} >
+            <Switch checked={this.state.site.enableAlert} onChange={checked => {
+              this.updateSiteField("enableAlert", checked);
+            }} />
+          </Col>
+        </Row>
+        {
+          this.state.site.enableAlert ? (
+            <Row style={{marginTop: "20px"}} >
+              <Col span={2} style={{marginTop: "5px"}}>
+                {i18next.t("site:Alert interval")}:
+              </Col>
+              <Col span={22} >
+                <InputNumber min={1} value={this.state.site.alertInterval} addonAfter={i18next.t("usage:seconds")} onChange={value => {
+                  this.updateSiteField("alertInterval", value);
+                }} />
+              </Col>
+            </Row>
+          ) : null
+        }
+        {
+          this.state.site.enableAlert ? (
+            <Row style={{marginTop: "20px"}} >
+              <Col span={2} style={{marginTop: "5px"}}>
+                {i18next.t("site:Alert try times")}:
+              </Col>
+              <Col span={22} >
+                <InputNumber min={1} value={this.state.site.alertTryTimes} onChange={value => {
+                  this.updateSiteField("alertTryTimes", value);
+                }} />
+              </Col>
+            </Row>
+          ) : null
+        }
+        {
+          this.state.site.enableAlert ? (
+            <Row style={{marginTop: "20px"}} >
+              <Col style={{marginTop: "5px"}} span={2}>
+                {i18next.t("site:Alert providers")}:
+              </Col>
+              <Col span={22} >
+                <Select virtual={false} mode="tags" style={{width: "100%"}} value={this.state.site.alertProviders} onChange={(value => {this.updateSiteField("alertProviders", value);})}>
+                  {
+                    this.state.providers.map((item, index) => <Option key={index} value={item}>{item}</Option>)
+                  }
+                </Select>
+              </Col>
+            </Row>
+          ) : null
+        }
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("site:Challenges")}:

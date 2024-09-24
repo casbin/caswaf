@@ -34,3 +34,10 @@ export function signout() {
     credentials: "include",
   }).then(res => res.json());
 }
+
+export function getProviders() {
+  return fetch(`${Setting.ServerUrl}/api/get-providers`, {
+    method: "GET",
+    credentials: "include",
+  }).then(res => res.json());
+}
