@@ -18,43 +18,57 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/casbin/caswaf/util"
 	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
 
 var healthCheckTryTimesMap = map[string]int{}
 
 func healthCheck(site *Site, domain string) error {
-	var flag bool
-	var log string
+	var isHealth bool
+	var pingResponse string
+	urlHttps := "https://" + domain
+	urlHttp := "http://" + domain
 	switch site.SslMode {
 	case "HTTPS Only":
-		flag, log = pingUrl("https://" + domain)
+		isHealth, pingResponse = pingUrl(urlHttps)
 	case "HTTP":
-		flag, log = pingUrl("http://" + domain)
+		isHealth, pingResponse = pingUrl(urlHttp)
 	case "HTTPS and HTTP":
-		flag, log = pingUrl("https://" + domain)
-		flagHttp, logHttp := pingUrl("http://" + domain)
-		flag = flag || flagHttp
-		log = log + logHttp
+		isHttpsHealth, httpsPingResponse := pingUrl(urlHttps)
+		isHttpHealth, httpPingResponse := pingUrl(urlHttp)
+		isHealth = isHttpsHealth || isHttpHealth
+		pingResponse = httpsPingResponse + httpPingResponse
 	}
-	if !flag {
-		fmt.Println(log)
-		healthCheckTryTimesMap[domain]--
-		if healthCheckTryTimesMap[domain] != 0 {
-			return nil
-		}
-		log = fmt.Sprintf("CasWAF health check failed for domain %s, %s", domain, log)
-		user, err := casdoorsdk.GetUser(site.Owner)
-		if err != nil {
-			fmt.Println(err)
-		}
-		err = casdoorsdk.SendEmail("CasWAF HealthCheck Check Alert", log, "CasWAF", user.Email)
-		if err != nil {
-			fmt.Println(err)
-		}
-	} else {
+
+	if isHealth {
 		healthCheckTryTimesMap[domain] = GetSiteByDomain(domain).AlertTryTimes
+		return nil
+	}
+
+	healthCheckTryTimesMap[domain]--
+	if healthCheckTryTimesMap[domain] != 0 {
+		return nil
+	}
+
+	pingResponse = fmt.Sprintf("CasWAF health check failed for domain %s, %s", domain, pingResponse)
+	user, err := casdoorsdk.GetUser(site.Owner)
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		return fmt.Errorf("user not found")
+	}
+	if user.Email != "" {
+		err = casdoorsdk.SendEmail("CasWAF HealthCheck Check Alert", pingResponse, "CasWAF", user.Email)
+	}
+	if err != nil {
+		fmt.Println(err)
+	}
+	if user.Phone != "" {
+		err = casdoorsdk.SendSms(pingResponse, user.Phone)
+	}
+	if err != nil {
+		fmt.Println(err)
 	}
 	return nil
 }
@@ -67,14 +81,9 @@ func startHealthCheckLoop() {
 		}
 		healthCheckTryTimesMap[domain] = GetSiteByDomain(domain).AlertTryTimes
 		go func() {
-			defer func() {
-				if r := recover(); r != nil {
-					fmt.Printf("[%s] Recovered from healthCheck() panic: %v\n", util.GetCurrentTime(), r)
-				}
-			}()
 			for {
 				site := GetSiteByDomain(domain)
-				if site == nil || !site.EnableAlert {
+				if site == nil || !site.EnableAlert || site.Domain == "" || site.Status == "Inactive" {
 					return
 				}
 
