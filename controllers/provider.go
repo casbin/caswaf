@@ -12,25 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as Setting from "../Setting";
+package controllers
 
-export function getAccount() {
-  return fetch(`${Setting.ServerUrl}/api/get-account`, {
-    method: "GET",
-    credentials: "include",
-  }).then(res => res.json());
-}
+import "github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 
-export function signin(code, state) {
-  return fetch(`${Setting.ServerUrl}/api/signin?code=${code}&state=${state}`, {
-    method: "POST",
-    credentials: "include",
-  }).then(res => res.json());
-}
+func (c *ApiController) GetProviders() {
+	providers, err := casdoorsdk.GetProviders()
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
 
-export function signout() {
-  return fetch(`${Setting.ServerUrl}/api/signout`, {
-    method: "POST",
-    credentials: "include",
-  }).then(res => res.json());
+	c.ResponseOk(providers)
 }

@@ -20,13 +20,11 @@ import (
 	"time"
 
 	"github.com/casbin/caswaf/util"
-	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
 
 var (
-	siteUpdateMap          = map[string]string{}
-	lock                   = &sync.Mutex{}
-	healthCheckTryTimesMap = map[string]int{}
+	siteUpdateMap = map[string]string{}
+	lock          = &sync.Mutex{}
 )
 
 func monitorSiteNodes() error {
@@ -79,41 +77,6 @@ func monitorSiteCerts() error {
 	return err
 }
 
-func healthCheck(site *Site, domain string) error {
-	var flag bool
-	var log string
-	switch site.SslMode {
-	case "HTTPS Only":
-		flag, log = pingUrl("https://" + domain)
-	case "HTTP":
-		flag, log = pingUrl("http://" + domain)
-	case "HTTPS and HTTP":
-		flag, log = pingUrl("https://" + domain)
-		flagHttp, logHttp := pingUrl("http://" + domain)
-		flag = flag || flagHttp
-		log = log + logHttp
-	}
-	if !flag {
-		fmt.Println(log)
-		healthCheckTryTimesMap[domain]--
-		if healthCheckTryTimesMap[domain] != 0 {
-			return nil
-		}
-		log = fmt.Sprintf("CasWAF health check failed for domain %s, %s", domain, log)
-		user, err := casdoorsdk.GetUser(site.Owner)
-		if err != nil {
-			fmt.Println(err)
-		}
-		err = casdoorsdk.SendEmail("CasWAF HealthCheck Check Alert", log, "CasWAF", user.Email)
-		if err != nil {
-			fmt.Println(err)
-		}
-	} else {
-		healthCheckTryTimesMap[domain] = GetSiteByDomain(domain).AlertTryTimes
-	}
-	return nil
-}
-
 func StartMonitorSitesLoop() {
 	fmt.Printf("StartMonitorSitesLoop() Start!\n\n")
 	go func() {
@@ -148,33 +111,4 @@ func StartMonitorSitesLoop() {
 			time.Sleep(5 * time.Second)
 		}
 	}()
-}
-
-func startHealthCheckLoop() {
-	for _, domain := range healthCheckNeededDomains {
-		domain := domain
-		if _, ok := healthCheckTryTimesMap[domain]; ok {
-			continue
-		}
-		healthCheckTryTimesMap[domain] = GetSiteByDomain(domain).AlertTryTimes
-		go func() {
-			defer func() {
-				if r := recover(); r != nil {
-					fmt.Printf("[%s] Recovered from healthCheck() panic: %v\n", util.GetCurrentTime(), r)
-				}
-			}()
-			for {
-				site := GetSiteByDomain(domain)
-				if site == nil || !site.EnableAlert {
-					return
-				}
-
-				err := healthCheck(site, domain)
-				if err != nil {
-					fmt.Println(err)
-				}
-				time.Sleep(time.Duration(site.AlertInterval) * time.Second)
-			}
-		}()
-	}
 }

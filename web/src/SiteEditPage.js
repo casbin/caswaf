@@ -15,7 +15,7 @@
 import React from "react";
 import {Button, Card, Col, Input, InputNumber, Row, Select, Switch} from "antd";
 import {LinkOutlined} from "@ant-design/icons";
-import * as AccountBackend from "./backend/AccountBackend";
+import * as ProviderBackend from "./backend/ProviderBackend";
 import * as SiteBackend from "./backend/SiteBackend";
 import * as CertBackend from "./backend/CertBackend";
 import * as RuleBackend from "./backend/RuleBackend";
@@ -103,7 +103,7 @@ class SiteEditPage extends React.Component {
   }
 
   getAlertProviders() {
-    AccountBackend.getProviders()
+    ProviderBackend.getProviders()
       .then((res) => {
         if (res.status === "ok") {
           const data = [];

@@ -76,6 +76,7 @@ func refreshSiteMap() error {
 	}
 
 	newSiteMap := map[string]*Site{}
+	newHealthCheckNeededDomains := make([]string, 0)
 	sites, err := GetGlobalSites()
 	if err != nil {
 		return err
@@ -107,7 +108,7 @@ func refreshSiteMap() error {
 
 		newSiteMap[strings.ToLower(site.Domain)] = site
 		if site.EnableAlert {
-			healthCheckNeededDomains = append(healthCheckNeededDomains, site.Domain)
+			newHealthCheckNeededDomains = append(newHealthCheckNeededDomains, site.Domain)
 		}
 		for _, domain := range site.OtherDomains {
 			if domain != "" {
@@ -117,6 +118,7 @@ func refreshSiteMap() error {
 	}
 
 	siteMap = newSiteMap
+	healthCheckNeededDomains = newHealthCheckNeededDomains
 	return nil
 }
 
