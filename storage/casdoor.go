@@ -63,7 +63,11 @@ func (p *CasdoorProvider) PutObject(user string, parent string, key string, file
 }
 
 func (p *CasdoorProvider) DeleteObject(key string) error {
-	_, err := casdoorsdk.DeleteResource(fmt.Sprintf("Direct/%s/%s", p.providerName, key))
+	resource, err := casdoorsdk.GetResource(fmt.Sprintf("Direct/%s/%s", p.providerName, key))
+	if err != nil {
+		return err
+	}
+	_, err = casdoorsdk.DeleteResource(resource)
 	if err != nil {
 		return err
 	}
