@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/beego/beego v1.12.12
 	github.com/casbin/lego/v4 v4.5.4
-	github.com/casdoor/casdoor-go-sdk v0.28.4
+	github.com/casdoor/casdoor-go-sdk v0.52.0
 	github.com/corazawaf/coraza/v3 v3.1.0
 	github.com/denisenkom/go-mssqldb v0.10.0
 	github.com/go-git/go-billy/v5 v5.5.0 // indirect
@@ -22,6 +22,6 @@ require (
 	github.com/xorm-io/core v0.7.4
 	github.com/xorm-io/xorm v1.1.6
 	golang.org/x/net v0.21.0
-	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
-	modernc.org/sqlite v1.11.2
+	golang.org/x/time v0.3.0
+	modernc.org/sqlite v1.18.1
 )
