@@ -16,6 +16,7 @@ package object
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
@@ -58,17 +59,19 @@ func healthCheck(site *Site, domain string) error {
 	if user == nil {
 		return fmt.Errorf("user not found")
 	}
-	if user.Email != "" {
-		err = casdoorsdk.SendEmail("CasWAF HealthCheck Check Alert", pingResponse, "CasWAF", user.Email)
-	}
-	if err != nil {
-		fmt.Println(err)
-	}
-	if user.Phone != "" {
-		err = casdoorsdk.SendSms(pingResponse, user.Phone)
-	}
-	if err != nil {
-		fmt.Println(err)
+	for _, provider := range site.AlertProviders {
+		if strings.HasPrefix(provider, "Email/") {
+			err := casdoorsdk.SendEmailByProvider("CasWAF HealthCheck Check Alert", pingResponse, "CasWAF", provider[6:], user.Email)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+		if strings.HasPrefix(provider, "SMS/") {
+			err := casdoorsdk.SendSmsByProvider(pingResponse, provider[4:], user.Phone)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
 	}
 	return nil
 }
@@ -83,7 +86,8 @@ func startHealthCheckLoop() {
 		go func() {
 			for {
 				site := GetSiteByDomain(domain)
-				if site == nil || !site.EnableAlert || site.Domain == "" || site.Status == "Inactive" {
+				if shouldStopHealthCheck(site) {
+					delete(healthCheckTryTimesMap, domain)
 					return
 				}
 
@@ -95,4 +99,8 @@ func startHealthCheckLoop() {
 			}
 		}()
 	}
+}
+
+func shouldStopHealthCheck(site *Site) bool {
+	return site == nil || !site.EnableAlert || site.Domain == "" || site.Status == "Inactive"
 }

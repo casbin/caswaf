@@ -107,8 +107,8 @@ func refreshSiteMap() error {
 		}
 
 		newSiteMap[strings.ToLower(site.Domain)] = site
-		if site.EnableAlert {
-			newHealthCheckNeededDomains = append(newHealthCheckNeededDomains, site.Domain)
+		if !shouldStopHealthCheck(site) {
+			newHealthCheckNeededDomains = append(newHealthCheckNeededDomains, strings.ToLower(site.Domain))
 		}
 		for _, domain := range site.OtherDomains {
 			if domain != "" {
