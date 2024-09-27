@@ -23,6 +23,7 @@ import (
 
 var siteMap = map[string]*Site{}
 var certMap = map[string]*Cert{}
+var healthCheckNeededDomains []string
 
 func InitSiteMap() {
 	err := refreshSiteMap()
@@ -75,6 +76,7 @@ func refreshSiteMap() error {
 	}
 
 	newSiteMap := map[string]*Site{}
+	newHealthCheckNeededDomains := make([]string, 0)
 	sites, err := GetGlobalSites()
 	if err != nil {
 		return err
@@ -105,6 +107,9 @@ func refreshSiteMap() error {
 		}
 
 		newSiteMap[strings.ToLower(site.Domain)] = site
+		if !shouldStopHealthCheck(site) {
+			newHealthCheckNeededDomains = append(newHealthCheckNeededDomains, strings.ToLower(site.Domain))
+		}
 		for _, domain := range site.OtherDomains {
 			if domain != "" {
 				newSiteMap[strings.ToLower(domain)] = site
@@ -113,6 +118,7 @@ func refreshSiteMap() error {
 	}
 
 	siteMap = newSiteMap
+	healthCheckNeededDomains = newHealthCheckNeededDomains
 	return nil
 }
 

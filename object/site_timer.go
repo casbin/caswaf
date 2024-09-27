@@ -106,6 +106,8 @@ func StartMonitorSitesLoop() {
 				continue
 			}
 
+			startHealthCheckLoop()
+
 			time.Sleep(5 * time.Second)
 		}
 	}()
