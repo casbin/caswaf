@@ -77,6 +77,8 @@ class App extends Component {
     });
     if (uri === "/") {
       this.setState({selectedMenuKey: "/"});
+    } else if (uri.includes("/dashboard")) {
+      this.setState({selectedMenuKey: "/dashboard"});
     } else if (uri.includes("/sites")) {
       this.setState({selectedMenuKey: "/sites"});
     } else if (uri.includes("/certs")) {
