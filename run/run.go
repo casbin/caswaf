@@ -146,7 +146,7 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 
 		if affected {
 			if !needStart {
-				if !strings.HasPrefix(siteName, "casdoor") {
+				if !strings.HasPrefix(siteName, "casdoor") && !strings.HasPrefix(siteName, "casibase") {
 					err = stopProcess(siteName)
 					if err != nil {
 						return wrapRepoError("stopProcess", err)
