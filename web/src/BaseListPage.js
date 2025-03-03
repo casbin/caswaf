@@ -24,7 +24,7 @@ class BaseListPage extends React.Component {
       data: [],
       pagination: {
         current: 1,
-        pageSize: 10,
+        pageSize: 1000,
       },
       loading: false,
       isAuthorized: true,

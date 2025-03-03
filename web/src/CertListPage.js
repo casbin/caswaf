@@ -32,7 +32,7 @@ class CertListPage extends BaseListPage {
       pagination: {
         ...this.state.pagination,
         current: 1,
-        pageSize: 10,
+        pageSize: 1000,
       },
     });
     this.fetch({pagination: this.state.pagination});
@@ -295,7 +295,7 @@ class CertListPage extends BaseListPage {
     const field = params.searchedColumn, value = params.searchText;
     const sortField = params.sortField, sortOrder = params.sortOrder;
     if (!params.pagination) {
-      params.pagination = {current: 1, pageSize: 10};
+      params.pagination = {current: 1, pageSize: 100};
     }
     this.setState({loading: true});
     CertBackend.getCerts(this.props.account.name, params.pagination.current, params.pagination.pageSize, field, value, sortField, sortOrder)

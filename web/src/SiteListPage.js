@@ -22,13 +22,16 @@ import i18next from "i18next";
 import BaseListPage from "./BaseListPage";
 
 class SiteListPage extends BaseListPage {
+  constructor(props) {
+    super(props);
+  }
 
   UNSAFE_componentWillMount() {
     this.setState({
       pagination: {
         ...this.state.pagination,
         current: 1,
-        pageSize: 10,
+        pageSize: 1000,
       },
     });
     this.fetch({pagination: this.state.pagination});
