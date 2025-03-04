@@ -129,7 +129,7 @@ class SiteListPage extends BaseListPage {
         title: i18next.t("general:Tag"),
         dataIndex: "tag",
         key: "tag",
-        width: "120px",
+        width: "140px",
         sorter: (a, b) => a.tag.localeCompare(b.tag),
       },
       {
@@ -396,7 +396,8 @@ class SiteListPage extends BaseListPage {
       params.pagination = {current: 1, pageSize: 10};
     }
     this.setState({loading: true});
-    SiteBackend.getSites(this.props.account.name, params.pagination.current, params.pagination.pageSize, field, value, sortField, sortOrder)
+    // SiteBackend.getSites(this.props.account.name, params.pagination.current, params.pagination.pageSize, field, value, sortField, sortOrder)
+    SiteBackend.getSites(this.props.account.name, "", "", field, value, sortField, sortOrder)
       .then((res) => {
         this.setState({
           loading: false,
