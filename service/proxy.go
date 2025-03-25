@@ -152,6 +152,16 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if strings.HasPrefix(r.RequestURI, "/MP_verify_") {
+		challengeMap := site.GetChallengeMap()
+		for path, value := range challengeMap {
+			if r.RequestURI == fmt.Sprintf("/%s", path) {
+				responseOk(w, value)
+				return
+			}
+		}
+	}
+
 	if site.SslMode == "HTTPS Only" {
 		// This domain only supports https but receive http request, redirect to https
 		if r.TLS == nil {
