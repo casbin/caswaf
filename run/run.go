@@ -27,8 +27,8 @@ func isTargetRepo(siteName string) bool {
 	return strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2
 }
 
-func wrapRepoError(function string, err error) (int, error) {
-	return 0, fmt.Errorf("%s(): %s", function, err.Error())
+func wrapRepoError(function string, path string, err error) (int, error) {
+	return 0, fmt.Errorf("%s(): path = %s, %s", function, path, err.Error())
 }
 
 func CreateRepo(siteName string, needStart bool, diff string, providerName string) (int, error) {
@@ -38,14 +38,14 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 		repoUrl := getRepoUrl(originalName)
 		err := gitClone(repoUrl, path)
 		if err != nil {
-			return wrapRepoError("gitClone", err)
+			return wrapRepoError("gitClone", path, err)
 		}
 
 		language := beego.AppConfig.String("language")
 		if language == "en" {
 			_, err = gitCreateDatabase(siteName)
 			if err != nil {
-				return wrapRepoError("gitCreateDatabase", err)
+				return wrapRepoError("gitCreateDatabase", path, err)
 			}
 		}
 
@@ -62,7 +62,7 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 			if diff != "" {
 				err = gitApply(path, diff)
 				if err != nil {
-					return wrapRepoError("gitApply", err)
+					return wrapRepoError("gitApply", path, err)
 				}
 			}
 		}
@@ -70,30 +70,30 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 		if needWebBuild {
 			err = gitWebBuild(path)
 			if err != nil {
-				return wrapRepoError("gitWebBuild", err)
+				return wrapRepoError("gitWebBuild", path, err)
 			}
 
 			err = gitUploadCdn(providerName, siteName)
 			if err != nil {
-				return wrapRepoError("gitUploadCdn", err)
+				return wrapRepoError("gitUploadCdn", path, err)
 			}
 		}
 
 		batExisted, err := updateBatFile(siteName)
 		if err != nil {
-			return wrapRepoError("updateBatFile", err)
+			return wrapRepoError("updateBatFile", path, err)
 		}
 
 		if !batExisted {
 			err = updateShortcutFile(siteName)
 			if err != nil {
-				return wrapRepoError("updateShortcutFile", err)
+				return wrapRepoError("updateShortcutFile", path, err)
 			}
 		}
 	} else {
 		affected, err := gitPull(path)
 		if err != nil {
-			return wrapRepoError("gitPull", err)
+			return wrapRepoError("gitPull", path, err)
 		}
 
 		needWebBuild := false
@@ -123,24 +123,24 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 		if needWebBuild {
 			err = gitWebBuild(path)
 			if err != nil {
-				return wrapRepoError("gitWebBuild", err)
+				return wrapRepoError("gitWebBuild", path, err)
 			}
 
 			err = gitUploadCdn(providerName, siteName)
 			if err != nil {
-				return wrapRepoError("gitUploadCdn", err)
+				return wrapRepoError("gitUploadCdn", path, err)
 			}
 		}
 
 		batExisted, err := updateBatFile(siteName)
 		if err != nil {
-			return wrapRepoError("updateBatFile", err)
+			return wrapRepoError("updateBatFile", path, err)
 		}
 
 		if !batExisted {
 			err = updateShortcutFile(siteName)
 			if err != nil {
-				return wrapRepoError("updateShortcutFile", err)
+				return wrapRepoError("updateShortcutFile", path, err)
 			}
 		}
 
@@ -149,19 +149,19 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 				if !strings.HasPrefix(siteName, "casdoor") && !strings.HasPrefix(siteName, "casibase") {
 					err = stopProcess(siteName)
 					if err != nil {
-						return wrapRepoError("stopProcess", err)
+						return wrapRepoError("stopProcess", path, err)
 					}
 				}
 
 				err = startProcess(siteName)
 				if err != nil {
-					return wrapRepoError("startProcess", err)
+					return wrapRepoError("startProcess", path, err)
 				}
 
 				var pid int
 				pid, err = getPid(siteName)
 				if err != nil {
-					return wrapRepoError("getPid", err)
+					return wrapRepoError("getPid", path, err)
 				}
 
 				return pid, nil
@@ -172,12 +172,12 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 	if needStart {
 		err := startProcess(siteName)
 		if err != nil {
-			return wrapRepoError("startProcess", err)
+			return wrapRepoError("startProcess", path, err)
 		}
 
 		pid, err := getPid(siteName)
 		if err != nil {
-			return wrapRepoError("getPid", err)
+			return wrapRepoError("getPid", path, err)
 		}
 
 		return pid, nil
