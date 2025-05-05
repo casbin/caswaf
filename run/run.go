@@ -27,6 +27,10 @@ func isTargetRepo(siteName string) bool {
 	return strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2
 }
 
+func isFrontendBaseDirEnabledRepo(siteName string) bool {
+	return strings.HasPrefix(siteName, "casibase_")
+}
+
 func wrapRepoError(function string, path string, err error) (int, error) {
 	return 0, fmt.Errorf("%s(): path = %s, %s", function, path, err.Error())
 }
@@ -67,7 +71,7 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 			}
 		}
 
-		if needWebBuild {
+		if needWebBuild && !isFrontendBaseDirEnabledRepo(siteName) {
 			err = gitWebBuild(path)
 			if err != nil {
 				return wrapRepoError("gitWebBuild", path, err)
@@ -120,7 +124,7 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 			}
 		}
 
-		if needWebBuild {
+		if needWebBuild && !isFrontendBaseDirEnabledRepo(siteName) {
 			err = gitWebBuild(path)
 			if err != nil {
 				return wrapRepoError("gitWebBuild", path, err)
