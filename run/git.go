@@ -21,10 +21,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
-
-	"github.com/beego/beego"
-	"github.com/xorm-io/xorm"
 )
 
 func gitClone(repoUrl string, path string) error {
@@ -113,14 +109,6 @@ func gitPull(path string) (bool, error) {
 	return affected, nil
 }
 
-func runCmd(dir, name string, args ...string) error {
-	cmd := exec.Command(name, args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Dir = dir
-	return cmd.Run()
-}
-
 func gitWebBuild(path string) error {
 	webDir := filepath.Join(path, "web")
 	fmt.Printf("gitWebBuild(): [%s]\n", webDir)
@@ -131,31 +119,4 @@ func gitWebBuild(path string) error {
 	}
 
 	return runCmd(webDir, "yarn", "build")
-}
-
-func gitCreateDatabase(name string) (bool, error) {
-	fmt.Printf("gitCreateDatabase(): [%s]\n", name)
-	name = strings.Replace(name, "_00", "_", 1)
-
-	driverName := "mysql"
-	dataSourceName := fmt.Sprintf("root:%s@tcp(localhost:3306)/", beego.AppConfig.String("dbPass"))
-	engine, err := xorm.NewEngine(driverName, dataSourceName)
-	if err != nil {
-		return false, err
-	}
-
-	cmd := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;", name)
-	result, err := engine.Exec(cmd)
-	if err != nil {
-		return false, err
-	}
-
-	affected, err := result.RowsAffected()
-	if err != nil {
-		return false, err
-	}
-
-	engine.Close()
-
-	return affected != 0, err
 }

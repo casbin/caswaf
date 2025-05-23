@@ -15,9 +15,11 @@
 package run
 
 import (
+	"bytes"
 	"fmt"
 	"os/exec"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/casbin/caswaf/util"
@@ -82,4 +84,36 @@ func getPid(name string) (int, error) {
 	} else {
 		return 0, fmt.Errorf("getBatNamesFromOutput() error, name = %s, batNameMap = %v", name, batNameMap)
 	}
+}
+
+func startProcess(name string) error {
+	fmt.Printf("startProcess(): [%s]\n", name)
+
+	cmd := exec.Command("cmd", "/C", "start", "", getShortcutPath(name))
+	return cmd.Run()
+}
+
+func stopProcess(name string) error {
+	fmt.Printf("stopProcess(): [%s]\n", name)
+
+	name = getMappedName(name)
+	windowName := fmt.Sprintf("%s.bat - %s", name, getShortcut())
+	// taskkill /IM "casdoor.bat - Shortcut" /F
+	// taskkill /F /FI "WINDOWTITLE eq casdoor.bat - Shortcut" /T
+	cmd := exec.Command("taskkill", "/F", "/FI", fmt.Sprintf("WINDOWTITLE eq %s", windowName), "/T")
+	return cmd.Run()
+}
+
+func IsProcessActive(pid int) (bool, error) {
+	cmd := exec.Command("tasklist", "/FI", fmt.Sprintf("PID eq %d", pid))
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		return false, err
+	}
+
+	output := out.String()
+	res := strings.Contains(output, strconv.Itoa(pid))
+	return res, nil
 }
