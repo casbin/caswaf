@@ -4,12 +4,12 @@ go 1.16
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
+	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1183
 	github.com/beego/beego v1.12.12
 	github.com/casbin/lego/v4 v4.5.4
 	github.com/casdoor/casdoor-go-sdk v0.52.0
 	github.com/corazawaf/coraza/v3 v3.1.0
 	github.com/denisenkom/go-mssqldb v0.10.0
-	github.com/go-git/go-billy/v5 v5.5.0 // indirect
 	github.com/go-git/go-git/v5 v5.9.0
 	github.com/go-mysql-org/go-mysql v1.7.0
 	github.com/go-sql-driver/mysql v1.6.0

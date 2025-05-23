@@ -51,6 +51,11 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 			if err != nil {
 				return wrapRepoError("gitCreateDatabase", path, err)
 			}
+		} else {
+			_, err = gitCreateDatabaseCloud(siteName)
+			if err != nil {
+				return wrapRepoError("gitCreateDatabaseCloud", path, err)
+			}
 		}
 
 		needWebBuild := false
