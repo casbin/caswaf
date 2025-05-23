@@ -27,7 +27,6 @@ import (
 
 	"github.com/beego/beego"
 	"github.com/casbin/caswaf/casdoor"
-	"github.com/casbin/caswaf/object"
 )
 
 func TestGitGetDiff(t *testing.T) {
@@ -48,7 +47,7 @@ func TestGitGetDiff(t *testing.T) {
 }
 
 func TestUploadCdn(t *testing.T) {
-	object.InitConfig()
+	// object.InitConfig()
 	casdoor.InitCasdoorConfig()
 
 	err := gitUploadCdn("provider_storage_aliyun_oss", "casdoor")
