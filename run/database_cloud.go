@@ -16,6 +16,7 @@ package run
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/auth/credentials"
@@ -57,7 +58,9 @@ func gitCreateDatabaseCloud(name string) (bool, error) {
 
 	_, err := rdsClient.CreateDatabase(r)
 	if err != nil {
-		return false, err
+		if !strings.Contains(err.Error(), "ErrorCode: InvalidDBName.Duplicate") {
+			return false, err
+		}
 	}
 
 	err = addDatabaseUser(name)
