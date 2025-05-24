@@ -36,6 +36,7 @@ func main() {
 	object.InitRuleMap()
 	object.InitActionMap()
 	run.InitAppMap()
+	run.InitRdsClient()
 	run.InitSelfStart()
 	object.StartMonitorSitesLoop()
 

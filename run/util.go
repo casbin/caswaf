@@ -87,7 +87,7 @@ func updateAppConfFile(name string, i int) {
 		content = strings.ReplaceAll(content, "root", beego.AppConfig.String("dbUser"))
 		content = strings.ReplaceAll(content, "123456", beego.AppConfig.String("dbPass"))
 		content = strings.ReplaceAll(content, "localhost:3306", fmt.Sprintf("%s:3306", beego.AppConfig.String("dbHost")))
-		content = strings.ReplaceAll(content, "dbName = casdoor", fmt.Sprintf("dbName = %s", name))
+		content = strings.ReplaceAll(content, "dbName = casibase", fmt.Sprintf("dbName = %s", name))
 		content = strings.ReplaceAll(content, "redisEndpoint =", fmt.Sprintf("redisEndpoint = \"%s\"", beego.AppConfig.String("redisEndpoint")))
 		content = strings.ReplaceAll(content, "disablePreviewMode = false", "disablePreviewMode = true")
 		content = strings.ReplaceAll(content, "casdoorEndpoint = https://door.casdoor.com", fmt.Sprintf("casdoorEndpoint = %s", beego.AppConfig.String("casdoorEndpoint")))

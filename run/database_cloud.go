@@ -16,29 +16,32 @@ package run
 
 import (
 	"fmt"
-	"github.com/beego/beego"
 
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/auth/credentials"
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/rds"
+	"github.com/beego/beego"
 )
 
 var rdsClient *rds.Client
 
-func InitRdsClient() *rds.Client {
+func InitRdsClient() {
 	dbRegionId := beego.AppConfig.String("dbRegionId")
 	dbAccessKeyId := beego.AppConfig.String("dbAccessKeyId")
 	dbAccessKeySecret := beego.AppConfig.String("dbAccessKeySecret")
 
+	if dbRegionId == "" || dbAccessKeyId == "" || dbAccessKeySecret == "" {
+		return
+	}
+
 	config := sdk.NewConfig()
 	credential := credentials.NewAccessKeyCredential(dbAccessKeyId, dbAccessKeySecret)
+
 	var err error
 	rdsClient, err = rds.NewClientWithOptions(dbRegionId, config, credential)
 	if err != nil {
 		panic(err)
 	}
-
-	return rdsClient
 }
 
 func gitCreateDatabaseCloud(name string) (bool, error) {
@@ -53,6 +56,11 @@ func gitCreateDatabaseCloud(name string) (bool, error) {
 	r.CharacterSetName = "utf8mb4"
 
 	_, err := rdsClient.CreateDatabase(r)
+	if err != nil {
+		return false, err
+	}
+
+	err = addDatabaseUser(name)
 	if err != nil {
 		return false, err
 	}

@@ -24,9 +24,4 @@ func TestCreateDatabaseCloud(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-
-	err = addDatabaseUser(dbName)
-	if err != nil {
-		panic(err)
-	}
 }
