@@ -83,6 +83,7 @@ func updateAppConfFile(name string, i int) {
 	content := util.ReadStringFromPath(confPath)
 
 	if strings.HasPrefix(name, "casibase_customer_") {
+		shortName := strings.ReplaceAll(name, "casibase_customer_", "cbc")
 		content = strings.ReplaceAll(content, "httpport = 14000", fmt.Sprintf("httpport = %d", 40000+i))
 		content = strings.ReplaceAll(content, "root", beego.AppConfig.String("dbUser"))
 		content = strings.ReplaceAll(content, "123456", beego.AppConfig.String("dbPass"))
@@ -90,11 +91,11 @@ func updateAppConfFile(name string, i int) {
 		content = strings.ReplaceAll(content, "dbName = casibase", fmt.Sprintf("dbName = %s", name))
 		content = strings.ReplaceAll(content, "redisEndpoint =", fmt.Sprintf("redisEndpoint = \"%s\"", beego.AppConfig.String("redisEndpoint")))
 		content = strings.ReplaceAll(content, "disablePreviewMode = false", "disablePreviewMode = true")
-		content = strings.ReplaceAll(content, "casdoorEndpoint = https://door.casdoor.com", fmt.Sprintf("casdoorEndpoint = %s", beego.AppConfig.String("casdoorEndpoint")))
-		content = strings.ReplaceAll(content, "clientId = af6b5aa958822fb9dc33", fmt.Sprintf("clientId = %s", beego.AppConfig.String("clientId")))
-		content = strings.ReplaceAll(content, "clientSecret = 8bc3010c1c951c8d876b1f311a901ff8deeb93bc", fmt.Sprintf("clientSecret = %s", beego.AppConfig.String("clientSecret")))
-		content = strings.ReplaceAll(content, "casdoorOrganization = \"casbin\"", fmt.Sprintf("casdoorOrganization = \"%s\"", beego.AppConfig.String("casdoorOrganization")))
-		content = strings.ReplaceAll(content, "casdoorApplication = \"app-casibase\"", fmt.Sprintf("casdoorApplication = \"%s\"", beego.AppConfig.String("casdoorApplication")))
+		content = strings.ReplaceAll(content, "casdoorEndpoint = https://door.casdoor.com", fmt.Sprintf("casdoorEndpoint = %s", strings.ReplaceAll(beego.AppConfig.String("casdoorEndpoint"), "my.", "cbc.")))
+		content = strings.ReplaceAll(content, "clientId = af6b5aa958822fb9dc33", fmt.Sprintf("clientId = %s", beego.AppConfig.String("clientIdPrefix")+shortName))
+		content = strings.ReplaceAll(content, "clientSecret = 8bc3010c1c951c8d876b1f311a901ff8deeb93bc", fmt.Sprintf("clientSecret = %s", beego.AppConfig.String("clientSecretPrefix")+shortName))
+		content = strings.ReplaceAll(content, "casdoorOrganization = \"casbin\"", fmt.Sprintf("casdoorOrganization = \"%s\"", shortName))
+		content = strings.ReplaceAll(content, "casdoorApplication = \"app-casibase\"", fmt.Sprintf("casdoorApplication = \"%s\"", fmt.Sprintf("app-%s", shortName)))
 		content = strings.ReplaceAll(content, "isLocalIpDb = false", "isLocalIpDb = true")
 		content = strings.ReplaceAll(content, "providerDbName = \"\"", "providerDbName = \"casibase_casbin\"")
 	} else {
