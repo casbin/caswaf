@@ -54,6 +54,8 @@ func getNameIndex(name string) int {
 func getRepoUrl(name string) string {
 	if name == "casdoor" {
 		return "https://github.com/casdoor/casdoor"
+	} else if name == "casibase" {
+		return "https://github.com/casibase/casibase"
 	} else {
 		return fmt.Sprintf("https://github.com/casbin/%s", name)
 	}
@@ -77,17 +79,32 @@ func ensureFileFolderExists(path string) error {
 
 func updateAppConfFile(name string, i int) {
 	fmt.Printf("updateAppConfFile(): [%s]\n", name)
-
-	dbName := strings.Replace(name, "_00", "_", 1)
 	confPath := getCodeAppConfPath(name)
 	content := util.ReadStringFromPath(confPath)
-	content = strings.ReplaceAll(content, "httpport = 8000", fmt.Sprintf("httpport = %d", 30000+i))
-	content = strings.ReplaceAll(content, "123456", beego.AppConfig.String("dbPass"))
-	content = strings.ReplaceAll(content, "(localhost:3306)", "(localhost:3306)")
-	content = strings.ReplaceAll(content, "dbName = casdoor", fmt.Sprintf("dbName = %s", dbName))
-	content = strings.ReplaceAll(content, "redisEndpoint =", "redisEndpoint = \"localhost:6379\"")
-	content = strings.ReplaceAll(content, "socks5Proxy = \"127.0.0.1:10808\"", "socks5Proxy =")
-	content = strings.ReplaceAll(content, "../casdoor", "../cc_0")
+
+	if strings.HasPrefix(name, "casibase_customer_") {
+		content = strings.ReplaceAll(content, "httpport = 14000", fmt.Sprintf("httpport = %d", 40000+i))
+		content = strings.ReplaceAll(content, "root", beego.AppConfig.String("dbUser"))
+		content = strings.ReplaceAll(content, "123456", beego.AppConfig.String("dbPass"))
+		content = strings.ReplaceAll(content, "localhost:3306", fmt.Sprintf("%s:3306", beego.AppConfig.String("dbHost")))
+		content = strings.ReplaceAll(content, "dbName = casdoor", fmt.Sprintf("dbName = %s", name))
+		content = strings.ReplaceAll(content, "redisEndpoint =", fmt.Sprintf("redisEndpoint = \"%s\"", beego.AppConfig.String("redisEndpoint")))
+		content = strings.ReplaceAll(content, "disablePreviewMode = false", "disablePreviewMode = true")
+		content = strings.ReplaceAll(content, "casdoorEndpoint = https://door.casdoor.com", fmt.Sprintf("casdoorEndpoint = %s", beego.AppConfig.String("casdoorEndpoint")))
+		content = strings.ReplaceAll(content, "clientId = af6b5aa958822fb9dc33", fmt.Sprintf("clientId = %s", beego.AppConfig.String("clientId")))
+		content = strings.ReplaceAll(content, "clientSecret = 8bc3010c1c951c8d876b1f311a901ff8deeb93bc", fmt.Sprintf("clientSecret = %s", beego.AppConfig.String("clientSecret")))
+		content = strings.ReplaceAll(content, "casdoorOrganization = \"casbin\"", fmt.Sprintf("casdoorOrganization = \"%s\"", beego.AppConfig.String("casdoorOrganization")))
+		content = strings.ReplaceAll(content, "casdoorApplication = \"app-casibase\"", fmt.Sprintf("casdoorApplication = \"%s\"", beego.AppConfig.String("casdoorApplication")))
+		content = strings.ReplaceAll(content, "isLocalIpDb = false", "isLocalIpDb = true")
+		content = strings.ReplaceAll(content, "providerDbName = \"\"", "providerDbName = \"casibase_casbin\"")
+	} else {
+		content = strings.ReplaceAll(content, "httpport = 8000", fmt.Sprintf("httpport = %d", 30000+i))
+		content = strings.ReplaceAll(content, "123456", beego.AppConfig.String("dbPass"))
+		content = strings.ReplaceAll(content, "dbName = casdoor", fmt.Sprintf("dbName = %s", strings.Replace(name, "_00", "_", 1)))
+		content = strings.ReplaceAll(content, "redisEndpoint =", "redisEndpoint = \"localhost:6379\"")
+		content = strings.ReplaceAll(content, "socks5Proxy = \"127.0.0.1:10808\"", "socks5Proxy =")
+	}
+
 	util.WriteStringToPath(content, confPath)
 }
 

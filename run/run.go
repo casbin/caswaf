@@ -24,7 +24,7 @@ import (
 )
 
 func isTargetRepo(siteName string) bool {
-	return strings.HasPrefix(siteName, "cc_") || strings.Count(siteName, "_") == 2
+	return strings.HasPrefix(siteName, "cc_") || strings.HasPrefix(siteName, "casibase_customer_") || strings.Count(siteName, "_") == 2
 }
 
 func isFrontendBaseDirEnabledRepo(siteName string) bool {

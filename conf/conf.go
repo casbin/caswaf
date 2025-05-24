@@ -67,6 +67,15 @@ func GetConfigBool(key string) bool {
 	}
 }
 
+func GetConfigInt(key string) int {
+	value := GetConfigString(key)
+	num, err := strconv.Atoi(value)
+	if err != nil {
+		panic(err)
+	}
+	return num
+}
+
 func GetConfigInt64(key string) (int64, error) {
 	value := GetConfigString(key)
 	num, err := strconv.ParseInt(value, 10, 64)
