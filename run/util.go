@@ -77,13 +77,17 @@ func ensureFileFolderExists(path string) error {
 	return nil
 }
 
-func updateAppConfFile(name string, i int) {
+func updateAppConfFile(name string, i int, orgName string) {
 	fmt.Printf("updateAppConfFile(): [%s]\n", name)
 	confPath := getCodeAppConfPath(name)
 	content := util.ReadStringFromPath(confPath)
 
 	if strings.HasPrefix(name, "casibase_customer_") {
 		shortName := strings.ReplaceAll(name, "casibase_customer_", "cbc")
+		if orgName != "" {
+			shortName = orgName
+		}
+
 		content = strings.ReplaceAll(content, "httpport = 14000", fmt.Sprintf("httpport = %d", 40000+i))
 		content = strings.ReplaceAll(content, "root", beego.AppConfig.String("dbUser"))
 		content = strings.ReplaceAll(content, "123456", beego.AppConfig.String("dbPass"))

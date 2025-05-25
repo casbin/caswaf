@@ -35,7 +35,7 @@ func wrapRepoError(function string, path string, err error) (int, error) {
 	return 0, fmt.Errorf("%s(): path = %s, %s", function, path, err.Error())
 }
 
-func CreateRepo(siteName string, needStart bool, diff string, providerName string) (int, error) {
+func CreateRepo(siteName string, needStart bool, diff string, providerName string, orgName string) (int, error) {
 	path := GetRepoPath(siteName)
 	if !util.FileExist(path) {
 		originalName := getOriginalName(siteName)
@@ -61,7 +61,7 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 		needWebBuild := false
 		if isTargetRepo(siteName) {
 			index := getNameIndex(siteName)
-			updateAppConfFile(siteName, index)
+			updateAppConfFile(siteName, index, orgName)
 			if index == 0 {
 				needWebBuild = true
 			}

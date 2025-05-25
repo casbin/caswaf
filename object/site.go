@@ -302,7 +302,12 @@ func (site *Site) checkNodes() error {
 			diff = site.Nodes[0].Diff
 		}
 
-		pid, err := run.CreateRepo(site.Name, !ok, diff, node.Provider)
+		orgName := ""
+		if len(site.Challenges) > 0 && strings.HasPrefix(site.Challenges[0], "cbc") {
+			orgName = site.Challenges[0]
+		}
+
+		pid, err := run.CreateRepo(site.Name, !ok, diff, node.Provider, orgName)
 		if err != nil {
 			msg = addErrorToMsg(msg, "CreateRepo", err)
 		}
