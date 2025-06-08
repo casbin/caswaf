@@ -70,14 +70,19 @@ func getBatNamesFromOutput(output string) map[string]int {
 func getPid(name string) (int, error) {
 	name = getMappedName(name)
 
-	// wmic process where (name="cmd.exe") get CommandLine, ProcessID
-	cmd := exec.Command("wmic", "process", "where", "name='cmd.exe'", "get", "CommandLine,ProcessID")
-	out, err := cmd.CombinedOutput()
+	psCommand := `Get-CimInstance Win32_Process -Filter "Name='cmd.exe'" | Select-Object CommandLine, ProcessId | ForEach-Object { "$($_.CommandLine) $($_.ProcessId)" }`
+	cmd := exec.Command("powershell", "-NoProfile", "-NonInteractive", "-Command", psCommand)
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("powershell command failed: %v, stderr: %s", err, stderr.String())
 	}
 
-	batNameMap := getBatNamesFromOutput(string(out))
+	batNameMap := getBatNamesFromOutput(out.String())
 	pid, ok := batNameMap[name]
 	if ok {
 		return pid, nil
