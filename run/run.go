@@ -45,8 +45,8 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 			return wrapRepoError("gitClone", path, err)
 		}
 
-		language := beego.AppConfig.String("language")
-		if language == "en" {
+		dbInstanceId := beego.AppConfig.String("dbInstanceId")
+		if dbInstanceId == "" {
 			_, err = gitCreateDatabase(siteName)
 			if err != nil {
 				return wrapRepoError("gitCreateDatabase", path, err)
