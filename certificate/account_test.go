@@ -20,10 +20,19 @@ package certificate
 import (
 	"testing"
 
+	"github.com/beego/beego"
+	"github.com/casbin/caswaf/proxy"
 	"github.com/casbin/caswaf/util"
 )
 
 func TestGetClient(t *testing.T) {
+	err := beego.LoadAppConfig("ini", "../conf/app.conf")
+	if err != nil {
+		panic(err)
+	}
+
+	proxy.InitHttpClient()
+
 	eccKey := util.ReadStringFromPath("acme_account.key")
 	println(eccKey)
 
