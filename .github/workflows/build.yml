@@ -67,29 +67,18 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: -1
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
 
-      - name: Fetch Previous version
-        id: get-previous-tag
-        uses: actions-ecosystem/action-get-latest-tag@v1.6.0
-
-      - name: Release
-        run: yarn global add semantic-release@17.4.4 && semantic-release
+      - name: Create Tag with Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v4
         env:
-          GH_TOKEN: ${{ secrets.GH_BOT_TOKEN }}
-
-      - name: Fetch Current version
-        id: get-current-tag
-        uses: actions-ecosystem/action-get-latest-tag@v1.6.0
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Decide Should_Push Or Not
         id: should_push
         run: |
-          old_version=${{steps.get-previous-tag.outputs.tag}}
-          new_version=${{steps.get-current-tag.outputs.tag }}
+          old_version=${{ steps.semantic.outputs.last_release_version }}
+          new_version=${{ steps.semantic.outputs.new_release_version }}
 
           old_array=(${old_version//\./ })
           new_array=(${new_version//\./ })
@@ -128,4 +117,4 @@ jobs:
           target: STANDARD
           platforms: linux/amd64
           push: true
-          tags: casbin/caswaf:${{steps.get-current-tag.outputs.tag }},casbin/caswaf:latest
+          tags: casbin/caswaf:${{ steps.semantic.outputs.new_release_version }},casbin/caswaf:latest
