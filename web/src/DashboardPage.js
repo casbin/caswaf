@@ -116,6 +116,10 @@ class DashboardDetailPage extends React.Component {
 
   getIPAddresses(rangeType) {
     this.getMetric("ip", rangeType).then((res) => {
+      if (!res.data) {
+        return;
+      }
+
       this.setState({
         ipAddresses: res.data.slice(0, 10),
         uniqueIPCount: res.data.length,
@@ -207,6 +211,10 @@ class DashboardDetailPage extends React.Component {
   }
 
   renderPieChart(title, data) {
+    if (data === null) {
+      data = [];
+    }
+
     const d = data.map((item) => {
       return {value: item.count, name: item.data};
     });
@@ -234,6 +242,10 @@ class DashboardDetailPage extends React.Component {
   }
 
   renderBarChart(title, data) {
+    if (data === null) {
+      data = [];
+    }
+
     return (
       <div className="dashboard-card" >
         <BarChartCard title={title} data={data} className="dashboard-card" />
