@@ -206,13 +206,18 @@ class SiteListPage extends BaseListPage {
         width: "80px",
         sorter: (a, b) => a.host.localeCompare(b.host),
         render: (text, record, index) => {
+          let host = record.port;
+          if (record.host !== "") {
+            host = `${record.host}:${record.port}`;
+          }
+
           if (record.status === "Active") {
-            return `${record.port}`;
+            return host;
           }
 
           return (
             <Tag color={"warning"}>
-              {`${record.port}`}
+              {host}
             </Tag>
           );
         },
