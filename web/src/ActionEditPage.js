@@ -92,7 +92,9 @@ class ActionEditPage extends React.Component {
             {i18next.t("general:Name")}:
           </Col>
           <Col span={22}>
-            <Input value={this.state.action.name} disabled={true} />
+            <Input value={this.state.action.name} onChange={e => {
+              this.updateActionField("name", e.target.value);
+            }} />
           </Col>
         </Row>
         <Row style={{marginTop: "20px"}} >

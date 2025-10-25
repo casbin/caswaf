@@ -92,7 +92,9 @@ class RuleEditPage extends React.Component {
             {i18next.t("general:Name")}:
           </Col>
           <Col span={22}>
-            <Input value={this.state.rule.name} disabled={true} />
+            <Input value={this.state.rule.name} onChange={e => {
+              this.updateRuleField("name", e.target.value);
+            }} />
           </Col>
         </Row>
         <Row style={{marginTop: "20px"}}>
