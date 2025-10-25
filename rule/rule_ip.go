@@ -61,6 +61,9 @@ func (r *IpRule) checkRule(expressions []*object.Expression, req *http.Request) 
 					if !ipNet.Contains(netIp) {
 						return &RuleResult{Reason: reason}, nil
 					}
+				case "is abroad":
+					// This case should not be reached due to early continue, but adding for safety
+					continue
 				default:
 					return nil, fmt.Errorf("unknown operator: %s", expression.Operator)
 				}
@@ -74,6 +77,9 @@ func (r *IpRule) checkRule(expressions []*object.Expression, req *http.Request) 
 					if ipStr != clientIp {
 						return &RuleResult{Reason: reason}, nil
 					}
+				case "is abroad":
+					// This case should not be reached due to early continue, but adding for safety
+					continue
 				default:
 					return nil, fmt.Errorf("unknown operator: %s", expression.Operator)
 				}
