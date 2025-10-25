@@ -25,6 +25,7 @@ func TestIsAbroadIp(t *testing.T) {
 	wd, _ := os.Getwd()
 	if filepath.Base(wd) == "ip" {
 		os.Chdir("..")
+		defer os.Chdir(wd)
 	}
 
 	// Initialize the IP database

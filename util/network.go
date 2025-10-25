@@ -45,5 +45,8 @@ func IsIntranetIp(ip string) bool {
 		return false
 	}
 
-	return parsedIP.IsPrivate() || parsedIP.IsLoopback() || parsedIP.IsLinkLocalUnicast() || parsedIP.IsLinkLocalMulticast()
+	return parsedIP.IsPrivate() ||
+		parsedIP.IsLoopback() ||
+		parsedIP.IsLinkLocalUnicast() ||
+		parsedIP.IsLinkLocalMulticast()
 }
