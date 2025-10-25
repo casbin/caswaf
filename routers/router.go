@@ -68,10 +68,4 @@ func initAPI() {
 	beego.Router("/api/add-rule", &controllers.ApiController{}, "POST:AddRule")
 	beego.Router("/api/update-rule", &controllers.ApiController{}, "POST:UpdateRule")
 	beego.Router("/api/delete-rule", &controllers.ApiController{}, "POST:DeleteRule")
-
-	beego.Router("/api/get-actions", &controllers.ApiController{}, "GET:GetActions")
-	beego.Router("/api/get-action", &controllers.ApiController{}, "GET:GetAction")
-	beego.Router("/api/add-action", &controllers.ApiController{}, "POST:AddAction")
-	beego.Router("/api/update-action", &controllers.ApiController{}, "POST:UpdateAction")
-	beego.Router("/api/delete-action", &controllers.ApiController{}, "POST:DeleteAction")
 }
