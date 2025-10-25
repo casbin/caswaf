@@ -17,6 +17,9 @@
 .idea/
 *.iml
 
+# Built binaries
+caswaf
+
 tmp/
 tmpFiles/
 *.tmp
