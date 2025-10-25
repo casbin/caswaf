@@ -14,7 +14,10 @@
 
 package util
 
-import "os"
+import (
+	"net"
+	"os"
+)
 
 var hostname = ""
 
@@ -29,4 +32,21 @@ func init() {
 
 func GetHostname() string {
 	return hostname
+}
+
+func IsIntranetIp(ip string) bool {
+	ipStr, _, err := net.SplitHostPort(ip)
+	if err != nil {
+		ipStr = ip
+	}
+
+	parsedIP := net.ParseIP(ipStr)
+	if parsedIP == nil {
+		return false
+	}
+
+	return parsedIP.IsPrivate() ||
+		parsedIP.IsLoopback() ||
+		parsedIP.IsLinkLocalUnicast() ||
+		parsedIP.IsLinkLocalMulticast()
 }
