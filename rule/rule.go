@@ -95,7 +95,15 @@ func CheckRules(ruleIds []string, r *http.Request) (*object.Action, string, erro
 			}
 		}
 	}
-	actionObj.Type = "Allow"
-	actionObj.StatusCode = 200
+	// No rule was hit, return Allow action
+	if actionObj == nil {
+		actionObj = &object.Action{
+			Type:       "Allow",
+			StatusCode: 200,
+		}
+	} else {
+		actionObj.Type = "Allow"
+		actionObj.StatusCode = 200
+	}
 	return actionObj, "", nil
 }
