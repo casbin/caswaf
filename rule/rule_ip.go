@@ -35,7 +35,7 @@ func (r *IpRule) checkRule(expressions []*object.Expression, req *http.Request) 
 	}
 	for _, expression := range expressions {
 		reason := fmt.Sprintf("expression matched: \"%s %s %s\"", clientIp, expression.Operator, expression.Value)
-		
+
 		// Handle "is abroad" operator
 		if expression.Operator == "is abroad" {
 			if ip.IsAbroadIp(clientIp) {
@@ -43,7 +43,7 @@ func (r *IpRule) checkRule(expressions []*object.Expression, req *http.Request) 
 			}
 			continue
 		}
-		
+
 		ips := strings.Split(expression.Value, ",")
 		for _, ipStr := range ips {
 			if strings.Contains(ipStr, "/") {

@@ -29,7 +29,7 @@ var (
 	std          *Locator
 )
 
-// Init defaut locator with dataFile
+// Init default locator with dataFile
 func Init(dataFile string) (err error) {
 	if std != nil {
 		return
@@ -38,7 +38,7 @@ func Init(dataFile string) (err error) {
 	return
 }
 
-// Init defaut locator with data
+// Init default locator with data
 func InitWithData(data []byte) {
 	if std != nil {
 		return
