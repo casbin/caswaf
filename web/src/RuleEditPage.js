@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from "react";
-import {Button, Card, Col, Input, InputNumber, Row, Select} from "antd";
+import {Button, Card, Col, Input, InputNumber, Row, Select, Switch} from "antd";
 import * as Setting from "./Setting";
 import * as RuleBackend from "./backend/RuleBackend";
 import i18next from "i18next";
@@ -212,6 +212,19 @@ class RuleEditPage extends React.Component {
               <Input value={this.state.rule.reason}
                 onChange={e => {
                   this.updateRuleField("reason", e.target.value);
+                }} />
+            </Col>
+          </Row>
+        }
+        {
+          <Row style={{marginTop: "20px"}}>
+            <Col span={2} style={{marginTop: "5px"}}>
+              {i18next.t("rule:Verbose mode")}:
+            </Col>
+            <Col span={22}>
+              <Switch checked={this.state.rule.isVerbose}
+                onChange={checked => {
+                  this.updateRuleField("isVerbose", checked);
                 }} />
             </Col>
           </Row>

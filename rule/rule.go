@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	"github.com/casbin/caswaf/object"
+	"github.com/casbin/caswaf/util"
 )
 
 type Rule interface {
@@ -89,7 +90,10 @@ func CheckRules(ruleIds []string, r *http.Request) (*RuleResult, error) {
 			
 			// Update reason if rule has custom reason
 			if result.Action == "Block" || result.Action == "Drop" {
-				if rule.Reason != "" {
+				if rule.IsVerbose {
+					// Add verbose debug info with rule name and triggered expression
+					result.Reason = util.GenerateVerboseReason(rule.GetId(), result.Reason, rule.Reason)
+				} else if rule.Reason != "" {
 					result.Reason = rule.Reason
 				} else if result.Reason != "" {
 					result.Reason = fmt.Sprintf("hit rule %s: %s", ruleIds[i], result.Reason)
