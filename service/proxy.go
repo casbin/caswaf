@@ -68,7 +68,7 @@ func getHostNonWww(host string) string {
 
 func logRequest(clientIp string, r *http.Request) {
 	if !strings.Contains(r.UserAgent(), "Uptime-Kuma") {
-		fmt.Printf("handleRequest: %s\t%s\t%s\t%s\t%s\n", r.RemoteAddr, r.Method, r.Host, r.RequestURI, r.UserAgent())
+		fmt.Printf("handleRequest: %s\t%s\t%s\t%s\t%s\t%s\n", clientIp, r.Method, r.Host, r.RequestURI, r.UserAgent(), r.RemoteAddr)
 		record := object.Record{
 			Owner:       "admin",
 			CreatedTime: util.GetCurrentTime(),
