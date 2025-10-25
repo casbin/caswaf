@@ -140,7 +140,7 @@ class IpRuleTable extends React.Component {
             mode="tags"
             style={{width: "100%"}}
             placeholder="Input IP Addresses"
-            value={record.value.split(",")}
+            value={record.value ? record.value.split(",") : []}
             onChange={value => this.updateField(table, index, "value", value)}
             options={this.state.options[index]}
           />

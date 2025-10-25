@@ -108,7 +108,7 @@ class RuleListPage extends BaseListPage {
         title: i18next.t("general:Owner"),
         dataIndex: "owner",
         key: "owner",
-        width: "200px",
+        width: "150px",
         sorter: (a, b) => a.owner.localeCompare(b.owner),
       },
       {
@@ -145,6 +145,7 @@ class RuleListPage extends BaseListPage {
         title: i18next.t("rule:Type"),
         dataIndex: "type",
         key: "type",
+        width: "100px",
         sorter: (a, b) => a.type.localeCompare(b.type),
         render: (text, rule, index) => {
           return (
@@ -168,6 +169,27 @@ class RuleListPage extends BaseListPage {
             );
           });
         },
+      },
+      {
+        title: i18next.t("general:Action"),
+        dataIndex: "action",
+        key: "action",
+        width: "100px",
+        sorter: (a, b) => a.action.localeCompare(b.action),
+      },
+      {
+        title: i18next.t("rule:Status code"),
+        dataIndex: "statusCode",
+        key: "statusCode",
+        width: "120px",
+        sorter: (a, b) => a.statusCode.localeCompare(b.statusCode),
+      },
+      {
+        title: i18next.t("rule:Reason"),
+        dataIndex: "reason",
+        key: "reason",
+        width: "300px",
+        sorter: (a, b) => a.reason.localeCompare(b.reason),
       },
       {
         title: i18next.t("general:Action"),

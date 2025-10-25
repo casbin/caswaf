@@ -193,7 +193,7 @@ class RuleEditPage extends React.Component {
           this.state.rule.type !== "WAF" && (this.state.rule.action === "Allow" || this.state.rule.action === "Block") && (
             <Row style={{marginTop: "20px"}}>
               <Col span={2} style={{marginTop: "5px"}}>
-                {i18next.t("rule:Status Code")}:
+                {i18next.t("rule:Status code")}:
               </Col>
               <Col span={22}>
                 <InputNumber value={this.state.rule.statusCode} min={100} max={599} onChange={e => {

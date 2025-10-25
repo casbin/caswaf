@@ -200,6 +200,28 @@ class SiteListPage extends BaseListPage {
         },
       },
       {
+        title: i18next.t("general:Rules"),
+        dataIndex: "rules",
+        key: "rules",
+        width: "120px",
+        sorter: (a, b) => a.rules.localeCompare(b.rules),
+        render: (text, record, index) => {
+          if (!record.rules) {
+            return null;
+          }
+
+          return record.rules.map(rule => {
+            return (
+              <a key={rule} target="_blank" rel="noreferrer" href={`/rules/${rule}`}>
+                <Tag color={"processing"}>
+                  {rule}
+                </Tag>
+              </a>
+            );
+          });
+        },
+      },
+      {
         title: i18next.t("site:Host"),
         dataIndex: "host",
         key: "host",
@@ -243,7 +265,7 @@ class SiteListPage extends BaseListPage {
         title: i18next.t("site:Nodes"),
         dataIndex: "nodes",
         key: "nodes",
-        // width: "200px",
+        width: "180px",
         sorter: (a, b) => a.nodes.length - b.nodes.length,
         render: (text, record, index) => {
           return record.nodes.map(node => {
@@ -315,13 +337,13 @@ class SiteListPage extends BaseListPage {
       //     );
       //   },
       // },
-      {
-        title: i18next.t("site:Mode"),
-        dataIndex: "sslMode",
-        key: "sslMode",
-        width: "100px",
-        sorter: (a, b) => a.sslMode.localeCompare(b.sslMode),
-      },
+      // {
+      //   title: i18next.t("site:Mode"),
+      //   dataIndex: "sslMode",
+      //   key: "sslMode",
+      //   width: "100px",
+      //   sorter: (a, b) => a.sslMode.localeCompare(b.sslMode),
+      // },
       {
         title: i18next.t("site:SSL cert"),
         dataIndex: "sslCert",
