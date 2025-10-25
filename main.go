@@ -19,6 +19,7 @@ import (
 	"github.com/beego/beego/plugins/cors"
 	_ "github.com/beego/beego/session/redis"
 	"github.com/casbin/caswaf/casdoor"
+	"github.com/casbin/caswaf/ip"
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/proxy"
 	"github.com/casbin/caswaf/routers"
@@ -32,6 +33,7 @@ func main() {
 	object.CreateTables()
 	casdoor.InitCasdoorConfig()
 	proxy.InitHttpClient()
+	ip.InitIpDb()
 	object.InitSiteMap()
 	object.InitRuleMap()
 	run.InitAppMap()

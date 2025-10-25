@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/casbin/caswaf/ip"
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/util"
 )
@@ -34,10 +35,19 @@ func (r *IpRule) checkRule(expressions []*object.Expression, req *http.Request) 
 	}
 	for _, expression := range expressions {
 		reason := fmt.Sprintf("expression matched: \"%s %s %s\"", clientIp, expression.Operator, expression.Value)
+		
+		// Handle "is abroad" operator
+		if expression.Operator == "is abroad" {
+			if ip.IsAbroadIp(clientIp) {
+				return &RuleResult{Reason: reason}, nil
+			}
+			continue
+		}
+		
 		ips := strings.Split(expression.Value, ",")
-		for _, ip := range ips {
-			if strings.Contains(ip, "/") {
-				_, ipNet, err := net.ParseCIDR(ip)
+		for _, ipStr := range ips {
+			if strings.Contains(ipStr, "/") {
+				_, ipNet, err := net.ParseCIDR(ipStr)
 				if err != nil {
 					return nil, err
 				}
@@ -54,21 +64,21 @@ func (r *IpRule) checkRule(expressions []*object.Expression, req *http.Request) 
 				default:
 					return nil, fmt.Errorf("unknown operator: %s", expression.Operator)
 				}
-			} else if strings.ContainsAny(ip, ".:") {
+			} else if strings.ContainsAny(ipStr, ".:") {
 				switch expression.Operator {
 				case "is in":
-					if ip == clientIp {
+					if ipStr == clientIp {
 						return &RuleResult{Reason: reason}, nil
 					}
 				case "is not in":
-					if ip != clientIp {
+					if ipStr != clientIp {
 						return &RuleResult{Reason: reason}, nil
 					}
 				default:
 					return nil, fmt.Errorf("unknown operator: %s", expression.Operator)
 				}
 			} else {
-				return nil, fmt.Errorf("unknown IP or CIDR format: %s", ip)
+				return nil, fmt.Errorf("unknown IP or CIDR format: %s", ipStr)
 			}
 		}
 	}
