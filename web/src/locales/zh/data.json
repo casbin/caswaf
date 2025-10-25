@@ -26,7 +26,6 @@
   },
   "general": {
     "Action": "操作",
-    "Actions": "Actions",
     "Add": "添加",
     "Back Home": "返回首页",
     "Cancel": "取消",
@@ -40,7 +39,6 @@
     "Delete": "删除",
     "Display name": "显示名称",
     "Edit": "编辑",
-    "Edit Action": "Edit Action",
     "Edit Record": "编辑日志",
     "Go to writable demo site?": "跳转至可写演示站点？",
     "Home": "首页",
@@ -80,7 +78,6 @@
     "Expressions": "表达式",
     "IP List": "IP 列表",
     "IP Rate Limiting": "IP 速率限制",
-    "Immunity times": "Immunity times",
     "Logic": "Logic",
     "Operator": "操作符",
     "Rate": "速率",

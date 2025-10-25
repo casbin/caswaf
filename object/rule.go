@@ -36,6 +36,7 @@ type Rule struct {
 	Type        string        `xorm:"varchar(100) notnull" json:"type"`
 	Expressions []*Expression `xorm:"mediumtext" json:"expressions"`
 	Action      string        `xorm:"varchar(100) notnull" json:"action"`
+	StatusCode  int           `xorm:"int notnull" json:"statusCode"`
 	Reason      string        `xorm:"varchar(100) notnull" json:"reason"`
 }
 

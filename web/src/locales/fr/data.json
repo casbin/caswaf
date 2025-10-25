@@ -26,7 +26,6 @@
   },
   "general": {
     "Action": "Action",
-    "Actions": "Actions",
     "Add": "Add",
     "Back Home": "Back Home",
     "Cancel": "Cancel",
@@ -40,7 +39,6 @@
     "Delete": "Delete",
     "Display name": "Display name",
     "Edit": "Edit",
-    "Edit Action": "Edit Action",
     "Edit Record": "Edit Record",
     "Go to writable demo site?": "Go to writable demo site?",
     "Home": "Home",
@@ -80,7 +78,6 @@
     "Expressions": "Expressions",
     "IP List": "IP List",
     "IP Rate Limiting": "IP Rate Limiting",
-    "Immunity times": "Immunity times",
     "Logic": "Logic",
     "Operator": "Operator",
     "Rate": "Rate",
