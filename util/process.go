@@ -40,9 +40,8 @@ func getPidByPort(port int) (int, error) {
 			if exitErr.ExitCode() == 1 {
 				return 0, nil
 			}
-		} else {
-			return 0, err
 		}
+		return 0, err
 	}
 
 	lines := strings.Split(string(output), "\n")
@@ -50,7 +49,7 @@ func getPidByPort(port int) (int, error) {
 		fields := strings.Fields(line)
 		if len(fields) > 0 {
 			if runtime.GOOS == "windows" {
-				if fields[1] == "0.0.0.0:"+strconv.Itoa(port) {
+				if len(fields) >= 2 && fields[1] == "0.0.0.0:"+strconv.Itoa(port) {
 					pid, err := strconv.Atoi(fields[len(fields)-1])
 					if err != nil {
 						return 0, err
@@ -89,9 +88,8 @@ func StopOldInstance(port int) error {
 	err = process.Kill()
 	if err != nil {
 		return err
-	} else {
-		fmt.Printf("The old instance with pid: %d has been stopped\n", pid)
 	}
 
+	fmt.Printf("The old instance with pid: %d has been stopped\n", pid)
 	return nil
 }
