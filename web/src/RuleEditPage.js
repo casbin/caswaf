@@ -226,9 +226,6 @@ class RuleEditPage extends React.Component {
                 onChange={checked => {
                   this.updateRuleField("isVerbose", checked);
                 }} />
-              <span style={{marginLeft: "10px"}}>
-                {i18next.t("rule:Enable verbose debugging information in error responses")}
-              </span>
             </Col>
           </Row>
         }
