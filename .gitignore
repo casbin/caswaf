@@ -23,4 +23,5 @@ tmpFiles/
 logs/
 lastupdate.tmp
 commentsRouter*.go
-acme_account.keycaswaf
+acme_account.key
+caswaf
