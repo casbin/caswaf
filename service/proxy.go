@@ -203,46 +203,46 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if site.Rules != nil && len(site.Rules) > 0 {
-		action, reason, err := rule.CheckRules(site.Rules, r)
-		if err != nil {
-			responseError(w, "Internal Server Error: %v", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		if reason != "" && site.DisableVerbose {
-			reason = "the rule has been hit"
-		}
-
-		switch action.Type {
-		case "", "Allow":
-			w.WriteHeader(action.StatusCode)
-		case "Block":
-			responseError(w, "Blocked by CasWAF: %s", reason)
-			w.WriteHeader(action.StatusCode)
-		case "Drop":
-			responseError(w, "Dropped by CasWAF: %s", reason)
-			w.WriteHeader(action.StatusCode)
-		case "CAPTCHA":
-			ok := isVerifiedSession(r)
-			if ok {
-				w.WriteHeader(http.StatusOK)
-				nextHandle(w, r)
-				return
-			}
-			w.Header().Set("Set-Cookie", "casdoor_captcha_token=; Path=/; Max-Age=-1")
-			redirectToCaptcha(w, r)
-			return
-		default:
-			responseError(w, "Error in CasWAF: %s", reason)
-			w.WriteHeader(http.StatusInternalServerError)
-		}
+	if len(site.Rules) == 0 {
 		nextHandle(w, r)
 		return
-	} else {
-		nextHandle(w, r)
 	}
+
+	action, reason, err := rule.CheckRules(site.Rules, r)
+	if err != nil {
+		responseError(w, "Internal Server Error: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if reason != "" && site.DisableVerbose {
+		reason = "the rule has been hit"
+	}
+
+	switch action.Type {
+	case "", "Allow":
+		w.WriteHeader(action.StatusCode)
+	case "Block":
+		responseError(w, "Blocked by CasWAF: %s", reason)
+		w.WriteHeader(action.StatusCode)
+	case "Drop":
+		responseError(w, "Dropped by CasWAF: %s", reason)
+		w.WriteHeader(action.StatusCode)
+	case "CAPTCHA":
+		ok := isVerifiedSession(r)
+		if ok {
+			w.WriteHeader(http.StatusOK)
+			nextHandle(w, r)
+			return
+		}
+		w.Header().Set("Set-Cookie", "casdoor_captcha_token=; Path=/; Max-Age=-1")
+		redirectToCaptcha(w, r)
+		return
+	default:
+		responseError(w, "Error in CasWAF: %s", reason)
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	nextHandle(w, r)
 }
 
 func nextHandle(w http.ResponseWriter, r *http.Request) {
