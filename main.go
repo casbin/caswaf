@@ -15,6 +15,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/beego/beego"
 	"github.com/beego/beego/plugins/cors"
 	_ "github.com/beego/beego/session/redis"
@@ -25,6 +27,7 @@ import (
 	"github.com/casbin/caswaf/routers"
 	"github.com/casbin/caswaf/run"
 	"github.com/casbin/caswaf/service"
+	"github.com/casbin/caswaf/util"
 )
 
 func main() {
@@ -67,5 +70,12 @@ func main() {
 
 	service.Start()
 
-	beego.Run()
+	port := beego.AppConfig.DefaultInt("httpport", 17000)
+
+	err := util.StopOldInstance(port)
+	if err != nil {
+		panic(err)
+	}
+
+	beego.Run(fmt.Sprintf(":%v", port))
 }
