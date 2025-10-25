@@ -208,27 +208,28 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	action, reason, err := rule.CheckRules(site.Rules, r)
+	result, err := rule.CheckRules(site.Rules, r)
 	if err != nil {
 		responseError(w, "Internal Server Error: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	reason := result.Reason
 	if reason != "" && site.DisableVerbose {
 		reason = "the rule has been hit"
 	}
 
-	switch action.Type {
+	switch result.Action {
 	case "", "Allow":
 		// Do not write header for Allow action, let the proxy handle it
 	case "Block":
 		responseError(w, "Blocked by CasWAF: %s", reason)
-		w.WriteHeader(action.StatusCode)
+		w.WriteHeader(result.StatusCode)
 		return
 	case "Drop":
 		responseError(w, "Dropped by CasWAF: %s", reason)
-		w.WriteHeader(action.StatusCode)
+		w.WriteHeader(result.StatusCode)
 		return
 	case "CAPTCHA":
 		ok := isVerifiedSession(r)

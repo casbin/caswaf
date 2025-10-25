@@ -1,3 +1,17 @@
+// Copyright 2023 The casbin Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package rule
 
 import (
@@ -113,19 +127,26 @@ func TestIpRateRule_checkRule(t *testing.T) {
 				ruleName: tt.fields.ruleName,
 			}
 			for i, arg := range tt.args.args {
-				got, got1, got2, err := r.checkRule(arg.expressions, arg.req)
+				result, err := r.checkRule(arg.expressions, arg.req)
 				if (err != nil) != tt.wantErr[i] {
 					t.Errorf("checkRule() error = %v, wantErr %v", err, tt.wantErr)
 					return
 				}
+				got := result != nil
+				got1 := ""
+				got2 := ""
+				if result != nil {
+					got1 = result.Action
+					got2 = result.Reason
+				}
 				if got != tt.want[i] {
-					t.Errorf("checkRule() got = %v, want %v", got, tt.want)
+					t.Errorf("checkRule() got = %v, want %v", got, tt.want[i])
 				}
 				if got1 != tt.want1[i] {
-					t.Errorf("checkRule() got1 = %v, want %v", got1, tt.want1)
+					t.Errorf("checkRule() got1 = %v, want %v", got1, tt.want1[i])
 				}
 				if got2 != tt.want2[i] {
-					t.Errorf("checkRule() got2 = %v, want %v", got2, tt.want2)
+					t.Errorf("checkRule() got2 = %v, want %v", got2, tt.want2[i])
 				}
 			}
 		})

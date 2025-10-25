@@ -80,7 +80,7 @@ func (i *IpRateLimiter) GetLimiter(ip string) *rate.Limiter {
 	return limiter
 }
 
-func (r *IpRateRule) checkRule(expressions []*object.Expression, req *http.Request) (bool, string, string, error) {
+func (r *IpRateRule) checkRule(expressions []*object.Expression, req *http.Request) (*RuleResult, error) {
 	expression := expressions[0] // IpRate rule should have only one expression
 	clientIp := util.GetClientIp(req)
 
@@ -89,7 +89,10 @@ func (r *IpRateRule) checkRule(expressions []*object.Expression, req *http.Reque
 	if ok {
 		blockTime := util.ParseInt(expression.Value)
 		if time.Now().Sub(createAt) < time.Duration(blockTime)*time.Second {
-			return true, "Block", "Rate limit exceeded", nil
+			return &RuleResult{
+				Action: "Block",
+				Reason: "Rate limit exceeded",
+			}, nil
 		} else {
 			delete(blackList, clientIp)
 		}
@@ -112,7 +115,7 @@ func (r *IpRateRule) checkRule(expressions []*object.Expression, req *http.Reque
 		limiter.SetBurst(ipRateLimiter.b)
 		err := limiter.Wait(req.Context())
 		if err != nil {
-			return false, "", "", err
+			return nil, err
 		}
 	} else {
 		// If the rate limit is exceeded, add the client IP to the blacklist
@@ -120,9 +123,12 @@ func (r *IpRateRule) checkRule(expressions []*object.Expression, req *http.Reque
 		if !allow {
 			blackList[r.ruleName] = map[string]time.Time{}
 			blackList[r.ruleName][clientIp] = time.Now()
-			return true, "Block", "Rate limit exceeded", nil
+			return &RuleResult{
+				Action: "Block",
+				Reason: "Rate limit exceeded",
+			}, nil
 		}
 	}
 
-	return false, "", "", nil
+	return nil, nil
 }

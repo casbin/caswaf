@@ -22,18 +22,19 @@ import (
 )
 
 type Rule interface {
-	checkRule(expressions []*object.Expression, req *http.Request) (bool, string, string, error)
+	checkRule(expressions []*object.Expression, req *http.Request) (*RuleResult, error)
 }
 
-type ActionResult struct {
-	Type       string
+type RuleResult struct {
+	Action     string
 	StatusCode int
+	Reason     string
 }
 
-func CheckRules(ruleIds []string, r *http.Request) (*ActionResult, string, error) {
+func CheckRules(ruleIds []string, r *http.Request) (*RuleResult, error) {
 	rules, err := object.GetRulesByRuleIds(ruleIds)
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
 	for i, rule := range rules {
 		var ruleObj Rule
@@ -51,63 +52,57 @@ func CheckRules(ruleIds []string, r *http.Request) (*ActionResult, string, error
 		case "Compound":
 			ruleObj = &CompoundRule{}
 		default:
-			return nil, "", fmt.Errorf("unknown rule type: %s for rule: %s", rule.Type, rule.GetId())
+			return nil, fmt.Errorf("unknown rule type: %s for rule: %s", rule.Type, rule.GetId())
 		}
 
-		isHit, action, reason, err := ruleObj.checkRule(rule.Expressions, r)
+		result, err := ruleObj.checkRule(rule.Expressions, r)
 		if err != nil {
-			return nil, "", err
+			return nil, err
 		}
 		
-		// Use rule's action if no action specified by the rule check
-		if action == "" {
-			action = rule.Action
-		}
-		
-		// Determine status code
-		statusCode := rule.StatusCode
-		if statusCode == 0 {
-			// Set default status codes if not specified
-			switch action {
-			case "Block":
-				statusCode = 403
-			case "Drop":
-				statusCode = 400
-			case "Allow":
-				statusCode = 200
-			case "CAPTCHA":
-				statusCode = 302
-			default:
-				return nil, "", fmt.Errorf("unknown rule action: %s for rule: %s", action, rule.GetId())
+		if result != nil {
+			// Use rule's action if no action specified by the rule check
+			if result.Action == "" {
+				result.Action = rule.Action
 			}
-		}
-		
-		actionResult := &ActionResult{
-			Type:       action,
-			StatusCode: statusCode,
-		}
-		
-		if isHit {
-			if action == "Block" || action == "Drop" {
-				if rule.Reason != "" {
-					reason = rule.Reason
+			
+			// Determine status code
+			if result.StatusCode == 0 {
+				if rule.StatusCode != 0 {
+					result.StatusCode = rule.StatusCode
 				} else {
-					reason = fmt.Sprintf("hit rule %s: %s", ruleIds[i], reason)
+					// Set default status codes if not specified
+					switch result.Action {
+					case "Block":
+						result.StatusCode = 403
+					case "Drop":
+						result.StatusCode = 400
+					case "Allow":
+						result.StatusCode = 200
+					case "CAPTCHA":
+						result.StatusCode = 302
+					default:
+						return nil, fmt.Errorf("unknown rule action: %s for rule: %s", result.Action, rule.GetId())
+					}
 				}
-				return actionResult, reason, nil
-			} else if action == "Allow" {
-				return actionResult, reason, nil
-			} else if action == "CAPTCHA" {
-				return actionResult, reason, nil
-			} else {
-				return nil, "", fmt.Errorf("unknown rule action: %s for rule: %s", action, rule.GetId())
 			}
+			
+			// Update reason if rule has custom reason
+			if result.Action == "Block" || result.Action == "Drop" {
+				if rule.Reason != "" {
+					result.Reason = rule.Reason
+				} else if result.Reason != "" {
+					result.Reason = fmt.Sprintf("hit rule %s: %s", ruleIds[i], result.Reason)
+				}
+			}
+			
+			return result, nil
 		}
 	}
 	
 	// Default action if no rule matched
-	return &ActionResult{
-		Type:       "Allow",
+	return &RuleResult{
+		Action:     "Allow",
 		StatusCode: 200,
-	}, "", nil
+	}, nil
 }
