@@ -38,6 +38,7 @@ type Rule struct {
 	Action      string        `xorm:"varchar(100) notnull" json:"action"`
 	StatusCode  int           `xorm:"int notnull" json:"statusCode"`
 	Reason      string        `xorm:"varchar(100) notnull" json:"reason"`
+	IsVerbose   bool          `xorm:"bool" json:"isVerbose"`
 }
 
 func GetGlobalRules() ([]*Rule, error) {

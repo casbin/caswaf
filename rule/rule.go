@@ -89,7 +89,17 @@ func CheckRules(ruleIds []string, r *http.Request) (*RuleResult, error) {
 			
 			// Update reason if rule has custom reason
 			if result.Action == "Block" || result.Action == "Drop" {
-				if rule.Reason != "" {
+				if rule.IsVerbose {
+					// Add verbose debug info with rule name and triggered expression
+					verboseReason := fmt.Sprintf("Rule [%s] triggered", rule.GetId())
+					if result.Reason != "" {
+						verboseReason += fmt.Sprintf(" - %s", result.Reason)
+					}
+					if rule.Reason != "" {
+						verboseReason += fmt.Sprintf(" - Custom reason: %s", rule.Reason)
+					}
+					result.Reason = verboseReason
+				} else if rule.Reason != "" {
 					result.Reason = rule.Reason
 				} else if result.Reason != "" {
 					result.Reason = fmt.Sprintf("hit rule %s: %s", ruleIds[i], result.Reason)
