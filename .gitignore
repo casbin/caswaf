@@ -23,4 +23,5 @@ tmpFiles/
 logs/
 lastupdate.tmp
 commentsRouter*.go
-acme_account.key
+acme_account.keyweb/yarn.lock
+web/package-lock.json
