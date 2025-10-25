@@ -113,19 +113,26 @@ func TestIpRateRule_checkRule(t *testing.T) {
 				ruleName: tt.fields.ruleName,
 			}
 			for i, arg := range tt.args.args {
-				got, got1, got2, err := r.checkRule(arg.expressions, arg.req)
+				result, err := r.checkRule(arg.expressions, arg.req)
 				if (err != nil) != tt.wantErr[i] {
 					t.Errorf("checkRule() error = %v, wantErr %v", err, tt.wantErr)
 					return
 				}
+				got := result != nil
+				got1 := ""
+				got2 := ""
+				if result != nil {
+					got1 = result.Action
+					got2 = result.Reason
+				}
 				if got != tt.want[i] {
-					t.Errorf("checkRule() got = %v, want %v", got, tt.want)
+					t.Errorf("checkRule() got = %v, want %v", got, tt.want[i])
 				}
 				if got1 != tt.want1[i] {
-					t.Errorf("checkRule() got1 = %v, want %v", got1, tt.want1)
+					t.Errorf("checkRule() got1 = %v, want %v", got1, tt.want1[i])
 				}
 				if got2 != tt.want2[i] {
-					t.Errorf("checkRule() got2 = %v, want %v", got2, tt.want2)
+					t.Errorf("checkRule() got2 = %v, want %v", got2, tt.want2[i])
 				}
 			}
 		})

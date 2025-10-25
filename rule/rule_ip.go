@@ -26,11 +26,11 @@ import (
 
 type IpRule struct{}
 
-func (r *IpRule) checkRule(expressions []*object.Expression, req *http.Request) (bool, string, string, error) {
+func (r *IpRule) checkRule(expressions []*object.Expression, req *http.Request) (*RuleResult, error) {
 	clientIp := util.GetClientIp(req)
 	netIp, err := parseIp(clientIp)
 	if err != nil {
-		return false, "", "", err
+		return nil, err
 	}
 	for _, expression := range expressions {
 		reason := fmt.Sprintf("expression matched: \"%s %s %s\"", clientIp, expression.Operator, expression.Value)
@@ -39,40 +39,40 @@ func (r *IpRule) checkRule(expressions []*object.Expression, req *http.Request) 
 			if strings.Contains(ip, "/") {
 				_, ipNet, err := net.ParseCIDR(ip)
 				if err != nil {
-					return false, "", "", err
+					return nil, err
 				}
 
 				switch expression.Operator {
 				case "is in":
 					if ipNet.Contains(netIp) {
-						return true, "", reason, nil
+						return &RuleResult{Reason: reason}, nil
 					}
 				case "is not in":
 					if !ipNet.Contains(netIp) {
-						return true, "", reason, nil
+						return &RuleResult{Reason: reason}, nil
 					}
 				default:
-					return false, "", "", fmt.Errorf("unknown operator: %s", expression.Operator)
+					return nil, fmt.Errorf("unknown operator: %s", expression.Operator)
 				}
 			} else if strings.ContainsAny(ip, ".:") {
 				switch expression.Operator {
 				case "is in":
 					if ip == clientIp {
-						return true, "", reason, nil
+						return &RuleResult{Reason: reason}, nil
 					}
 				case "is not in":
 					if ip != clientIp {
-						return true, "", reason, nil
+						return &RuleResult{Reason: reason}, nil
 					}
 				default:
-					return false, "", "", fmt.Errorf("unknown operator: %s", expression.Operator)
+					return nil, fmt.Errorf("unknown operator: %s", expression.Operator)
 				}
 			} else {
-				return false, "", "", fmt.Errorf("unknown IP or CIDR format: %s", ip)
+				return nil, fmt.Errorf("unknown IP or CIDR format: %s", ip)
 			}
 		}
 	}
-	return false, "", "", nil
+	return nil, nil
 }
 
 func parseIp(ipStr string) (net.IP, error) {

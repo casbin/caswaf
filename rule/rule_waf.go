@@ -27,7 +27,7 @@ import (
 
 type WafRule struct{}
 
-func (r *WafRule) checkRule(expressions []*object.Expression, req *http.Request) (bool, string, string, error) {
+func (r *WafRule) checkRule(expressions []*object.Expression, req *http.Request) (*RuleResult, error) {
 	var ruleStr string
 	for _, expression := range expressions {
 		ruleStr += expression.Value
@@ -39,7 +39,7 @@ func (r *WafRule) checkRule(expressions []*object.Expression, req *http.Request)
 			WithDirectives(ruleStr),
 	)
 	if err != nil {
-		return false, "", "", fmt.Errorf("create WAF failed")
+		return nil, fmt.Errorf("create WAF failed")
 	}
 	tx := waf.NewTransaction()
 	processRequest(tx, req)
@@ -48,18 +48,26 @@ func (r *WafRule) checkRule(expressions []*object.Expression, req *http.Request)
 		rule := matchedRule.Rule()
 		directive, err := parser.NewSecLangScannerFromString(rule.Raw()).AllDirective()
 		if err != nil {
-			return false, "", "", err
+			return nil, err
 		}
 		for _, d := range directive {
 			ruleDirective := d.(*parser.RuleDirective)
 			for _, action := range ruleDirective.Actions.Action {
 				switch action.Tk {
 				case parser.TkActionBlock, parser.TkActionDeny:
-					return true, "Block", fmt.Sprintf("blocked by WAF rule: %d", rule.ID()), nil
+					return &RuleResult{
+						Action: "Block",
+						Reason: fmt.Sprintf("blocked by WAF rule: %d", rule.ID()),
+					}, nil
 				case parser.TkActionAllow:
-					return true, "Allow", "", nil
+					return &RuleResult{
+						Action: "Allow",
+					}, nil
 				case parser.TkActionDrop:
-					return true, "Drop", fmt.Sprintf("dropped by WAF rule: %d", rule.ID()), nil
+					return &RuleResult{
+						Action: "Drop",
+						Reason: fmt.Sprintf("dropped by WAF rule: %d", rule.ID()),
+					}, nil
 				default:
 					// skip other actions
 					continue
@@ -67,7 +75,7 @@ func (r *WafRule) checkRule(expressions []*object.Expression, req *http.Request)
 			}
 		}
 	}
-	return false, "", "", nil
+	return nil, nil
 }
 
 func processRequest(tx types.Transaction, req *http.Request) {

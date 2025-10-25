@@ -24,16 +24,16 @@ import (
 
 type CompoundRule struct{}
 
-func (r *CompoundRule) checkRule(expressions []*object.Expression, req *http.Request) (bool, string, string, error) {
+func (r *CompoundRule) checkRule(expressions []*object.Expression, req *http.Request) (*RuleResult, error) {
 	operators := util.NewStack()
 	res := true
 	for _, expression := range expressions {
 		isHit := true
-		action, _, err := CheckRules([]string{expression.Value}, req)
+		result, err := CheckRules([]string{expression.Value}, req)
 		if err != nil {
-			return false, "", "", err
+			return nil, err
 		}
-		if action.Type == "" {
+		if result == nil || result.Action == "" {
 			isHit = false
 		}
 		switch expression.Operator {
@@ -43,7 +43,7 @@ func (r *CompoundRule) checkRule(expressions []*object.Expression, req *http.Req
 			operators.Push(res)
 			res = isHit
 		default:
-			return false, "", "", fmt.Errorf("unknown operator: %s", expression.Operator)
+			return nil, fmt.Errorf("unknown operator: %s", expression.Operator)
 		}
 		if operators.Size() > 0 {
 			last, ok := operators.Pop()
@@ -53,5 +53,8 @@ func (r *CompoundRule) checkRule(expressions []*object.Expression, req *http.Req
 			}
 		}
 	}
-	return res, "", "", nil
+	if res {
+		return &RuleResult{}, nil
+	}
+	return nil, nil
 }
