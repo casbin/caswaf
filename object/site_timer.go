@@ -94,6 +94,12 @@ func StartMonitorSitesLoop() {
 				continue
 			}
 
+			err = refreshRuleMap()
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
 			err = monitorSiteNodes()
 			if err != nil {
 				fmt.Println(err)
