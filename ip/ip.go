@@ -14,7 +14,11 @@
 
 package ip
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/casbin/caswaf/util"
+)
 
 func InitIpDb() {
 	err := Init("ip/17monipdb.dat")
@@ -24,6 +28,11 @@ func InitIpDb() {
 }
 
 func IsAbroadIp(ip string) bool {
+	// If it's an intranet IP, it's not abroad
+	if util.IsIntranetIp(ip) {
+		return false
+	}
+
 	info, err := Find(ip)
 	if err != nil {
 		fmt.Printf("error: ip = %s, error = %s\n", ip, err.Error())
