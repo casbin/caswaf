@@ -22,9 +22,11 @@ import (
 )
 
 type Action struct {
-	Owner         string `xorm:"varchar(100) notnull pk" json:"owner"`
-	Name          string `xorm:"varchar(100) notnull pk" json:"name"`
-	CreatedTime   string `xorm:"varchar(100) notnull" json:"createdTime"`
+	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
+	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
+	CreatedTime string `xorm:"varchar(100) notnull" json:"createdTime"`
+	UpdatedTime string `xorm:"varchar(100) notnull" json:"updatedTime"`
+
 	Type          string `xorm:"varchar(100) notnull" json:"type"`
 	StatusCode    int    `xorm:"int notnull" json:"statusCode"`
 	ImmunityTimes int    `xorm:"int notnull" json:"immunityTimes"` // minutes
