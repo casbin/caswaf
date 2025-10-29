@@ -16,7 +16,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/beego/beego"
 	"github.com/beego/beego/plugins/cors"
@@ -32,18 +31,7 @@ import (
 )
 
 func main() {
-	// Auto-recovery is always enabled - check if we're not already supervised
-	if !util.IsSupervisedProcess() {
-		// Run as supervisor
-		err := util.RunSupervisor()
-		if err != nil {
-			fmt.Printf("Supervisor error: %v\n", err)
-			os.Exit(1)
-		}
-		return
-	}
-
-	// Normal execution (supervised process)
+	util.InitSelfGuard()
 	object.InitFlag()
 	object.InitAdapter()
 	object.CreateTables()

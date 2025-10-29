@@ -90,12 +90,6 @@ After creating an organization and an application for CasWAF in a Casdoor, you n
 - Configure and run CasWAF by yourself. If you want to learn more about caswaf.
 - Open browser: http://localhost:16001/
 
-CasWAF includes a built-in auto-recovery mechanism that automatically restarts the process if it crashes. This feature is always enabled and:
-- Automatically restarts CasWAF if it crashes
-- Prevents restart loops with smart restart limits (max 5 restarts in 5 minutes)
-- Works cross-platform (Windows, Linux, macOS)
-- Uses pure Go with no external dependencies
-
 ### Optional configuration
 
 #### Setup your WAF to enable some third-party login platform

@@ -34,13 +34,28 @@ const (
 	RestartDelay = 2 * time.Second
 )
 
-// IsSupervisedProcess checks if the current process is running under supervision
-func IsSupervisedProcess() bool {
-	return os.Getenv(EnvSupervisorKey) == "1"
+// InitSelfGuard initializes the self-recovery mechanism
+// If not already supervised, it starts a supervisor process and exits
+// If already supervised, it does nothing and returns
+func InitSelfGuard() {
+	// Check if we're already supervised
+	if os.Getenv(EnvSupervisorKey) == "1" {
+		// Already supervised, just return and continue normal execution
+		return
+	}
+	
+	// Start as supervisor
+	err := runSupervisor()
+	if err != nil {
+		fmt.Printf("Supervisor error: %v\n", err)
+		os.Exit(1)
+	}
+	// If we get here, supervisor exited cleanly
+	os.Exit(0)
 }
 
-// RunSupervisor starts the supervisor that monitors and restarts the main process
-func RunSupervisor() error {
+// runSupervisor starts the supervisor that monitors and restarts the main process
+func runSupervisor() error {
 	fmt.Println("Starting CasWAF with auto-recovery mechanism...")
 	
 	restartTimes := []time.Time{}
