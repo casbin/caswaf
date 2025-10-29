@@ -19,6 +19,8 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
+	"runtime"
 	"syscall"
 	"time"
 )
@@ -26,6 +28,8 @@ import (
 const (
 	// EnvSupervisorKey is the environment variable key to detect if running under supervisor
 	EnvSupervisorKey = "CASWAF_SUPERVISED"
+	// EnvSupervisorMode indicates if this process is the supervisor itself
+	EnvSupervisorMode = "CASWAF_SUPERVISOR_MODE"
 	// MaxRestarts is the maximum number of restarts within the restart window
 	MaxRestarts = 5
 	// RestartWindow is the time window for counting restarts
@@ -35,30 +39,102 @@ const (
 )
 
 // InitSelfGuard initializes the self-recovery mechanism
-// If not already supervised, it starts a supervisor process and exits
+// On Windows: Launches a new CMD window with supervisor that monitors the main process
+// On other platforms: Uses the current terminal to run supervisor
 // If already supervised, it does nothing and returns
 func InitSelfGuard() {
-	// Check if we're already supervised
+	// Check if we're already supervised (child process)
 	if os.Getenv(EnvSupervisorKey) == "1" {
 		// Already supervised, just return and continue normal execution
+		fmt.Println("Running under supervisor, proceeding with normal startup...")
 		return
 	}
 	
-	// Start as supervisor
-	err := runSupervisor()
-	if err != nil {
-		fmt.Printf("Supervisor error: %v\n", err)
-		os.Exit(1)
+	// Check if we are the supervisor process itself
+	if os.Getenv(EnvSupervisorMode) == "1" {
+		// We are the supervisor, run supervisor logic
+		err := runSupervisor()
+		if err != nil {
+			fmt.Printf("Supervisor error: %v\n", err)
+			os.Exit(1)
+		}
+		// Supervisor exited cleanly
+		os.Exit(0)
 	}
-	// If we get here, supervisor exited cleanly
-	os.Exit(0)
+	
+	// We are the initial process, need to start supervisor
+	if runtime.GOOS == "windows" {
+		// On Windows, start supervisor in a new CMD window
+		err := startWindowsSupervisor()
+		if err != nil {
+			fmt.Printf("Failed to start supervisor window: %v\n", err)
+			os.Exit(1)
+		}
+		// Initial process exits after launching supervisor
+		fmt.Println("Supervisor window started, this process will exit...")
+		os.Exit(0)
+	} else {
+		// On non-Windows, run supervisor in current terminal
+		err := runSupervisor()
+		if err != nil {
+			fmt.Printf("Supervisor error: %v\n", err)
+			os.Exit(1)
+		}
+		// Supervisor exited cleanly
+		os.Exit(0)
+	}
+}
+
+// startWindowsSupervisor starts a new CMD window with the supervisor on Windows
+func startWindowsSupervisor() error {
+	exePath, err := os.Executable()
+	if err != nil {
+		return fmt.Errorf("failed to get executable path: %w", err)
+	}
+	
+	// Get absolute path
+	exePath, err = filepath.Abs(exePath)
+	if err != nil {
+		return fmt.Errorf("failed to get absolute path: %w", err)
+	}
+	
+	// Build command arguments for the new CMD window
+	// We need to pass all original arguments and set supervisor mode
+	args := []string{"/c", "start", "CasWAF Supervisor", "cmd", "/k"}
+	
+	// Add the executable path and arguments
+	cmdLine := fmt.Sprintf(`"%s"`, exePath)
+	for _, arg := range os.Args[1:] {
+		cmdLine += fmt.Sprintf(` "%s"`, arg)
+	}
+	args = append(args, cmdLine)
+	
+	// Create the command
+	cmd := exec.Command("cmd", args...)
+	
+	// Set environment variable to mark this as supervisor mode
+	cmd.Env = append(os.Environ(), fmt.Sprintf("%s=1", EnvSupervisorMode))
+	
+	// Start the CMD window
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to start supervisor window: %w", err)
+	}
+	
+	fmt.Println("Starting CasWAF with supervisor in new CMD window...")
+	return nil
 }
 
 // runSupervisor starts the supervisor that monitors and restarts the main process
 func runSupervisor() error {
-	fmt.Println("Starting CasWAF with auto-recovery mechanism...")
+	fmt.Println("=====================================")
+	fmt.Println("     CasWAF Supervisor Started")
+	fmt.Println("=====================================")
+	fmt.Println("This window monitors the CasWAF process")
+	fmt.Println("and will automatically restart it if it crashes.")
+	fmt.Println()
 	
 	restartTimes := []time.Time{}
+	restartCount := 0
 	
 	for {
 		// Clean up old restart times outside the window
@@ -73,6 +149,9 @@ func runSupervisor() error {
 		
 		// Check if we've exceeded max restarts
 		if len(restartTimes) >= MaxRestarts {
+			fmt.Printf("\n[ERROR] Exceeded maximum restart limit (%d restarts in %v)\n", MaxRestarts, RestartWindow)
+			fmt.Println("Stopping supervisor to prevent infinite restart loop.")
+			fmt.Println("Please check the application logs for errors.")
 			return fmt.Errorf("exceeded maximum restart limit (%d restarts in %v), stopping supervisor", MaxRestarts, RestartWindow)
 		}
 		
@@ -87,12 +166,14 @@ func runSupervisor() error {
 		
 		// Start the process
 		if err := cmd.Start(); err != nil {
-			fmt.Printf("Failed to start process: %v\n", err)
+			fmt.Printf("[ERROR] Failed to start process: %v\n", err)
 			return err
 		}
 		
 		processStartTime := time.Now()
-		fmt.Printf("Started supervised process with PID: %d\n", cmd.Process.Pid)
+		restartCount++
+		fmt.Printf("\n[%s] Started CasWAF process (PID: %d, Start #%d)\n", 
+			processStartTime.Format("2006-01-02 15:04:05"), cmd.Process.Pid, restartCount)
 		
 		// Setup signal handling to forward signals to child
 		sigChan := make(chan os.Signal, 1)
@@ -111,31 +192,37 @@ func runSupervisor() error {
 			uptime := exitTime.Sub(processStartTime)
 			
 			if err != nil {
-				fmt.Printf("Process crashed after %v: %v\n", uptime, err)
+				fmt.Printf("\n[%s] CasWAF process crashed after running for %v\n", 
+					exitTime.Format("2006-01-02 15:04:05"), uptime)
+				fmt.Printf("[ERROR] Exit error: %v\n", err)
 				
 				// Record this restart
 				restartTimes = append(restartTimes, time.Now())
 				
-				fmt.Printf("Waiting %v before restarting... (restart %d/%d)\n", 
-					RestartDelay, len(restartTimes), MaxRestarts)
+				fmt.Printf("[INFO] Waiting %v before restarting... (Restart %d/%d in last %v)\n", 
+					RestartDelay, len(restartTimes), MaxRestarts, RestartWindow)
 				time.Sleep(RestartDelay)
 				
 				// Continue to restart
 				continue
 			} else {
 				// Clean exit
-				fmt.Println("Process exited cleanly")
+				fmt.Printf("\n[%s] CasWAF process exited cleanly after running for %v\n", 
+					exitTime.Format("2006-01-02 15:04:05"), uptime)
+				fmt.Println("Supervisor shutting down...")
 				return nil
 			}
 			
 		case sig := <-sigChan:
 			// Received shutdown signal, forward to child
-			fmt.Printf("Received signal %v, forwarding to child process...\n", sig)
+			fmt.Printf("\n[%s] Received signal %v, forwarding to CasWAF process...\n", 
+				time.Now().Format("2006-01-02 15:04:05"), sig)
 			if cmd.Process != nil {
 				cmd.Process.Signal(sig)
 			}
 			// Wait for child to exit
 			<-doneChan
+			fmt.Println("Supervisor shutting down...")
 			return nil
 		}
 	}
