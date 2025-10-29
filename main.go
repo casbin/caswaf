@@ -31,6 +31,7 @@ import (
 )
 
 func main() {
+	util.InitSelfGuard()
 	object.InitFlag()
 	object.InitAdapter()
 	object.CreateTables()
