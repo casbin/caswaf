@@ -85,6 +85,63 @@ func InitSelfGuard() {
 	}
 }
 
+// escapeWindowsArg escapes an argument for use in Windows command line
+// Based on Windows command line parsing rules
+func escapeWindowsArg(arg string) string {
+	// If the argument doesn't contain special characters, return as-is
+	if !containsSpecialChar(arg) {
+		return arg
+	}
+	
+	// Escape the argument with quotes and handle internal quotes/backslashes
+	result := "\""
+	for i := 0; i < len(arg); i++ {
+		numBackslashes := 0
+		
+		// Count consecutive backslashes
+		for i < len(arg) && arg[i] == '\\' {
+			numBackslashes++
+			i++
+		}
+		
+		if i == len(arg) {
+			// Backslashes at end of string - double them before closing quote
+			for j := 0; j < numBackslashes*2; j++ {
+				result += "\\"
+			}
+			break
+		} else if arg[i] == '"' {
+			// Backslashes followed by quote - double them and escape the quote
+			for j := 0; j < numBackslashes*2; j++ {
+				result += "\\"
+			}
+			result += "\\\""
+		} else {
+			// Backslashes followed by normal character - keep them as-is
+			for j := 0; j < numBackslashes; j++ {
+				result += "\\"
+			}
+			result += string(arg[i])
+		}
+	}
+	result += "\""
+	return result
+}
+
+// containsSpecialChar checks if a string contains characters that need escaping
+func containsSpecialChar(s string) bool {
+	for _, c := range s {
+		if c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '"' {
+			return true
+		}
+	}
+	// Also need to escape if string ends with backslash (will be followed by closing quote)
+	if len(s) > 0 && s[len(s)-1] == '\\' {
+		return true
+	}
+	return false
+}
+
 // startWindowsSupervisor starts a new CMD window with the supervisor on Windows
 func startWindowsSupervisor() error {
 	exePath, err := os.Executable()
@@ -99,13 +156,13 @@ func startWindowsSupervisor() error {
 	}
 	
 	// Build command arguments for the new CMD window
-	// We need to pass all original arguments and set supervisor mode
+	// Using cmd /c start to create new window, then cmd /k to keep it open
 	args := []string{"/c", "start", "CasWAF Supervisor", "cmd", "/k"}
 	
-	// Add the executable path and arguments
-	cmdLine := fmt.Sprintf(`"%s"`, exePath)
+	// Build the command line with properly escaped arguments
+	cmdLine := escapeWindowsArg(exePath)
 	for _, arg := range os.Args[1:] {
-		cmdLine += fmt.Sprintf(` "%s"`, arg)
+		cmdLine += " " + escapeWindowsArg(arg)
 	}
 	args = append(args, cmdLine)
 	

@@ -61,3 +61,53 @@ func TestInitSelfGuard_AlreadySupervised(t *testing.T) {
 	// Note: In a real supervised scenario, this would just return
 	// We can't test the full flow without mocking os.Exit
 }
+
+func TestEscapeWindowsArg(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"simple", "simple"},
+		{"with space", "\"with space\""},
+		{"with\"quote", "\"with\\\"quote\""},
+		{"path\\to\\file", "path\\to\\file"},
+		{"path\\to\\file with space", "\"path\\to\\file with space\""},
+		{"ends\\with\\backslash\\", "\"ends\\with\\backslash\\\\\""},
+		{"quote\"and\\backslash\\", "\"quote\\\"and\\backslash\\\\\""},
+		{"", ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			result := escapeWindowsArg(tt.input)
+			if result != tt.expected {
+				t.Errorf("escapeWindowsArg(%q) = %q, want %q", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestContainsSpecialChar(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{"simple", false},
+		{"with space", true},
+		{"with\ttab", true},
+		{"with\nnewline", true},
+		{"with\"quote", true},
+		{"normal_string", false},
+		{"path/to/file", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			result := containsSpecialChar(tt.input)
+			if result != tt.expected {
+				t.Errorf("containsSpecialChar(%q) = %v, want %v", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
+
