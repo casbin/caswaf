@@ -90,6 +90,24 @@ After creating an organization and an application for CasWAF in a Casdoor, you n
 - Configure and run CasWAF by yourself. If you want to learn more about caswaf.
 - Open browser: http://localhost:16001/
 
+#### Enable Auto-Recovery (Recommended for Production)
+
+CasWAF includes a built-in auto-recovery mechanism that automatically restarts the process if it crashes. This is enabled by default but can be configured in `conf/app.conf`:
+
+```ini
+autoRecoveryEnabled = true
+```
+
+This feature:
+- Automatically restarts CasWAF if it crashes
+- Prevents restart loops with smart restart limits
+- Works cross-platform (Windows, Linux, macOS)
+- Uses pure Go with no external dependencies
+
+For more details, see [supervisor/README.md](supervisor/README.md).
+
+**Note**: If using external process managers (systemd, Docker, Kubernetes), set `autoRecoveryEnabled = false` to avoid conflicts.
+
 ### Optional configuration
 
 #### Setup your WAF to enable some third-party login platform
