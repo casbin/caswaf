@@ -57,7 +57,7 @@ import (
 
 const (
 	EnvSupervisorKey = "CASWAF_SUPERVISED"
-	MaxRestarts = 3
+	MaxRestarts = 3  // Using 3 for demo (shorter runtime), actual supervisor uses 5
 	RestartDelay = 2 * time.Second
 )
 
@@ -150,12 +150,19 @@ EOF
 
 # Build the programs
 echo "Building demo programs..."
-go build -o "$DEMO_DIR/demo_crash" "$DEMO_DIR/demo_crash.go" 2>&1 | grep -v "go: downloading" || true
-go build -o "$DEMO_DIR/demo_supervisor" "$DEMO_DIR/demo_supervisor.go" 2>&1 | grep -v "go: downloading" || true
+# Build and check exit status explicitly
+if ! go build -o "$DEMO_DIR/demo_crash" "$DEMO_DIR/demo_crash.go" 2>&1 | grep -v "go: downloading"; then
+    if [ ! -f "$DEMO_DIR/demo_crash" ]; then
+        echo "Failed to build demo_crash"
+        exit 1
+    fi
+fi
 
-if [ ! -f "$DEMO_DIR/demo_crash" ] || [ ! -f "$DEMO_DIR/demo_supervisor" ]; then
-    echo "Failed to build demo programs"
-    exit 1
+if ! go build -o "$DEMO_DIR/demo_supervisor" "$DEMO_DIR/demo_supervisor.go" 2>&1 | grep -v "go: downloading"; then
+    if [ ! -f "$DEMO_DIR/demo_supervisor" ]; then
+        echo "Failed to build demo_supervisor"
+        exit 1
+    fi
 fi
 
 echo "Build successful!"
