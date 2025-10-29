@@ -1,4 +1,4 @@
-// Copyright 2023 The casbin Authors. All Rights Reserved.
+// Copyright 2025 The casbin Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package supervisor
+package util
 
 import (
 	"fmt"
@@ -39,8 +39,8 @@ func IsSupervisedProcess() bool {
 	return os.Getenv(EnvSupervisorKey) == "1"
 }
 
-// Run starts the supervisor that monitors and restarts the main process
-func Run() error {
+// RunSupervisor starts the supervisor that monitors and restarts the main process
+func RunSupervisor() error {
 	fmt.Println("Starting CasWAF with auto-recovery mechanism...")
 	
 	restartTimes := []time.Time{}

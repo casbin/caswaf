@@ -22,22 +22,20 @@ import (
 	"github.com/beego/beego/plugins/cors"
 	_ "github.com/beego/beego/session/redis"
 	"github.com/casbin/caswaf/casdoor"
-	"github.com/casbin/caswaf/conf"
 	"github.com/casbin/caswaf/ip"
 	"github.com/casbin/caswaf/object"
 	"github.com/casbin/caswaf/proxy"
 	"github.com/casbin/caswaf/routers"
 	"github.com/casbin/caswaf/run"
 	"github.com/casbin/caswaf/service"
-	"github.com/casbin/caswaf/supervisor"
 	"github.com/casbin/caswaf/util"
 )
 
 func main() {
-	// Check if auto-recovery is enabled and we're not already supervised
-	if conf.GetConfigBool("autoRecoveryEnabled") && !supervisor.IsSupervisedProcess() {
+	// Auto-recovery is always enabled - check if we're not already supervised
+	if !util.IsSupervisedProcess() {
 		// Run as supervisor
-		err := supervisor.Run()
+		err := util.RunSupervisor()
 		if err != nil {
 			fmt.Printf("Supervisor error: %v\n", err)
 			os.Exit(1)
@@ -45,7 +43,7 @@ func main() {
 		return
 	}
 
-	// Normal execution (either supervised or auto-recovery disabled)
+	// Normal execution (supervised process)
 	object.InitFlag()
 	object.InitAdapter()
 	object.CreateTables()
