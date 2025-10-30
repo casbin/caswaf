@@ -66,10 +66,14 @@ func handleAuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	scheme := getScheme(r)
 	cookie := &http.Cookie{
-		Name:  "casdoor_access_token",
-		Value: token.AccessToken,
-		Path:  "/",
+		Name:     "casdoor_access_token",
+		Value:    token.AccessToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   scheme == "https",
+		SameSite: http.SameSiteLaxMode,
 	}
 	http.SetCookie(w, cookie)
 

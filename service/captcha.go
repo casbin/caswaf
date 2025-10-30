@@ -98,6 +98,7 @@ func handleCaptchaCallback(w http.ResponseWriter, r *http.Request) {
 	// set verified session
 	uuidStr := uuid.NewString()
 	verifiedSession[uuidStr] = time.Now()
+	scheme := getScheme(r)
 	cookie := &http.Cookie{
 		Name:       "casdoor_captcha_token",
 		Value:      uuidStr,
@@ -106,14 +107,13 @@ func handleCaptchaCallback(w http.ResponseWriter, r *http.Request) {
 		Expires:    time.Now().Add(30 * time.Minute),
 		RawExpires: "",
 		MaxAge:     0,
-		Secure:     false,
-		HttpOnly:   false,
-		SameSite:   0,
+		Secure:     scheme == "https",
+		HttpOnly:   true,
+		SameSite:   http.SameSiteLaxMode,
 		Raw:        "",
 		Unparsed:   nil,
 	}
 
-	scheme := getScheme(r)
 	http.SetCookie(w, cookie)
 	http.Redirect(w, r, scheme+"://"+host, http.StatusFound)
 	return
