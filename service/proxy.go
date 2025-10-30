@@ -306,15 +306,25 @@ func Start() {
 		server := &http.Server{
 			Addr: fmt.Sprintf(":%d", gatewayHttpsPort),
 			TLSConfig: &tls.Config{
+				// Minimum TLS version 1.2, TLS 1.3 is automatically supported
 				MinVersion: tls.VersionTLS12,
+				// Prefer server's cipher suite order for better security
+				PreferServerCipherSuites: true,
+				// Secure cipher suites for TLS 1.2 (excluding 3DES to prevent Sweet32 attack)
+				// TLS 1.3 cipher suites are automatically configured by Go
 				CipherSuites: []uint16{
-					// Secure cipher suites for TLS 1.2 (excluding 3DES to prevent Sweet32 attack)
 					tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 					tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
 					tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 					tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 					tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
 					tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+				},
+				// Prefer strong elliptic curves
+				CurvePreferences: []tls.CurveID{
+					tls.X25519,
+					tls.CurveP256,
+					tls.CurveP384,
 				},
 			},
 		}
