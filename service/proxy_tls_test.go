@@ -19,10 +19,10 @@ import (
 	"testing"
 )
 
-// TestTLSConfigSecurity verifies that the TLS configuration meets security requirements
-func TestTLSConfigSecurity(t *testing.T) {
-	// Create a TLS config similar to what's used in Start()
-	config := &tls.Config{
+// getTestTLSConfig returns the standard TLS configuration used in production
+// This should match the configuration in Start()
+func getTestTLSConfig() *tls.Config {
+	return &tls.Config{
 		MinVersion:               tls.VersionTLS12,
 		PreferServerCipherSuites: true,
 		CipherSuites: []uint16{
@@ -39,6 +39,11 @@ func TestTLSConfigSecurity(t *testing.T) {
 			tls.CurveP384,
 		},
 	}
+}
+
+// TestTLSConfigSecurity verifies that the TLS configuration meets security requirements
+func TestTLSConfigSecurity(t *testing.T) {
+	config := getTestTLSConfig()
 
 	// Test 1: Verify minimum TLS version is 1.2
 	if config.MinVersion != tls.VersionTLS12 {
@@ -98,17 +103,7 @@ func TestTLSConfigSecurity(t *testing.T) {
 
 // TestWeakCipherSuitesNotPresent specifically tests that 3DES cipher suites are not present
 func TestWeakCipherSuitesNotPresent(t *testing.T) {
-	config := &tls.Config{
-		MinVersion: tls.VersionTLS12,
-		CipherSuites: []uint16{
-			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-			tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-			tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-			tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
-			tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
-		},
-	}
+	config := getTestTLSConfig()
 
 	// These are the specific weak cipher suites mentioned in the issue
 	forbiddenCiphers := map[uint16]string{
