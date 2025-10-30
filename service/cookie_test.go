@@ -29,6 +29,8 @@ func TestCaptchaCookieAttributes(t *testing.T) {
 
 	// Create a test request with HTTPS scheme
 	r := httptest.NewRequest("GET", "https://example.com/test", nil)
+	// Explicitly set scheme to ensure test reliability
+	r.URL.Scheme = "https"
 
 	// Set a test captcha cookie
 	uuidStr := "test-uuid-123"
@@ -74,6 +76,8 @@ func TestCaptchaCookieAttributesHTTP(t *testing.T) {
 
 	// Create a test request with HTTP scheme
 	r := httptest.NewRequest("GET", "http://example.com/test", nil)
+	// Explicitly set scheme to ensure test reliability
+	r.URL.Scheme = "http"
 
 	// Set a test captcha cookie
 	uuidStr := "test-uuid-123"
@@ -114,6 +118,8 @@ func TestOAuthCookieAttributes(t *testing.T) {
 
 	// Create a test request with HTTPS scheme
 	r := httptest.NewRequest("GET", "https://example.com/test", nil)
+	// Explicitly set scheme to ensure test reliability
+	r.URL.Scheme = "https"
 
 	// Set a test OAuth access token cookie
 	cookie := &http.Cookie{
