@@ -16,21 +16,14 @@ package service
 
 import (
 	"crypto/tls"
+	"strings"
 	"testing"
 )
 
-// TestTLSConfigurationExcludes3DES verifies that the TLS configuration
-// excludes vulnerable 3DES cipher suites to prevent Sweet32 attack
-func TestTLSConfigurationExcludes3DES(t *testing.T) {
-	// Vulnerable 3DES cipher suites that should NOT be present
-	vulnerable3DESCiphers := []uint16{
-		tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA,         // 0x000A
-		tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,   // 0xC012
-	}
-
-	// Get the cipher suites that would be used by the HTTPS server
-	// This matches the configuration in the Start() function
-	configuredCiphers := []uint16{
+// getConfiguredCipherSuites returns the cipher suites configured in the HTTPS server
+// This matches the configuration in the Start() function in proxy.go
+func getConfiguredCipherSuites() []uint16 {
+	return []uint16{
 		tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 		tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
 		tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
@@ -42,6 +35,18 @@ func TestTLSConfigurationExcludes3DES(t *testing.T) {
 		tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
 		tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
 	}
+}
+
+// TestTLSConfigurationExcludes3DES verifies that the TLS configuration
+// excludes vulnerable 3DES cipher suites to prevent Sweet32 attack
+func TestTLSConfigurationExcludes3DES(t *testing.T) {
+	// Vulnerable 3DES cipher suites that should NOT be present
+	vulnerable3DESCiphers := []uint16{
+		tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA,         // 0x000A
+		tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,   // 0xC012
+	}
+
+	configuredCiphers := getConfiguredCipherSuites()
 
 	// Verify that no vulnerable 3DES ciphers are in the configured list
 	for _, vulnerableCipher := range vulnerable3DESCiphers {
@@ -67,18 +72,7 @@ func TestTLSMinimumVersion(t *testing.T) {
 // TestConfiguredCiphersAreSecure verifies that all configured cipher suites
 // are from the secure list (not from InsecureCipherSuites)
 func TestConfiguredCiphersAreSecure(t *testing.T) {
-	configuredCiphers := []uint16{
-		tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-		tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-		tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-		tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-		tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
-		tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
-		tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
-		tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-		tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
-		tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
-	}
+	configuredCiphers := getConfiguredCipherSuites()
 
 	// Get list of insecure cipher suites
 	insecureCiphers := tls.InsecureCipherSuites()
@@ -98,18 +92,7 @@ func TestConfiguredCiphersAreSecure(t *testing.T) {
 // TestAllConfiguredCiphersHaveForwardSecrecy verifies that all configured
 // cipher suites use ECDHE for forward secrecy
 func TestAllConfiguredCiphersHaveForwardSecrecy(t *testing.T) {
-	configuredCiphers := []uint16{
-		tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-		tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-		tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-		tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-		tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
-		tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
-		tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
-		tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-		tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
-		tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
-	}
+	configuredCiphers := getConfiguredCipherSuites()
 
 	// Get the list of all secure cipher suites that Go supports
 	secureCiphers := tls.CipherSuites()
@@ -128,13 +111,8 @@ func TestAllConfiguredCiphersHaveForwardSecrecy(t *testing.T) {
 		}
 
 		// Verify the cipher name contains "ECDHE" for forward secrecy
-		if !contains(suite.Name, "ECDHE") {
+		if !strings.Contains(suite.Name, "ECDHE") {
 			t.Errorf("Cipher suite %s (0x%04X) does not use ECDHE for forward secrecy", suite.Name, cipherID)
 		}
 	}
-}
-
-// Helper function to check if a string contains a substring
-func contains(s, substr string) bool {
-	return len(s) >= len(substr) && s[:len(substr)] == substr || len(s) > len(substr) && contains(s[1:], substr)
 }
