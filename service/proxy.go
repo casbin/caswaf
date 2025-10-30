@@ -304,8 +304,10 @@ func Start() {
 	go func() {
 		fmt.Printf("CasWAF gateway running on: https://127.0.0.1:%d\n", gatewayHttpsPort)
 		server := &http.Server{
-			Addr:      fmt.Sprintf(":%d", gatewayHttpsPort),
-			TLSConfig: &tls.Config{},
+			Addr: fmt.Sprintf(":%d", gatewayHttpsPort),
+			TLSConfig: &tls.Config{
+				MinVersion: tls.VersionTLS12,
+			},
 		}
 
 		// start https server and set how to get certificate
