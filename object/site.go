@@ -71,7 +71,7 @@ type Site struct {
 
 func GetGlobalSites() ([]*Site, error) {
 	sites := []*Site{}
-	err := ormer.Engine.Asc("owner").Desc("created_time").Find(&sites)
+	err := ormer.Engine.Desc("created_time").Find(&sites)
 	if err != nil {
 		return nil, err
 	}
