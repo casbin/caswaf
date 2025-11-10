@@ -80,6 +80,12 @@ jobs:
           old_version=${{ steps.semantic.outputs.last_release_version }}
           new_version=${{ steps.semantic.outputs.new_release_version }}
 
+          # If semantic-release didn't create a new version, skip Docker push
+          if [ -z "$new_version" ]; then
+              echo ::set-output name=push::'false'
+              exit 0
+          fi
+
           old_array=(${old_version//\./ })
           new_array=(${new_version//\./ })
 
