@@ -17,12 +17,15 @@ package run
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/casbin/caswaf/util"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 )
 
 var reBatNames *regexp.Regexp
@@ -136,7 +139,16 @@ func IsWindowTitleActive(name string) (bool, error) {
 		return false, err
 	}
 
-	output := out.String()
+	// Decode output from GBK (Windows default codepage) to UTF-8
+	decoder := simplifiedchinese.GBK.NewDecoder()
+	reader := transform.NewReader(&out, decoder)
+	decoded, err := io.ReadAll(reader)
+	if err != nil {
+		// If decoding fails, fall back to original output
+		decoded = out.Bytes()
+	}
+	output := string(decoded)
+
 	// Check if cmd.exe process with the window title exists
 	// If window title is found, output will contain "cmd.exe" and the window title
 	res := strings.Contains(output, "cmd.exe") && strings.Contains(output, windowName)
