@@ -37,6 +37,13 @@ func initAPI() {
 	beego.Router("/api/get-account", &controllers.ApiController{}, "GET:GetAccount")
 	beego.Router("/api/get-providers", &controllers.ApiController{}, "GET:GetProviders")
 
+	beego.Router("/api/get-global-nodes", &controllers.ApiController{}, "GET:GetGlobalNodes")
+	beego.Router("/api/get-nodes", &controllers.ApiController{}, "GET:GetNodes")
+	beego.Router("/api/get-node", &controllers.ApiController{}, "GET:GetNode")
+	beego.Router("/api/update-node", &controllers.ApiController{}, "POST:UpdateNode")
+	beego.Router("/api/add-node", &controllers.ApiController{}, "POST:AddNode")
+	beego.Router("/api/delete-node", &controllers.ApiController{}, "POST:DeleteNode")
+
 	beego.Router("/api/get-global-sites", &controllers.ApiController{}, "GET:GetGlobalSites")
 	beego.Router("/api/get-sites", &controllers.ApiController{}, "GET:GetSites")
 	beego.Router("/api/get-site", &controllers.ApiController{}, "GET:GetSite")
