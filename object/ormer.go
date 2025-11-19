@@ -23,11 +23,11 @@ import (
 
 	"github.com/beego/beego"
 	"github.com/casbin/caswaf/conf"
-	"github.com/xorm-io/core"
-	"github.com/xorm-io/xorm"
 	_ "github.com/denisenkom/go-mssqldb" // db = mssql
 	_ "github.com/go-sql-driver/mysql"   // db = mysql
 	_ "github.com/lib/pq"                // db = postgres
+	"github.com/xorm-io/core"
+	"github.com/xorm-io/xorm"
 	_ "modernc.org/sqlite" // db = sqlite
 )
 

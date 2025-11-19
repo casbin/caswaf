@@ -126,7 +126,7 @@ func IsProcessActive(pid int) (bool, error) {
 func IsWindowTitleActive(name string) (bool, error) {
 	name = getMappedName(name)
 	windowName := fmt.Sprintf("%s.bat - %s", name, getShortcut())
-	
+
 	// Use tasklist to check if a window with the specific title exists
 	cmd := exec.Command("tasklist", "/V", "/FI", fmt.Sprintf("WINDOWTITLE eq %s", windowName))
 	var out bytes.Buffer
