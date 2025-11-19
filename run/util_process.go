@@ -122,3 +122,23 @@ func IsProcessActive(pid int) (bool, error) {
 	res := strings.Contains(output, strconv.Itoa(pid))
 	return res, nil
 }
+
+func IsWindowTitleActive(name string) (bool, error) {
+	name = getMappedName(name)
+	windowName := fmt.Sprintf("%s.bat - %s", name, getShortcut())
+
+	// Use tasklist to check if a window with the specific title exists
+	cmd := exec.Command("tasklist", "/V", "/FI", fmt.Sprintf("WINDOWTITLE eq %s", windowName))
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		return false, err
+	}
+
+	output := out.String()
+	// Check if cmd.exe process with the window title exists
+	// If window title is found, output will contain "cmd.exe" and the window title
+	res := strings.Contains(output, "cmd.exe") && strings.Contains(output, windowName)
+	return res, nil
+}
