@@ -46,6 +46,7 @@ class NodeListPage extends BaseListPage {
       displayName: `New Node - ${randomName}`,
       tag: "",
       clientIp: "",
+      upgradeMode: "At Any Time",
     };
   }
 
@@ -143,6 +144,16 @@ class NodeListPage extends BaseListPage {
         key: "clientIp",
         width: "150px",
         sorter: (a, b) => a.clientIp.localeCompare(b.clientIp),
+      },
+      {
+        title: i18next.t("general:Upgrade mode"),
+        dataIndex: "upgradeMode",
+        key: "upgradeMode",
+        width: "150px",
+        sorter: (a, b) => (a.upgradeMode || "").localeCompare(b.upgradeMode || ""),
+        render: (text, record, index) => {
+          return text || "At Any Time";
+        },
       },
       {
         title: i18next.t("general:Action"),

@@ -16,6 +16,7 @@ package object
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/casbin/caswaf/util"
 	"github.com/xorm-io/core"
@@ -27,8 +28,9 @@ type Node struct {
 	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
 	DisplayName string `xorm:"varchar(100)" json:"displayName"`
 
-	Tag      string `xorm:"varchar(100)" json:"tag"`
-	ClientIp string `xorm:"varchar(100)" json:"clientIp"`
+	Tag         string `xorm:"varchar(100)" json:"tag"`
+	ClientIp    string `xorm:"varchar(100)" json:"clientIp"`
+	UpgradeMode string `xorm:"varchar(100)" json:"upgradeMode"`
 }
 
 func GetGlobalNodes() ([]*Node, error) {
@@ -117,4 +119,34 @@ func GetPaginationNodes(owner string, offset, limit int, field, value, sortField
 	}
 
 	return nodes, nil
+}
+
+// ShouldAllowUpgrade checks if upgrade is allowed based on node's upgrade mode
+func (node *Node) ShouldAllowUpgrade() bool {
+	if node.UpgradeMode == "" || node.UpgradeMode == "At Any Time" {
+		return true
+	}
+
+	if node.UpgradeMode == "No Upgrade" {
+		return false
+	}
+
+	if node.UpgradeMode == "Half A Hour" {
+		// Check if current time is in the 23:00-23:30 GMT+8 window
+		// GMT+8 is 8 hours ahead of UTC
+		location := time.FixedZone("GMT+8", 8*60*60)
+		now := time.Now().In(location)
+
+		hour := now.Hour()
+		minute := now.Minute()
+
+		// Allow upgrade if time is between 23:00 and 23:30
+		if hour == 23 && minute < 30 {
+			return true
+		}
+		return false
+	}
+
+	// Default to allowing upgrade for unknown modes
+	return true
 }

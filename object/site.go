@@ -307,7 +307,16 @@ func (site *Site) checkNodes() error {
 			orgName = site.Challenges[0]
 		}
 
-		pid, err := run.CreateRepo(site.Name, !ok, diff, node.Provider, orgName)
+		// Check if upgrade is allowed based on node's upgrade mode
+		shouldUpgrade := true
+		nodeObj, err := GetNode(site.Node)
+		if err != nil {
+			msg = addErrorToMsg(msg, "GetNode", err)
+		} else if nodeObj != nil {
+			shouldUpgrade = nodeObj.ShouldAllowUpgrade()
+		}
+
+		pid, err := run.CreateRepo(site.Name, !ok, diff, node.Provider, orgName, shouldUpgrade)
 		if err != nil {
 			msg = addErrorToMsg(msg, "CreateRepo", err)
 		}
