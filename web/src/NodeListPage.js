@@ -150,10 +150,7 @@ class NodeListPage extends BaseListPage {
         dataIndex: "upgradeMode",
         key: "upgradeMode",
         width: "150px",
-        sorter: (a, b) => (a.upgradeMode || "").localeCompare(b.upgradeMode || ""),
-        render: (text, record, index) => {
-          return text || "At Any Time";
-        },
+        sorter: (a, b) => a.upgradeMode.localeCompare(b.upgradeMode),
       },
       {
         title: i18next.t("general:Action"),
