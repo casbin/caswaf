@@ -35,9 +35,10 @@ func wrapRepoError(function string, path string, err error) (int, error) {
 	return 0, fmt.Errorf("%s(): path = %s, %s", function, path, err.Error())
 }
 
-func CreateRepo(siteName string, needStart bool, diff string, providerName string, orgName string) (int, error) {
+func CreateRepo(siteName string, needStart bool, diff string, providerName string, orgName string, shouldUpgrade bool) (int, error) {
 	path := GetRepoPath(siteName)
 	if !util.FileExist(path) {
+		// For new repositories, always allow creation regardless of upgrade mode
 		originalName := getOriginalName(siteName)
 		repoUrl := getRepoUrl(originalName)
 		err := gitClone(repoUrl, path)
@@ -100,9 +101,14 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 			}
 		}
 	} else {
-		affected, err := gitPull(path)
-		if err != nil {
-			return wrapRepoError("gitPull", path, err)
+		// For existing repositories, check if upgrade is allowed
+		affected := false
+		var err error
+		if shouldUpgrade {
+			affected, err = gitPull(path)
+			if err != nil {
+				return wrapRepoError("gitPull", path, err)
+			}
 		}
 
 		needWebBuild := false
