@@ -172,9 +172,8 @@ class NodeListPage extends BaseListPage {
               <Popconfirm
                 title={`Sure to delete: ${record.name} ?`}
                 onConfirm={() => this.deleteNode(index)}
-                disabled={!Setting.isLocalAdminUser(this.props.account)}
               >
-                <Button style={{marginBottom: "10px"}} type="danger" disabled={!Setting.isLocalAdminUser(this.props.account)}>{i18next.t("general:Delete")}</Button>
+                <Button style={{marginBottom: "10px"}} type="danger">{i18next.t("general:Delete")}</Button>
               </Popconfirm>
             </div>
           );
@@ -189,7 +188,7 @@ class NodeListPage extends BaseListPage {
           title={() => (
             <div>
               {i18next.t("general:Nodes")}&nbsp;&nbsp;&nbsp;&nbsp;
-              <Button type="primary" size="small" disabled={!Setting.isLocalAdminUser(this.props.account)} onClick={this.addNode.bind(this)}>{i18next.t("general:Add")}</Button>
+              <Button type="primary" size="small" onClick={this.addNode.bind(this)}>{i18next.t("general:Add")}</Button>
             </div>
           )}
         />
