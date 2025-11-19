@@ -20,6 +20,7 @@ import * as SiteBackend from "./backend/SiteBackend";
 import * as CertBackend from "./backend/CertBackend";
 import * as RuleBackend from "./backend/RuleBackend";
 import * as ApplicationBackend from "./backend/ApplicationBackend";
+import * as NodeBackend from "./backend/NodeBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
 import NodeTable from "./NodeTable";
@@ -39,6 +40,7 @@ class SiteEditPage extends React.Component {
       site: null,
       certs: null,
       applications: null,
+      nodes: [],
     };
   }
 
@@ -48,6 +50,7 @@ class SiteEditPage extends React.Component {
     this.getRules();
     this.getApplications();
     this.getAlertProviders();
+    this.getNodes();
   }
 
   getSite() {
@@ -118,6 +121,19 @@ class SiteEditPage extends React.Component {
           });
         } else {
           Setting.showMessage("error", `Failed to get providers: ${res.msg}`);
+        }
+      });
+  }
+
+  getNodes() {
+    NodeBackend.getNodes(this.props.account.name)
+      .then((res) => {
+        if (res.status === "ok") {
+          this.setState({
+            nodes: res.data,
+          });
+        } else {
+          Setting.showMessage("error", `Failed to get nodes: ${res.msg}`);
         }
       });
   }
@@ -431,6 +447,7 @@ class SiteEditPage extends React.Component {
               table={this.state.site.nodes}
               siteName={this.state.site.name}
               account={this.props.account}
+              nodes={this.state.nodes}
               onUpdateTable={(value) => {this.updateSiteField("nodes", value);}}
             />
           </Col>

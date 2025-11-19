@@ -131,6 +131,16 @@ class SiteListPage extends BaseListPage {
         key: "tag",
         width: "140px",
         sorter: (a, b) => a.tag.localeCompare(b.tag),
+        render: (text, record, index) => {
+          if (text === "") {
+            return null;
+          }
+          return (
+            <Link to={`/nodes/${record.owner}/${text}`}>
+              {text}
+            </Link>
+          );
+        },
       },
       {
         title: i18next.t("general:Name"),

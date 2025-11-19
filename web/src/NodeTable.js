@@ -14,10 +14,11 @@
 
 import React from "react";
 import {CheckCircleOutlined, DeleteOutlined, DownOutlined, MinusCircleOutlined, SyncOutlined, UpOutlined} from "@ant-design/icons";
-import {Button, Col, Input, Row, Table, Tag, Tooltip} from "antd";
+import {Button, Col, Input, Row, Select, Table, Tag, Tooltip} from "antd";
 import * as Setting from "./Setting";
 
 const {TextArea} = Input;
+const {Option} = Select;
 
 class NodeTable extends React.Component {
   constructor(props) {
@@ -75,6 +76,19 @@ class NodeTable extends React.Component {
   }
 
   renderTable(table) {
+    // Get list of already selected nodes
+    const selectedNodes = table ? table.map(item => item.name) : [];
+
+    // Filter available nodes (exclude already selected ones, but include current node)
+    const getAvailableNodes = (currentName) => {
+      if (!this.props.nodes) {
+        return [];
+      }
+      return this.props.nodes.filter(node =>
+        node.name === currentName || !selectedNodes.includes(node.name)
+      );
+    };
+
     const columns = [
       {
         title: "Name",
@@ -82,10 +96,22 @@ class NodeTable extends React.Component {
         key: "name",
         width: "180px",
         render: (text, record, index) => {
+          const availableNodes = getAvailableNodes(text);
           return (
-            <Input value={text} onChange={e => {
-              this.updateField(table, index, "name", e.target.value);
-            }} />
+            <Select
+              virtual={false}
+              style={{width: "100%"}}
+              value={text}
+              onChange={value => {
+                this.updateField(table, index, "name", value);
+              }}
+            >
+              {
+                availableNodes.map((node, idx) => (
+                  <Option key={idx} value={node.name}>{node.name}</Option>
+                ))
+              }
+            </Select>
           );
         },
       },
