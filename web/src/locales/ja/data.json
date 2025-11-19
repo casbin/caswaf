@@ -27,9 +27,11 @@
   "general": {
     "Action": "Action",
     "Add": "Add",
+    "At Any Time": "At Any Time",
     "Back Home": "Back Home",
     "Cancel": "Cancel",
     "Certs": "Certs",
+    "Client IP": "Client IP",
     "Client ip": "Client ip",
     "Count": "Count",
     "Create time": "Create time",
@@ -41,12 +43,15 @@
     "Edit": "Edit",
     "Edit Record": "Edit Record",
     "Go to writable demo site?": "Go to writable demo site?",
+    "Half A Hour": "Half A Hour",
     "Home": "Home",
     "Host": "Host",
     "ID": "ID",
     "IP Address": "IP Address",
     "Method": "Method",
     "Name": "Name",
+    "No Upgrade": "No Upgrade",
+    "Nodes": "Nodes",
     "OK": "OK",
     "Owner": "Owner",
     "Path": "Path",
@@ -65,7 +70,12 @@
     "Total Request Count": "Total Request Count",
     "Unique IP Count": "Unique IP Count",
     "Update time": "Update time",
-    "User-Agent": "User-Agent"
+    "Upgrade mode": "Upgrade mode",
+    "User-Agent": "User-Agent",
+    "{total} in total": "{total} in total"
+  },
+  "node": {
+    "Edit Node": "Edit Node"
   },
   "rule": {
     "Allow": "Allow",
