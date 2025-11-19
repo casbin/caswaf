@@ -197,7 +197,8 @@ class NodeListPage extends BaseListPage {
       params.pagination = this.state.pagination;
     }
     this.setState({loading: true});
-    NodeBackend.getNodes(this.props.account.name, params.pagination.current, params.pagination.pageSize, field, value, sortField, sortOrder)
+    // NodeBackend.getNodes(this.props.account.name, params.pagination.current, params.pagination.pageSize, field, value, sortField, sortOrder)
+    NodeBackend.getNodes(this.props.account.name, "", "", field, value, sortField, sortOrder)
       .then((res) => {
         if (res.status === "ok") {
           this.setState({

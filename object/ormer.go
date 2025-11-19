@@ -179,7 +179,12 @@ func (a *Ormer) createTable() {
 	showSql := conf.GetConfigBool("showSql")
 	a.Engine.ShowSQL(showSql)
 
-	err := a.Engine.Sync2(new(Site))
+	err := a.Engine.Sync2(new(Node))
+	if err != nil {
+		panic(err)
+	}
+
+	err = a.Engine.Sync2(new(Site))
 	if err != nil {
 		panic(err)
 	}

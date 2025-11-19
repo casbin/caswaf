@@ -39,7 +39,7 @@ func GetGlobalNodes() ([]*Node, error) {
 
 func GetNodes(owner string) ([]*Node, error) {
 	nodes := []*Node{}
-	err := ormer.Engine.Desc("created_time").Find(&nodes, &Node{Owner: owner})
+	err := ormer.Engine.Asc("tag").Desc("created_time").Find(&nodes, &Node{Owner: owner})
 	if err != nil {
 		return nil, err
 	}
