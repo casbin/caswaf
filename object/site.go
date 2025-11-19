@@ -317,7 +317,7 @@ func (site *Site) checkNodes() error {
 
 		// Check if upgrade is allowed based on node's upgrade mode
 		shouldUpgrade := true
-		nodeObj, err := GetNode(site.Node)
+		nodeObj, err := getNode("admin", site.Node)
 		if err != nil {
 			msg = addErrorToMsg(msg, "GetNode", err)
 		} else if nodeObj != nil {
