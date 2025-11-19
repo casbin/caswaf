@@ -89,12 +89,13 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 			}
 		}
 
-		batExisted, err := updateBatFile(siteName)
+		_, err = updateBatFile(siteName)
 		if err != nil {
 			return wrapRepoError("updateBatFile", path, err)
 		}
 
-		if !batExisted {
+		shortcutPath := getShortcutPath(siteName)
+		if !util.FileExist(shortcutPath) {
 			err = updateShortcutFile(siteName)
 			if err != nil {
 				return wrapRepoError("updateShortcutFile", path, err)
@@ -147,12 +148,13 @@ func CreateRepo(siteName string, needStart bool, diff string, providerName strin
 			}
 		}
 
-		batExisted, err := updateBatFile(siteName)
+		_, err = updateBatFile(siteName)
 		if err != nil {
 			return wrapRepoError("updateBatFile", path, err)
 		}
 
-		if !batExisted {
+		shortcutPath := getShortcutPath(siteName)
+		if !util.FileExist(shortcutPath) {
 			err = updateShortcutFile(siteName)
 			if err != nil {
 				return wrapRepoError("updateShortcutFile", path, err)
