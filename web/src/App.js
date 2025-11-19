@@ -22,6 +22,8 @@ import * as AccountBackend from "./backend/AccountBackend";
 import AuthCallback from "./AuthCallback";
 import * as Conf from "./Conf";
 import HomePage from "./HomePage";
+import NodeListPage from "./NodeListPage";
+import NodeEditPage from "./NodeEditPage";
 import SiteListPage from "./SiteListPage";
 import SiteEditPage from "./SiteEditPage";
 import CertListPage from "./CertListPage";
@@ -77,6 +79,8 @@ class App extends Component {
       this.setState({selectedMenuKey: "/"});
     } else if (uri.includes("/dashboard")) {
       this.setState({selectedMenuKey: "/dashboard"});
+    } else if (uri.includes("/nodes")) {
+      this.setState({selectedMenuKey: "/nodes"});
     } else if (uri.includes("/sites")) {
       this.setState({selectedMenuKey: "/sites"});
     } else if (uri.includes("/certs")) {
@@ -279,6 +283,13 @@ class App extends Component {
       </Menu.Item>
     );
     res.push(
+      <Menu.Item key="/nodes">
+        <Link to="/nodes">
+          {i18next.t("general:Nodes")}
+        </Link>
+      </Menu.Item>
+    );
+    res.push(
       <Menu.Item key="/sites">
         <Link to="/sites">
           {i18next.t("general:Sites")}
@@ -361,6 +372,8 @@ class App extends Component {
           <Route exact path="/home" render={(props) => <HomePage account={this.state.account} {...props} />} />
           <Route exact path="/" render={(props) => <Redirect to="/sites" />} />
           <Route exact path="/signin" render={(props) => this.renderHomeIfSignedIn(<SigninPage {...props} />)} />
+          <Route exact path="/nodes" render={(props) => this.renderSigninIfNotSignedIn(<NodeListPage account={this.state.account} {...props} />)} />
+          <Route exact path="/nodes/:owner/:nodeName" render={(props) => this.renderSigninIfNotSignedIn(<NodeEditPage account={this.state.account} {...props} />)} />
           <Route exact path="/sites" render={(props) => this.renderSigninIfNotSignedIn(<SiteListPage account={this.state.account} {...props} />)} />
           <Route exact path="/sites/:owner/:siteName" render={(props) => this.renderSigninIfNotSignedIn(<SiteEditPage account={this.state.account} {...props} />)} />
           <Route exact path="/certs" render={(props) => this.renderSigninIfNotSignedIn(<CertListPage account={this.state.account} {...props} />)} />

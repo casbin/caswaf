@@ -47,6 +47,7 @@
     "IP Address": "IP地址",
     "Method": "方法",
     "Name": "名称",
+    "Nodes": "节点",
     "OK": "确定",
     "Owner": "所有者",
     "Path": "路径",
@@ -55,6 +56,7 @@
     "Restore": "复原",
     "Rules": "规则",
     "Save": "保存",
+    "Save & Exit": "保存并退出",
     "Self": "自己",
     "Sites": "站点",
     "Sorry, you do not have permission to access this page or logged in status invalid.": "抱歉，您无权访问该页面或登录状态无效。",
@@ -66,6 +68,12 @@
     "Unique IP Count": "独立IP统计",
     "Update time": "创建时间",
     "User-Agent": "User-Agent"
+  },
+  "node": {
+    "Description": "描述",
+    "Edit Node": "编辑节点",
+    "Hostname": "主机名",
+    "IP address": "IP地址"
   },
   "rule": {
     "Allow": "允许",
