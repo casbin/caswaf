@@ -159,7 +159,7 @@ func (cert *Cert) GetId() string {
 }
 
 func RenewCert(cert *Cert) (bool, error) {
-	useProxy := false
+	useProxy := true
 	if cert.Provider == "GoDaddy" {
 		useProxy = true
 	}
