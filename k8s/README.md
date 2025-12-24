@@ -74,7 +74,26 @@ casdoorEndpoint: http://your-casdoor-service:port
 
 ### 5. Deploy to Kubernetes
 
-Using individual files:
+**Option A: Using the deployment script (Recommended)**
+
+The easiest way to deploy CasWAF:
+
+```bash
+cd k8s
+chmod +x deploy.sh
+./deploy.sh
+```
+
+The script will:
+- Validate your configuration
+- Deploy MySQL and wait for it to be ready
+- Deploy secrets and configuration
+- Deploy CasWAF application
+- Optionally deploy Ingress
+- Show deployment status
+
+**Option B: Using individual files**
+
 ```bash
 # Create namespace and deploy MySQL
 kubectl apply -f k8s/mysql.yaml
@@ -95,7 +114,7 @@ kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/ingress.yaml
 ```
 
-Or using Kustomize:
+**Option C: Using Kustomize**
 ```bash
 kubectl apply -k k8s/
 ```

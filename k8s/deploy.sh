@@ -1,0 +1,112 @@
+#!/bin/bash
+# Quick deployment script for CasWAF on Kubernetes
+# This script helps you deploy CasWAF with proper configuration
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${GREEN}CasWAF Kubernetes Deployment Script${NC}"
+echo "====================================="
+echo
+
+# Check if kubectl is installed
+if ! command -v kubectl &> /dev/null; then
+    echo -e "${RED}Error: kubectl is not installed${NC}"
+    exit 1
+fi
+
+# Check if we're in the k8s directory
+if [ ! -f "secret.yaml" ] || [ ! -f "deployment.yaml" ]; then
+    echo -e "${RED}Error: Please run this script from the k8s directory${NC}"
+    exit 1
+fi
+
+echo -e "${YELLOW}Step 1: Checking configuration...${NC}"
+
+# Check if secrets have been configured
+if grep -q "REPLACE_WITH" secret.yaml; then
+    echo -e "${RED}Error: Secrets have not been configured!${NC}"
+    echo "Please edit k8s/secret.yaml and replace all placeholder values with your actual credentials:"
+    echo "  - casdoor-client-id"
+    echo "  - casdoor-client-secret"
+    echo "  - mysql-password"
+    echo
+    echo "Also update k8s/mysql.yaml with the base64 encoded password:"
+    echo "  echo -n 'your-password' | base64"
+    exit 1
+fi
+
+if grep -q "REPLACE_WITH" mysql.yaml; then
+    echo -e "${RED}Error: MySQL password has not been configured!${NC}"
+    echo "Please edit k8s/mysql.yaml and set a strong password (base64 encoded)"
+    echo "  echo -n 'your-strong-password' | base64"
+    exit 1
+fi
+
+echo -e "${GREEN}✓ Configuration looks good${NC}"
+echo
+
+echo -e "${YELLOW}Step 2: Deploying MySQL...${NC}"
+kubectl apply -f mysql.yaml
+
+echo "Waiting for MySQL to be ready..."
+kubectl wait --for=condition=ready pod -l app=caswaf-mysql -n caswaf --timeout=300s || {
+    echo -e "${RED}Error: MySQL failed to start${NC}"
+    echo "Check logs with: kubectl logs -n caswaf -l app=caswaf-mysql"
+    exit 1
+}
+echo -e "${GREEN}✓ MySQL is ready${NC}"
+echo
+
+echo -e "${YELLOW}Step 3: Deploying CasWAF configuration...${NC}"
+kubectl apply -f secret.yaml
+kubectl apply -f configmap.yaml
+echo -e "${GREEN}✓ Configuration deployed${NC}"
+echo
+
+echo -e "${YELLOW}Step 4: Deploying CasWAF application...${NC}"
+kubectl apply -f deployment.yaml
+
+echo "Waiting for CasWAF to be ready..."
+kubectl wait --for=condition=ready pod -l app=caswaf -n caswaf --timeout=300s || {
+    echo -e "${RED}Warning: CasWAF took longer than expected to start${NC}"
+    echo "Check logs with: kubectl logs -n caswaf -l app=caswaf"
+}
+echo -e "${GREEN}✓ CasWAF is deployed${NC}"
+echo
+
+# Ask if user wants to deploy Ingress
+read -p "Do you want to deploy the Ingress? (y/N): " deploy_ingress
+if [[ $deploy_ingress =~ ^[Yy]$ ]]; then
+    echo -e "${YELLOW}Step 5: Deploying Ingress...${NC}"
+    kubectl apply -f ingress.yaml
+    echo -e "${GREEN}✓ Ingress deployed${NC}"
+    echo
+    echo -e "${YELLOW}Note: Update your DNS or /etc/hosts to point to your ingress controller IP${NC}"
+else
+    echo -e "${YELLOW}Skipping Ingress deployment${NC}"
+    echo
+    echo "You can access CasWAF using port-forward:"
+    echo "  kubectl port-forward svc/caswaf 17000:17000 -n caswaf"
+    echo "  Then access: http://localhost:17000"
+fi
+
+echo
+echo -e "${GREEN}Deployment Summary:${NC}"
+echo "==================="
+kubectl get all -n caswaf
+
+echo
+echo -e "${GREEN}✓ CasWAF deployment completed successfully!${NC}"
+echo
+echo "Useful commands:"
+echo "  View pods:        kubectl get pods -n caswaf"
+echo "  View services:    kubectl get svc -n caswaf"
+echo "  View logs:        kubectl logs -f deployment/caswaf -n caswaf"
+echo "  Port forward:     kubectl port-forward svc/caswaf 17000:17000 -n caswaf"
+echo "  Delete all:       kubectl delete namespace caswaf"
