@@ -11,9 +11,10 @@ metadata:
   namespace: caswaf
 type: Opaque
 data:
-  # Default password: "password" (base64 encoded)
-  # Change this to your actual password encoded in base64
-  mysql-root-password: cGFzc3dvcmQ=
+  # REQUIRED: Change this to your own strong password (base64 encoded)
+  # Generate with: echo -n "your-strong-password" | base64
+  # This is a placeholder - DO NOT use in production
+  mysql-root-password: UkVQTEFDRV9XSVRIX1NUUk9OR19QQVNTV09SRA==
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

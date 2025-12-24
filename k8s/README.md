@@ -36,15 +36,22 @@ Edit `k8s/secret.yaml` and update the sensitive credentials:
 
 ```yaml
 stringData:
-  casdoor-client-id: "YOUR_CLIENT_ID_HERE"
-  casdoor-client-secret: "YOUR_CLIENT_SECRET_HERE"
-  mysql-password: "YOUR_SECURE_PASSWORD"
+  casdoor-client-id: "YOUR_ACTUAL_CLIENT_ID"
+  casdoor-client-secret: "YOUR_ACTUAL_CLIENT_SECRET"
+  mysql-password: "YOUR_STRONG_PASSWORD"
 ```
 
 **Important**: 
+- **REQUIRED**: You must replace all placeholder values before deployment
 - Get `casdoor-client-id` and `casdoor-client-secret` from your Casdoor application settings
-- Use a strong password for `mysql-password`
+- Use a strong password for `mysql-password` (min 12 characters recommended)
 - This password must match the one in `k8s/mysql.yaml`
+- The deployment will fail with validation errors if placeholders are not replaced
+
+**Security Best Practice**: Never commit actual secrets to version control. Consider using:
+- [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets)
+- [External Secrets Operator](https://external-secrets.io/)
+- Cloud provider secret management (AWS Secrets Manager, Azure Key Vault, GCP Secret Manager)
 
 ### 3. Configure MySQL Password
 
