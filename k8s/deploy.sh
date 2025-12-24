@@ -1,6 +1,7 @@
 #!/bin/bash
 # Quick deployment script for CasWAF on Kubernetes
 # This script helps you deploy CasWAF with proper configuration
+# Usage: ./deploy.sh [--auto-ingress|--no-ingress]
 
 set -e
 
@@ -9,6 +10,26 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
+
+# Parse command line arguments
+AUTO_INGRESS=""
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --auto-ingress)
+      AUTO_INGRESS="yes"
+      shift
+      ;;
+    --no-ingress)
+      AUTO_INGRESS="no"
+      shift
+      ;;
+    *)
+      echo -e "${RED}Unknown option: $1${NC}"
+      echo "Usage: $0 [--auto-ingress|--no-ingress]"
+      exit 1
+      ;;
+  esac
+done
 
 echo -e "${GREEN}CasWAF Kubernetes Deployment Script${NC}"
 echo "====================================="
@@ -80,9 +101,24 @@ kubectl wait --for=condition=ready pod -l app=caswaf -n caswaf --timeout=300s ||
 echo -e "${GREEN}✓ CasWAF is deployed${NC}"
 echo
 
-# Ask if user wants to deploy Ingress
-read -p "Do you want to deploy the Ingress? (y/N): " deploy_ingress
-if [[ $deploy_ingress =~ ^[Yy]$ ]]; then
+# Handle Ingress deployment
+if [ -z "$AUTO_INGRESS" ]; then
+    # Interactive mode - only ask if terminal is interactive
+    if [ -t 0 ]; then
+        read -p "Do you want to deploy the Ingress? (y/N): " deploy_ingress
+        if [[ $deploy_ingress =~ ^[Yy]$ ]]; then
+            AUTO_INGRESS="yes"
+        else
+            AUTO_INGRESS="no"
+        fi
+    else
+        echo -e "${YELLOW}Non-interactive mode detected, skipping Ingress deployment${NC}"
+        echo "Use --auto-ingress flag to deploy Ingress automatically"
+        AUTO_INGRESS="no"
+    fi
+fi
+
+if [ "$AUTO_INGRESS" = "yes" ]; then
     echo -e "${YELLOW}Step 5: Deploying Ingress...${NC}"
     kubectl apply -f ingress.yaml
     echo -e "${GREEN}✓ Ingress deployed${NC}"

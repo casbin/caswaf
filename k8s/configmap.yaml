@@ -19,6 +19,8 @@ data:
     gatewayHttpPort = 80
     gatewayHttpsPort = 443
     httpProxy = ""
+    # Update this if your Casdoor is deployed elsewhere
+    # Format: http://service-name.namespace.svc.cluster.local:port
     casdoorEndpoint = http://casdoor.casdoor-system.svc.cluster.local:8000
     casdoorInsecureSkipVerify = true
     clientId = "CLIENT_ID_PLACEHOLDER"

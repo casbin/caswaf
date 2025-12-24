@@ -16,7 +16,7 @@ spec:
     spec:
       initContainers:
         - name: wait-for-mysql
-          image: busybox:1.35
+          image: busybox:1.36
           command:
             - sh
             - -c
@@ -27,7 +27,7 @@ spec:
               done
               echo "MySQL is ready!"
         - name: setup-config
-          image: busybox:1.35
+          image: busybox:1.36
           command:
             - sh
             - -c
