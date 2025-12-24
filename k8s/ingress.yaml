@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: caswaf-ingress
+  namespace: caswaf
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # Add SSL redirect if needed
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: caswaf.example.com  # Change this to your domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: caswaf
+            port:
+              number: 7000
+  # Uncomment and configure TLS if you have certificates
+  # tls:
+  # - hosts:
+  #   - caswaf.example.com
+  #   secretName: caswaf-tls

@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: caswaf
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: caswaf-mysql-secret
+  namespace: caswaf
+type: Opaque
+data:
+  # Default password: "password" (base64 encoded)
+  # Change this to your actual password encoded in base64
+  mysql-root-password: cGFzc3dvcmQ=
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: caswaf
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: caswaf-mysql
+  namespace: caswaf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: caswaf-mysql
+  template:
+    metadata:
+      labels:
+        app: caswaf-mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0.25
+        ports:
+        - containerPort: 3306
+          name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: caswaf-mysql-secret
+              key: mysql-root-password
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+        livenessProbe:
+          exec:
+            command:
+            - mysqladmin
+            - ping
+            - -h
+            - localhost
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - mysqladmin
+            - ping
+            - -h
+            - localhost
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 1
+      volumes:
+      - name: mysql-storage
+        persistentVolumeClaim:
+          claimName: mysql-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: caswaf-mysql
+  namespace: caswaf
+spec:
+  selector:
+    app: caswaf-mysql
+  ports:
+  - port: 3306
+    targetPort: 3306
+    name: mysql
+  clusterIP: None
