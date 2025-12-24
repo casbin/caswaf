@@ -1,0 +1,44 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: caswaf-config
+  namespace: caswaf
+data:
+  app.conf: |
+    appname = caswaf
+    httpport = 17000
+    runmode = prod
+    SessionOn = true
+    copyrequestbody = true
+    driverName = mysql
+    dataSourceName = root:MYSQL_PASSWORD_PLACEHOLDER@tcp(caswaf-mysql:3306)/
+    dbName = caswaf
+    redisEndpoint =
+    gatewayEnabled = false
+    gatewayHttpPort = 80
+    gatewayHttpsPort = 443
+    httpProxy = ""
+    # Update this if your Casdoor is deployed elsewhere
+    # Format: http://service-name.namespace.svc.cluster.local:port
+    casdoorEndpoint = http://casdoor.casdoor-system.svc.cluster.local:8000
+    casdoorInsecureSkipVerify = true
+    clientId = "CLIENT_ID_PLACEHOLDER"
+    clientSecret = "CLIENT_SECRET_PLACEHOLDER"
+    casdoorOrganization = "built-in"
+    casdoorApplication = "app-casdoor-gateway"
+    isDemoMode = false
+    appDir = "/app"
+    dbRegionId = ""
+    dbAccessKeyId = ""
+    dbAccessKeySecret = ""
+    dbInstanceId = ""
+    dbHost = ""
+    dbUser = ""
+    dbPass = ""
+    clientIdPrefix = ""
+    clientSecretPrefix = ""
+    language = "en"
+    appMap =
+    acmeEmail = ""
+    acmePrivateKey = ""

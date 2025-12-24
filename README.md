@@ -55,6 +55,12 @@ CasWAF contains 2 parts:
 
 CasWAF uses Casdoor to manage members. So you need to create an organization and an application for CasWAF in a Casdoor instance.
 
+### Deployment Options
+
+- **[Kubernetes Deployment](k8s/README.md)**: Deploy CasWAF on Kubernetes with complete manifests and guide
+- **Docker Compose**: Use the provided `docker-compose.yml` for quick local setup
+- **Manual Installation**: Build and run from source
+
 ### Necessary configuration
 
 #### Get the code

@@ -1,0 +1,21 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: caswaf
+
+resources:
+  - mysql.yaml
+  - secret.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - ingress.yaml
+
+# You can customize common labels here
+commonLabels:
+  app.kubernetes.io/name: caswaf
+  app.kubernetes.io/part-of: caswaf
+
+# You can add configuration transformers here
+# For example, to change the namespace:
+# namespace: my-custom-namespace
