@@ -21,7 +21,7 @@ spec:
             - sh
             - -c
             - |
-              until nc -z caswaf-mysql 3306; do
+              until timeout 1 sh -c 'cat < /dev/null > /dev/tcp/caswaf-mysql/3306' 2>/dev/null; do
                 echo "Waiting for MySQL to be ready..."
                 sleep 2
               done

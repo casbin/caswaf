@@ -3,7 +3,7 @@
 # This script helps you deploy CasWAF with proper configuration
 # Usage: ./deploy.sh [--auto-ingress|--no-ingress]
 
-set -e
+set -euo pipefail
 
 # Colors for output
 RED='\033[0;31m'

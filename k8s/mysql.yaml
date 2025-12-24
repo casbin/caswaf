@@ -13,8 +13,8 @@ type: Opaque
 data:
   # REQUIRED: Change this to your own strong password (base64 encoded)
   # Generate with: echo -n "your-strong-password" | base64
-  # This is a placeholder - DO NOT use in production
-  mysql-root-password: UkVQTEFDRV9XSVRIX1NUUk9OR19QQVNTV09SRA==
+  # This is a placeholder that will fail validation if not replaced
+  mysql-root-password: Q0hBTkdFTUVfSU5TRUNVUkVfREVGQVVMVF9SRVBMQUNFX1RISVM=
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
