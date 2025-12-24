@@ -50,7 +50,7 @@ fi
 echo -e "${YELLOW}Step 1: Checking configuration...${NC}"
 
 # Check if secrets have been configured
-if grep -q "REPLACE_WITH" secret.yaml; then
+if grep -q "CHANGEME_INSECURE_DEFAULT_REPLACE_THIS" secret.yaml; then
     echo -e "${RED}Error: Secrets have not been configured!${NC}"
     echo "Please edit k8s/secret.yaml and replace all placeholder values with your actual credentials:"
     echo "  - casdoor-client-id"
@@ -62,7 +62,7 @@ if grep -q "REPLACE_WITH" secret.yaml; then
     exit 1
 fi
 
-if grep -q "REPLACE_WITH" mysql.yaml; then
+if grep -q "CHANGEME_INSECURE_DEFAULT_REPLACE_THIS" mysql.yaml; then
     echo -e "${RED}Error: MySQL password has not been configured!${NC}"
     echo "Please edit k8s/mysql.yaml and set a strong password (base64 encoded)"
     echo "  echo -n 'your-strong-password' | base64"

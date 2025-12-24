@@ -32,18 +32,21 @@ spec:
             - sh
             - -c
             - |
+              # Define placeholder values for validation
+              PLACEHOLDER="CHANGEME_INSECURE_DEFAULT_REPLACE_THIS"
+              
               # Validate that secrets have been replaced
-              if [ "$MYSQL_PASSWORD" = "REPLACE_WITH_STRONG_PASSWORD" ]; then
+              if [ "$MYSQL_PASSWORD" = "$PLACEHOLDER" ]; then
                 echo "ERROR: MySQL password has not been configured!"
                 echo "Please update k8s/secret.yaml with your actual MySQL password"
                 exit 1
               fi
-              if [ "$CASDOOR_CLIENT_ID" = "REPLACE_WITH_YOUR_CLIENT_ID" ]; then
+              if [ "$CASDOOR_CLIENT_ID" = "$PLACEHOLDER" ]; then
                 echo "ERROR: Casdoor client ID has not been configured!"
                 echo "Please update k8s/secret.yaml with your actual Casdoor client ID"
                 exit 1
               fi
-              if [ "$CASDOOR_CLIENT_SECRET" = "REPLACE_WITH_YOUR_CLIENT_SECRET" ]; then
+              if [ "$CASDOOR_CLIENT_SECRET" = "$PLACEHOLDER" ]; then
                 echo "ERROR: Casdoor client secret has not been configured!"
                 echo "Please update k8s/secret.yaml with your actual Casdoor client secret"
                 exit 1

@@ -177,10 +177,10 @@ Key configuration parameters:
 
 ### MySQL Deployment (`mysql.yaml`)
 
-- Uses MySQL 8.0.25
+- Uses MySQL 8.0.36 (latest stable)
 - Persistent storage with PVC (10Gi)
-- Includes health checks
-- Root password stored in Kubernetes Secret
+- Includes health checks (liveness and readiness probes)
+- Root password stored in Kubernetes Secret with obvious placeholder
 
 ### CasWAF Deployment (`deployment.yaml`)
 
