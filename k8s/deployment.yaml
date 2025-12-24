@@ -26,11 +26,43 @@ spec:
                 sleep 2
               done
               echo "MySQL is ready!"
+        - name: setup-config
+          image: busybox:1.35
+          command:
+            - sh
+            - -c
+            - |
+              cp /tmp/config/app.conf /conf-out/app.conf
+              sed -i "s/MYSQL_PASSWORD_PLACEHOLDER/${MYSQL_PASSWORD}/g" /conf-out/app.conf
+              sed -i "s/CLIENT_ID_PLACEHOLDER/${CASDOOR_CLIENT_ID}/g" /conf-out/app.conf
+              sed -i "s/CLIENT_SECRET_PLACEHOLDER/${CASDOOR_CLIENT_SECRET}/g" /conf-out/app.conf
+              echo "Configuration prepared successfully"
+          env:
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: caswaf-secrets
+                  key: mysql-password
+            - name: CASDOOR_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: caswaf-secrets
+                  key: casdoor-client-id
+            - name: CASDOOR_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: caswaf-secrets
+                  key: casdoor-client-secret
+          volumeMounts:
+            - name: config-template
+              mountPath: /tmp/config
+            - name: config
+              mountPath: /conf-out
       containers:
         - name: caswaf
           image: casbin/caswaf:latest
           ports:
-            - containerPort: 7000
+            - containerPort: 17000
               name: http
               protocol: TCP
           env:
@@ -38,20 +70,17 @@ spec:
               value: "UTC"
           volumeMounts:
             - name: config
-              mountPath: /conf/app.conf
-              subPath: app.conf
+              mountPath: /conf
           livenessProbe:
-            httpGet:
-              path: /api/get-account
-              port: 7000
+            tcpSocket:
+              port: 17000
             initialDelaySeconds: 60
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
           readinessProbe:
-            httpGet:
-              path: /api/get-account
-              port: 7000
+            tcpSocket:
+              port: 17000
             initialDelaySeconds: 30
             periodSeconds: 5
             timeoutSeconds: 3
@@ -64,9 +93,11 @@ spec:
               memory: "1Gi"
               cpu: "1000m"
       volumes:
-        - name: config
+        - name: config-template
           configMap:
             name: caswaf-config
+        - name: config
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -77,7 +108,7 @@ spec:
   selector:
     app: caswaf
   ports:
-    - port: 7000
-      targetPort: 7000
+    - port: 17000
+      targetPort: 17000
       name: http
   type: ClusterIP

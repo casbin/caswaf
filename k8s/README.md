@@ -14,7 +14,8 @@ This guide provides instructions for deploying CasWAF on Kubernetes.
 The deployment consists of:
 - **CasWAF Application**: The main WAF application
 - **MySQL Database**: Stores CasWAF configuration and data
-- **ConfigMap**: Contains CasWAF configuration
+- **Secrets**: Stores sensitive credentials (Casdoor client ID/secret, MySQL password)
+- **ConfigMap**: Contains CasWAF configuration template
 - **Services**: Exposes CasWAF and MySQL within the cluster
 - **Ingress** (optional): Exposes CasWAF externally
 
@@ -29,46 +30,53 @@ CasWAF requires Casdoor for authentication. If you don't have Casdoor deployed:
 # https://casdoor.org/docs/deployment/k8s
 ```
 
-### 2. Configure CasWAF
+### 2. Configure Secrets
 
-Edit `k8s/configmap.yaml` and update the following values:
+Edit `k8s/secret.yaml` and update the sensitive credentials:
 
 ```yaml
-# MySQL connection
-dataSourceName: root:YOUR_MYSQL_PASSWORD@tcp(caswaf-mysql:3306)/
-
-# Casdoor configuration
-casdoorEndpoint: http://casdoor.casdoor-system.svc.cluster.local:8000
-clientId: "YOUR_CLIENT_ID"
-clientSecret: "YOUR_CLIENT_SECRET"
-casdoorOrganization: "YOUR_ORGANIZATION"
-casdoorApplication: "YOUR_APPLICATION"
+stringData:
+  casdoor-client-id: "YOUR_CLIENT_ID_HERE"
+  casdoor-client-secret: "YOUR_CLIENT_SECRET_HERE"
+  mysql-password: "YOUR_SECURE_PASSWORD"
 ```
 
 **Important**: 
-- Replace `YOUR_MYSQL_PASSWORD` with your MySQL root password
-- Get `clientId` and `clientSecret` from your Casdoor application settings
-- Ensure `casdoorEndpoint` points to your Casdoor instance
+- Get `casdoor-client-id` and `casdoor-client-secret` from your Casdoor application settings
+- Use a strong password for `mysql-password`
+- This password must match the one in `k8s/mysql.yaml`
 
 ### 3. Configure MySQL Password
 
 Edit `k8s/mysql.yaml` and update the MySQL root password:
 
 ```bash
-# Generate base64 encoded password
-echo -n "your-secure-password" | base64
+# Generate base64 encoded password (use the same password as in secret.yaml)
+echo -n "YOUR_SECURE_PASSWORD" | base64
 ```
 
 Then update the `mysql-root-password` in the Secret resource with the base64 value.
 
-### 4. Deploy to Kubernetes
+### 4. Configure Casdoor Endpoint (Optional)
 
+If your Casdoor is not at `http://casdoor.casdoor-system.svc.cluster.local:8000`, edit `k8s/configmap.yaml`:
+
+```yaml
+casdoorEndpoint: http://your-casdoor-service:port
+```
+
+### 5. Deploy to Kubernetes
+
+Using individual files:
 ```bash
 # Create namespace and deploy MySQL
 kubectl apply -f k8s/mysql.yaml
 
 # Wait for MySQL to be ready
 kubectl wait --for=condition=ready pod -l app=caswaf-mysql -n caswaf --timeout=300s
+
+# Deploy Secrets
+kubectl apply -f k8s/secret.yaml
 
 # Deploy ConfigMap
 kubectl apply -f k8s/configmap.yaml
@@ -80,7 +88,12 @@ kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/ingress.yaml
 ```
 
-### 5. Verify Deployment
+Or using Kustomize:
+```bash
+kubectl apply -k k8s/
+```
+
+### 6. Verify Deployment
 
 ```bash
 # Check if pods are running
@@ -93,7 +106,7 @@ kubectl logs -f deployment/caswaf -n caswaf
 kubectl get svc -n caswaf
 ```
 
-### 6. Access CasWAF
+### 7. Access CasWAF
 
 If using Ingress:
 ```bash
@@ -103,11 +116,20 @@ If using Ingress:
 
 If using port-forward for testing:
 ```bash
-kubectl port-forward svc/caswaf 7000:7000 -n caswaf
-# Access: http://localhost:7000
+kubectl port-forward svc/caswaf 17000:17000 -n caswaf
+# Access: http://localhost:17000
 ```
 
 ## Configuration Details
+
+### Secrets (`secret.yaml`)
+
+Stores sensitive credentials:
+- `casdoor-client-id`: Casdoor application client ID
+- `casdoor-client-secret`: Casdoor application client secret  
+- `mysql-password`: MySQL root password (must match mysql.yaml)
+
+**Security Note**: Never commit actual secrets to version control. Use sealed-secrets, external secret operators, or other secret management solutions in production.
 
 ### ConfigMap (`configmap.yaml`)
 
@@ -115,15 +137,15 @@ Key configuration parameters:
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `httpport` | CasWAF HTTP port | `7000` |
+| `httpport` | CasWAF HTTP port | `17000` |
 | `runmode` | Run mode (dev/prod) | `prod` |
 | `driverName` | Database driver | `mysql` |
-| `dataSourceName` | MySQL connection string | `root:password@tcp(caswaf-mysql:3306)/` |
+| `dataSourceName` | MySQL connection string | Uses secrets substitution |
 | `dbName` | Database name | `caswaf` |
 | `casdoorEndpoint` | Casdoor API endpoint | Required |
 | `casdoorInsecureSkipVerify` | Skip TLS verification for Casdoor | `true` |
-| `clientId` | Casdoor application client ID | Required |
-| `clientSecret` | Casdoor application client secret | Required |
+| `clientId` | Casdoor application client ID | Uses secrets substitution |
+| `clientSecret` | Casdoor application client secret | Uses secrets substitution |
 | `casdoorOrganization` | Casdoor organization name | `built-in` |
 | `casdoorApplication` | Casdoor application name | Required |
 
@@ -137,16 +159,20 @@ Key configuration parameters:
 ### CasWAF Deployment (`deployment.yaml`)
 
 Features:
-- Init container to wait for MySQL readiness
-- Liveness and readiness probes
+- Init containers:
+  - Wait for MySQL readiness
+  - Substitute secrets into configuration file
+- TCP-based liveness and readiness probes (no authentication required)
 - Resource limits and requests
-- Configuration mounted from ConfigMap
+- Configuration mounted from ConfigMap with secret substitution
 
 ## Troubleshooting
 
 ### Common Issues
 
 #### 1. "wait-for-it: timeout occurred after waiting 15 seconds for db:3306"
+
+**Note**: This issue is fixed in the current deployment by using an init container instead of wait-for-it.
 
 **Cause**: MySQL is not ready or not accessible
 

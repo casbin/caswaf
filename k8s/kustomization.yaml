@@ -6,6 +6,7 @@ namespace: caswaf
 
 resources:
   - mysql.yaml
+  - secret.yaml
   - configmap.yaml
   - deployment.yaml
   - ingress.yaml

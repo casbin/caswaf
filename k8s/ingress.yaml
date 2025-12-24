@@ -20,7 +20,7 @@ spec:
               service:
                 name: caswaf
                 port:
-                  number: 7000
+                  number: 17000
   # Uncomment and configure TLS if you have certificates
   # tls:
   #   - hosts:

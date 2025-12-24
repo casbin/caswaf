@@ -7,12 +7,12 @@ metadata:
 data:
   app.conf: |
     appname = caswaf
-    httpport = 7000
+    httpport = 17000
     runmode = prod
     SessionOn = true
     copyrequestbody = true
     driverName = mysql
-    dataSourceName = root:password@tcp(caswaf-mysql:3306)/
+    dataSourceName = root:MYSQL_PASSWORD_PLACEHOLDER@tcp(caswaf-mysql:3306)/
     dbName = caswaf
     redisEndpoint =
     gatewayEnabled = false
@@ -21,8 +21,8 @@ data:
     httpProxy = ""
     casdoorEndpoint = http://casdoor.casdoor-system.svc.cluster.local:8000
     casdoorInsecureSkipVerify = true
-    clientId = "YOUR_CLIENT_ID"
-    clientSecret = "YOUR_CLIENT_SECRET"
+    clientId = "CLIENT_ID_PLACEHOLDER"
+    clientSecret = "CLIENT_SECRET_PLACEHOLDER"
     casdoorOrganization = "built-in"
     casdoorApplication = "app-casdoor-gateway"
     isDemoMode = false
