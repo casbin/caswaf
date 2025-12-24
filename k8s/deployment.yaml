@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,58 +15,58 @@ spec:
         app: caswaf
     spec:
       initContainers:
-      - name: wait-for-mysql
-        image: busybox:1.35
-        command: 
-        - sh
-        - -c
-        - |
-          until nc -z caswaf-mysql 3306; do
-            echo "Waiting for MySQL to be ready..."
-            sleep 2
-          done
-          echo "MySQL is ready!"
+        - name: wait-for-mysql
+          image: busybox:1.35
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z caswaf-mysql 3306; do
+                echo "Waiting for MySQL to be ready..."
+                sleep 2
+              done
+              echo "MySQL is ready!"
       containers:
-      - name: caswaf
-        image: casbin/caswaf:latest
-        ports:
-        - containerPort: 7000
-          name: http
-          protocol: TCP
-        env:
-        - name: TZ
-          value: "UTC"
-        volumeMounts:
-        - name: config
-          mountPath: /conf/app.conf
-          subPath: app.conf
-        livenessProbe:
-          httpGet:
-            path: /api/get-account
-            port: 7000
-          initialDelaySeconds: 60
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /api/get-account
-            port: 7000
-          initialDelaySeconds: 30
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "100m"
-          limits:
-            memory: "1Gi"
-            cpu: "1000m"
+        - name: caswaf
+          image: casbin/caswaf:latest
+          ports:
+            - containerPort: 7000
+              name: http
+              protocol: TCP
+          env:
+            - name: TZ
+              value: "UTC"
+          volumeMounts:
+            - name: config
+              mountPath: /conf/app.conf
+              subPath: app.conf
+          livenessProbe:
+            httpGet:
+              path: /api/get-account
+              port: 7000
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/get-account
+              port: 7000
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
       volumes:
-      - name: config
-        configMap:
-          name: caswaf-config
+        - name: config
+          configMap:
+            name: caswaf-config
 ---
 apiVersion: v1
 kind: Service
@@ -76,7 +77,7 @@ spec:
   selector:
     app: caswaf
   ports:
-  - port: 7000
-    targetPort: 7000
-    name: http
+    - port: 7000
+      targetPort: 7000
+      name: http
   type: ClusterIP

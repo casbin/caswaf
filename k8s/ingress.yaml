@@ -1,3 +1,4 @@
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -10,18 +11,18 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: caswaf.example.com  # Change this to your domain
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: caswaf
-            port:
-              number: 7000
+    - host: caswaf.example.com  # Change this to your domain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: caswaf
+                port:
+                  number: 7000
   # Uncomment and configure TLS if you have certificates
   # tls:
-  # - hosts:
-  #   - caswaf.example.com
-  #   secretName: caswaf-tls
+  #   - hosts:
+  #       - caswaf.example.com
+  #     secretName: caswaf-tls
