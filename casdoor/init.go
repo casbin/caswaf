@@ -18,6 +18,7 @@ import (
 	_ "embed"
 
 	"github.com/beego/beego"
+	"github.com/casbin/caswaf/proxy"
 	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 )
 
@@ -31,4 +32,7 @@ func InitCasdoorConfig() {
 	casdoorOrganization := beego.AppConfig.String("casdoorOrganization")
 	casdoorApplication := beego.AppConfig.String("casdoorApplication")
 	casdoorsdk.InitConfig(casdoorEndpoint, clientId, clientSecret, JwtPublicKey, casdoorOrganization, casdoorApplication)
+
+	// Set custom HTTP client for Casdoor SDK with optional TLS skip verification
+	casdoorsdk.SetHttpClient(proxy.CasdoorHttpClient)
 }

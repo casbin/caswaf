@@ -15,6 +15,7 @@
 package proxy
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
@@ -26,6 +27,7 @@ import (
 
 var DefaultHttpClient *http.Client
 var ProxyHttpClient *http.Client
+var CasdoorHttpClient *http.Client
 
 func InitHttpClient() {
 	// not use proxy
@@ -33,6 +35,9 @@ func InitHttpClient() {
 
 	// use proxy
 	ProxyHttpClient = getProxyHttpClient()
+
+	// initialize Casdoor HTTP client with optional TLS skip verification
+	CasdoorHttpClient = getCasdoorHttpClient()
 }
 
 func isAddressOpen(address string) bool {
@@ -91,4 +96,18 @@ func GetProxyDialer() *net.Dialer {
 	}
 
 	return dialer.(*net.Dialer)
+}
+
+func getCasdoorHttpClient() *http.Client {
+	insecureSkipVerify := beego.AppConfig.DefaultBool("casdoorInsecureSkipVerify", false)
+
+	if insecureSkipVerify {
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		fmt.Println("Casdoor TLS verification disabled (insecure mode)")
+		return &http.Client{Transport: tr}
+	}
+
+	return &http.Client{}
 }
