@@ -105,7 +105,7 @@ func getCasdoorHttpClient() *http.Client {
 		tr := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
-		fmt.Println("Casdoor TLS verification disabled (insecure mode)")
+		beego.Warning("Casdoor TLS verification disabled (insecure mode)")
 		return &http.Client{Transport: tr}
 	}
 
