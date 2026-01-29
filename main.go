@@ -45,6 +45,8 @@ func main() {
 	run.InitSelfStart()
 	object.StartMonitorSitesLoop()
 
+	beego.InsertFilter("/debug/*", beego.BeforeRouter, routers.BlockDebugEndpoints)
+
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"},

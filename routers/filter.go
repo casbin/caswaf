@@ -57,3 +57,11 @@ func isAllowedInDemoMode(method string, urlPath string) bool {
 	// If method equals GET
 	return true
 }
+
+func BlockDebugEndpoints(ctx *context.Context) {
+	urlPath := ctx.Request.URL.Path
+	if strings.HasPrefix(urlPath, "/debug/") {
+		ctx.ResponseWriter.WriteHeader(http.StatusNotFound)
+		ctx.WriteString("404 page not found")
+	}
+}
