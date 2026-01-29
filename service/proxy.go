@@ -270,9 +270,10 @@ func nextHandle(w http.ResponseWriter, r *http.Request) {
 }
 
 func Start() {
-	http.HandleFunc("/", handleRequest)
-	http.HandleFunc("/caswaf-handler", handleAuthCallback)
-	http.HandleFunc("/caswaf-captcha-verify", handleCaptchaCallback)
+	serverMux := http.NewServeMux()
+	serverMux.HandleFunc("/", handleRequest)
+	serverMux.HandleFunc("/caswaf-handler", handleAuthCallback)
+	serverMux.HandleFunc("/caswaf-captcha-verify", handleCaptchaCallback)
 
 	gatewayEnabled, err := beego.AppConfig.Bool("gatewayEnabled")
 	if err != nil {
@@ -295,7 +296,7 @@ func Start() {
 
 	go func() {
 		fmt.Printf("CasWAF gateway running on: http://127.0.0.1:%d\n", gatewayHttpPort)
-		err := http.ListenAndServe(fmt.Sprintf(":%d", gatewayHttpPort), nil)
+		err := http.ListenAndServe(fmt.Sprintf(":%d", gatewayHttpPort), serverMux)
 		if err != nil {
 			panic(err)
 		}
@@ -304,7 +305,8 @@ func Start() {
 	go func() {
 		fmt.Printf("CasWAF gateway running on: https://127.0.0.1:%d\n", gatewayHttpsPort)
 		server := &http.Server{
-			Addr: fmt.Sprintf(":%d", gatewayHttpsPort),
+			Handler: serverMux,
+			Addr:    fmt.Sprintf(":%d", gatewayHttpsPort),
 			TLSConfig: &tls.Config{
 				// Minimum TLS version 1.2, TLS 1.3 is automatically supported
 				MinVersion: tls.VersionTLS12,
