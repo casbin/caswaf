@@ -55,7 +55,13 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 	}
 
 	proxy.ModifyResponse = func(resp *http.Response) error {
-		resp.Header.Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+		// Only set HSTS header for HTTPS connections
+		if request.TLS != nil {
+			// Only set if backend hasn't already set it
+			if resp.Header.Get("Strict-Transport-Security") == "" {
+				resp.Header.Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+			}
+		}
 		return nil
 	}
 
