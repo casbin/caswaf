@@ -42,16 +42,24 @@ func TestBlockDebugEndpoints(t *testing.T) {
 			shouldBlock:    true,
 		},
 		{
-			name:           "Allow /api/signin",
-			path:           "/api/signin",
-			expectedStatus: http.StatusOK,
-			shouldBlock:    false,
+			name:        "Allow /api/signin",
+			path:        "/api/signin",
+			shouldBlock: false,
 		},
 		{
-			name:           "Allow root path",
-			path:           "/",
-			expectedStatus: http.StatusOK,
-			shouldBlock:    false,
+			name:        "Allow root path",
+			path:        "/",
+			shouldBlock: false,
+		},
+		{
+			name:        "Allow /debugging (not a debug endpoint)",
+			path:        "/debugging",
+			shouldBlock: false,
+		},
+		{
+			name:        "Allow /debug (without trailing slash)",
+			path:        "/debug",
+			shouldBlock: false,
 		},
 	}
 
@@ -78,9 +86,9 @@ func TestBlockDebugEndpoints(t *testing.T) {
 					t.Errorf("Expected '404 page not found' message, got %s", body)
 				}
 			} else {
-				// For non-blocked paths, the filter should not set status or write anything
-				if w.Code != 0 && w.Code != http.StatusOK {
-					t.Errorf("Filter should not block path %s, but got status %d", tt.path, w.Code)
+				// For non-blocked paths, the filter should not write anything to the body
+				if w.Body.Len() > 0 {
+					t.Errorf("Filter should not write anything for path %s, but got %s", tt.path, w.Body.String())
 				}
 			}
 		})

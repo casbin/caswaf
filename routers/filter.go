@@ -63,5 +63,6 @@ func BlockDebugEndpoints(ctx *context.Context) {
 	if strings.HasPrefix(urlPath, "/debug/") {
 		ctx.ResponseWriter.WriteHeader(http.StatusNotFound)
 		ctx.WriteString("404 page not found")
+		return
 	}
 }
