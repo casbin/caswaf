@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/beego/beego"
 	"github.com/beego/beego/plugins/cors"
@@ -45,8 +46,27 @@ func main() {
 	run.InitSelfStart()
 	object.StartMonitorSitesLoop()
 
+	// Get CORS allowed origins from configuration
+	corsOriginsConfig := beego.AppConfig.String("corsAllowedOrigins")
+	var allowedOrigins []string
+	if corsOriginsConfig != "" {
+		// Split by comma and trim spaces
+		origins := strings.Split(corsOriginsConfig, ",")
+		for _, origin := range origins {
+			trimmed := strings.TrimSpace(origin)
+			if trimmed != "" {
+				allowedOrigins = append(allowedOrigins, trimmed)
+			}
+		}
+	}
+	
+	// If no origins are configured, use a secure default (localhost only)
+	if len(allowedOrigins) == 0 {
+		allowedOrigins = []string{"http://localhost:7001"}
+	}
+
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
-		AllowOrigins:     []string{"*"},
+		AllowOrigins:     allowedOrigins,
 		AllowMethods:     []string{"GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "X-Requested-With", "Content-Type", "Accept"},
 		ExposeHeaders:    []string{"Content-Length"},
