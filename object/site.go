@@ -68,9 +68,9 @@ type Site struct {
 	CasdoorApplication string                  `xorm:"varchar(100)" json:"casdoorApplication"`
 	ApplicationObj     *casdoorsdk.Application `xorm:"-" json:"applicationObj"`
 
-	EnableHSTS            bool `json:"enableHSTS"`
-	HSTSMaxAge            int  `json:"hstsMaxAge"`
-	HSTSIncludeSubDomains bool `json:"hstsIncludeSubDomains"`
+	EnableHSTS            bool `xorm:"bool" json:"enableHSTS"`
+	HSTSMaxAge            int  `xorm:"int" json:"hstsMaxAge"`
+	HSTSIncludeSubDomains bool `xorm:"bool" json:"hstsIncludeSubDomains"`
 }
 
 func GetGlobalSites() ([]*Site, error) {

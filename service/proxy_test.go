@@ -16,103 +16,108 @@ package service
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/casbin/caswaf/object"
 )
 
-func TestHSTSHeader(t *testing.T) {
-	// Create a mock backend server
-	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
-	}))
-	defer backend.Close()
-
-	// Test case 1: HSTS enabled with includeSubDomains
-	t.Run("HSTS enabled with includeSubDomains", func(t *testing.T) {
-		// Create a test request
-		req := httptest.NewRequest("GET", "http://example.com/test", nil)
-		req.Host = "example.com"
-		rr := httptest.NewRecorder()
-
-		// Call forwardHandler
-		forwardHandler(backend.URL, rr, req)
-
-		// Note: In a real test, we would need to mock getSiteByDomainWithWww
-		// For now, this test documents the expected behavior
-		// The HSTS header should be set if site.EnableHSTS is true
-	})
-
-	// Test case 2: HSTS enabled without includeSubDomains
-	t.Run("HSTS enabled without includeSubDomains", func(t *testing.T) {
-		req := httptest.NewRequest("GET", "http://example.com/test", nil)
-		req.Host = "example.com"
-		rr := httptest.NewRecorder()
-
-		forwardHandler(backend.URL, rr, req)
-
-		// The HSTS header should be set without includeSubDomains if configured
-	})
-
-	// Test case 3: HSTS disabled
-	t.Run("HSTS disabled", func(t *testing.T) {
-		req := httptest.NewRequest("GET", "http://example.com/test", nil)
-		req.Host = "example.com"
-		rr := httptest.NewRecorder()
-
-		forwardHandler(backend.URL, rr, req)
-
-		// The HSTS header should not be set if site.EnableHSTS is false
-	})
-}
-
-func TestHSTSHeaderFormat(t *testing.T) {
+func TestSetHSTSHeader(t *testing.T) {
 	tests := []struct {
 		name                  string
-		enableHSTS            bool
-		hstsMaxAge            int
-		hstsIncludeSubDomains bool
+		site                  *object.Site
+		isHTTPS               bool
 		expectedHeader        string
+		expectHeaderSet       bool
 	}{
 		{
-			name:                  "HSTS with includeSubDomains",
-			enableHSTS:            true,
-			hstsMaxAge:            31536000,
-			hstsIncludeSubDomains: true,
-			expectedHeader:        "max-age=31536000; includeSubDomains",
+			name: "HSTS enabled with includeSubDomains over HTTPS",
+			site: &object.Site{
+				EnableHSTS:            true,
+				HSTSMaxAge:            31536000,
+				HSTSIncludeSubDomains: true,
+			},
+			isHTTPS:         true,
+			expectedHeader:  "max-age=31536000; includeSubDomains",
+			expectHeaderSet: true,
 		},
 		{
-			name:                  "HSTS without includeSubDomains",
-			enableHSTS:            true,
-			hstsMaxAge:            31536000,
-			hstsIncludeSubDomains: false,
-			expectedHeader:        "max-age=31536000",
+			name: "HSTS enabled without includeSubDomains over HTTPS",
+			site: &object.Site{
+				EnableHSTS:            true,
+				HSTSMaxAge:            31536000,
+				HSTSIncludeSubDomains: false,
+			},
+			isHTTPS:         true,
+			expectedHeader:  "max-age=31536000",
+			expectHeaderSet: true,
 		},
 		{
-			name:                  "HSTS with custom max-age",
-			enableHSTS:            true,
-			hstsMaxAge:            86400,
-			hstsIncludeSubDomains: false,
-			expectedHeader:        "max-age=86400",
+			name: "HSTS enabled over HTTP - should not set header",
+			site: &object.Site{
+				EnableHSTS:            true,
+				HSTSMaxAge:            31536000,
+				HSTSIncludeSubDomains: true,
+			},
+			isHTTPS:         false,
+			expectedHeader:  "",
+			expectHeaderSet: false,
+		},
+		{
+			name: "HSTS disabled over HTTPS",
+			site: &object.Site{
+				EnableHSTS:            false,
+				HSTSMaxAge:            31536000,
+				HSTSIncludeSubDomains: true,
+			},
+			isHTTPS:         true,
+			expectedHeader:  "",
+			expectHeaderSet: false,
+		},
+		{
+			name: "HSTS enabled with zero max-age - should not set header",
+			site: &object.Site{
+				EnableHSTS:            true,
+				HSTSMaxAge:            0,
+				HSTSIncludeSubDomains: true,
+			},
+			isHTTPS:         true,
+			expectedHeader:  "",
+			expectHeaderSet: false,
+		},
+		{
+			name: "HSTS enabled with custom max-age over HTTPS",
+			site: &object.Site{
+				EnableHSTS:            true,
+				HSTSMaxAge:            86400,
+				HSTSIncludeSubDomains: false,
+			},
+			isHTTPS:         true,
+			expectedHeader:  "max-age=86400",
+			expectHeaderSet: true,
+		},
+		{
+			name:            "Nil site - should not set header",
+			site:            nil,
+			isHTTPS:         true,
+			expectedHeader:  "",
+			expectHeaderSet: false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// This test documents the expected HSTS header format
-			// based on the Site configuration
-			site := &object.Site{
-				EnableHSTS:            tt.enableHSTS,
-				HSTSMaxAge:            tt.hstsMaxAge,
-				HSTSIncludeSubDomains: tt.hstsIncludeSubDomains,
-			}
+			header := http.Header{}
+			setHSTSHeader(tt.site, header, tt.isHTTPS)
 
-			if site.EnableHSTS {
-				// Expected header format
-				_ = tt.expectedHeader
-				// In actual implementation, this would be set via ModifyResponse
+			hstsHeader := header.Get("Strict-Transport-Security")
+			if tt.expectHeaderSet {
+				if hstsHeader != tt.expectedHeader {
+					t.Errorf("Expected HSTS header to be %q, got %q", tt.expectedHeader, hstsHeader)
+				}
+			} else {
+				if hstsHeader != "" {
+					t.Errorf("Expected HSTS header to not be set, got %q", hstsHeader)
+				}
 			}
 		})
 	}

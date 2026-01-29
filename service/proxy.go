@@ -30,6 +30,22 @@ import (
 	"github.com/casbin/caswaf/util"
 )
 
+func setHSTSHeader(site *object.Site, header http.Header, isHTTPS bool) {
+	// Only set HSTS header over HTTPS connections
+	// Browsers ignore HSTS headers received over HTTP (RFC 6797)
+	if !isHTTPS {
+		return
+	}
+
+	if site != nil && site.EnableHSTS && site.HSTSMaxAge > 0 {
+		hstsValue := fmt.Sprintf("max-age=%d", site.HSTSMaxAge)
+		if site.HSTSIncludeSubDomains {
+			hstsValue += "; includeSubDomains"
+		}
+		header.Set("Strict-Transport-Security", hstsValue)
+	}
+}
+
 func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.Request) {
 	target, err := url.Parse(targetUrl)
 
@@ -57,13 +73,7 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 	// Add ModifyResponse to inject HSTS header if enabled
 	proxy.ModifyResponse = func(resp *http.Response) error {
 		site := getSiteByDomainWithWww(request.Host)
-		if site != nil && site.EnableHSTS {
-			hstsValue := fmt.Sprintf("max-age=%d", site.HSTSMaxAge)
-			if site.HSTSIncludeSubDomains {
-				hstsValue += "; includeSubDomains"
-			}
-			resp.Header.Set("Strict-Transport-Security", hstsValue)
-		}
+		setHSTSHeader(site, resp.Header, request.TLS != nil)
 		return nil
 	}
 
@@ -265,13 +275,7 @@ func nextHandle(w http.ResponseWriter, r *http.Request) {
 
 	if site.SslMode == "Static Folder" {
 		// Set HSTS header for static folder mode
-		if site.EnableHSTS {
-			hstsValue := fmt.Sprintf("max-age=%d", site.HSTSMaxAge)
-			if site.HSTSIncludeSubDomains {
-				hstsValue += "; includeSubDomains"
-			}
-			w.Header().Set("Strict-Transport-Security", hstsValue)
-		}
+		setHSTSHeader(site, w.Header(), r.TLS != nil)
 
 		var path string
 		if r.RequestURI != "/" {
