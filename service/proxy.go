@@ -54,6 +54,19 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 		}
 	}
 
+	proxy.ModifyResponse = func(resp *http.Response) error {
+		// Add Secure flag to all Set-Cookie headers in HTTPS responses
+		if request.TLS != nil {
+			cookies := resp.Header["Set-Cookie"]
+			for i, cookie := range cookies {
+				if !strings.Contains(cookie, "Secure") && !strings.Contains(cookie, "secure") {
+					cookies[i] = cookie + "; Secure"
+				}
+			}
+		}
+		return nil
+	}
+
 	proxy.ServeHTTP(writer, request)
 }
 
