@@ -247,6 +247,36 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("site:Enable cookie secure")}:
+          </Col>
+          <Col span={1} >
+            <Switch checked={this.state.site.enableCookieSecure} onChange={checked => {
+              this.updateSiteField("enableCookieSecure", checked);
+            }} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("site:Enable cookie HttpOnly")}:
+          </Col>
+          <Col span={1} >
+            <Switch checked={this.state.site.enableCookieHttpOnly} onChange={checked => {
+              this.updateSiteField("enableCookieHttpOnly", checked);
+            }} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
+            {i18next.t("site:Enable cookie SameSite")}:
+          </Col>
+          <Col span={1} >
+            <Switch checked={this.state.site.enableCookieSameSite} onChange={checked => {
+              this.updateSiteField("enableCookieSameSite", checked);
+            }} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={2}>
             {i18next.t("site:Rules")}:
           </Col>
           <Col span={22} >
