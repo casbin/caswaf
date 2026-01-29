@@ -262,7 +262,17 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 func nextHandle(w http.ResponseWriter, r *http.Request) {
 	site := getSiteByDomainWithWww(r.Host)
 	host := site.GetHost()
+
 	if site.SslMode == "Static Folder" {
+		// Set HSTS header for static folder mode
+		if site.EnableHSTS {
+			hstsValue := fmt.Sprintf("max-age=%d", site.HSTSMaxAge)
+			if site.HSTSIncludeSubDomains {
+				hstsValue += "; includeSubDomains"
+			}
+			w.Header().Set("Strict-Transport-Security", hstsValue)
+		}
+
 		var path string
 		if r.RequestURI != "/" {
 			path = filepath.Join(host, r.RequestURI)
