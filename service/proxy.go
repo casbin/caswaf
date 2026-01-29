@@ -84,12 +84,17 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 
 		// Fix CORS security vulnerability: Remove dangerous CORS header combinations
 		// that allow credential theft from any origin
+		allowOrigin := resp.Header.Get("Access-Control-Allow-Origin")
 		allowCredentials := resp.Header.Get("Access-Control-Allow-Credentials")
 		
-		// Remove CORS headers when credentials are allowed to prevent credential theft
-		// from untrusted origins. Without a configured allowlist, we cannot safely
-		// validate origins, so we disable CORS for all credential-bearing requests.
-		if allowCredentials == "true" {
+		// Remove CORS headers when the dangerous combination is present:
+		// 1. Access-Control-Allow-Credentials: true with Access-Control-Allow-Origin: *
+		//    This is actually blocked by browsers but we sanitize it anyway
+		// 2. Access-Control-Allow-Credentials: true with any origin
+		//    Without a configured allowlist, we cannot safely validate if the origin
+		//    is trusted or if it's being reflected from the request, so we remove all
+		//    CORS headers for credential-bearing responses to prevent theft
+		if strings.EqualFold(allowCredentials, "true") && allowOrigin != "" {
 			// Remove CORS headers to prevent credential theft
 			resp.Header.Del("Access-Control-Allow-Origin")
 			resp.Header.Del("Access-Control-Allow-Credentials")
