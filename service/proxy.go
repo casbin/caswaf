@@ -63,10 +63,12 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 				resp.Header.Del("Set-Cookie")
 				// Add them back with Secure flag if not already present
 				for _, cookie := range cookies {
-					// Check if Secure attribute is already present
-					// Look for "; Secure" or "; Secure;" patterns
-					hasSecure := strings.Contains(cookie, "; Secure;") || 
-					             strings.HasSuffix(cookie, "; Secure")
+					// Check if Secure attribute is already present (case-insensitive)
+					cookieLower := strings.ToLower(cookie)
+					hasSecure := strings.Contains(cookieLower, ";secure;") || 
+					             strings.Contains(cookieLower, "; secure;") ||
+					             strings.HasSuffix(cookieLower, ";secure") ||
+					             strings.HasSuffix(cookieLower, "; secure")
 					if !hasSecure {
 						cookie = cookie + "; Secure"
 					}
