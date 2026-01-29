@@ -57,6 +57,11 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 	proxy.ModifyResponse = func(resp *http.Response) error {
 		// Add Secure flag to all Set-Cookie headers in HTTPS responses
 		if request.TLS != nil {
+			// Add HSTS header for HTTPS responses if not already set by backend
+			if resp.Header.Get("Strict-Transport-Security") == "" {
+				resp.Header.Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+			}
+
 			cookies := resp.Header["Set-Cookie"]
 			if len(cookies) > 0 {
 				// Clear existing Set-Cookie headers
