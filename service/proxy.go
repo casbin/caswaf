@@ -54,6 +54,11 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 		}
 	}
 
+	proxy.ModifyResponse = func(resp *http.Response) error {
+		resp.Header.Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+		return nil
+	}
+
 	proxy.ServeHTTP(writer, request)
 }
 
