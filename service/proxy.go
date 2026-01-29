@@ -58,9 +58,19 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 		// Add Secure flag to all Set-Cookie headers in HTTPS responses
 		if request.TLS != nil {
 			cookies := resp.Header["Set-Cookie"]
-			for i, cookie := range cookies {
-				if !strings.Contains(cookie, "Secure") && !strings.Contains(cookie, "secure") {
-					cookies[i] = cookie + "; Secure"
+			if len(cookies) > 0 {
+				// Clear existing Set-Cookie headers
+				resp.Header.Del("Set-Cookie")
+				// Add them back with Secure flag if not already present
+				for _, cookie := range cookies {
+					// Check if Secure attribute is already present
+					// Look for "; Secure" or "; Secure;" patterns
+					hasSecure := strings.Contains(cookie, "; Secure;") || 
+					             strings.HasSuffix(cookie, "; Secure")
+					if !hasSecure {
+						cookie = cookie + "; Secure"
+					}
+					resp.Header.Add("Set-Cookie", cookie)
 				}
 			}
 		}
