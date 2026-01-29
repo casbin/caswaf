@@ -56,7 +56,8 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 
 	// Set secure CORS headers on all reverse proxy responses
 	proxy.ModifyResponse = func(resp *http.Response) error {
-		setSecureCORSHeaders(writer, request)
+		origin := request.Header.Get("Origin")
+		setSecureCORSHeaders(resp.Header, origin)
 		return nil
 	}
 
