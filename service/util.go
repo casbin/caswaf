@@ -149,3 +149,52 @@ func getCasdoorEndpoint() string {
 	}
 	return endpoint
 }
+
+// isAllowedOrigin checks if the given origin is in the allowed list
+// Returns true if the origin is trusted, false otherwise
+func isAllowedOrigin(origin string) bool {
+	// Empty origin is not allowed
+	if origin == "" {
+		return false
+	}
+
+	// Hardcoded list of allowed origins for CORS with credentials
+	// This should be configured based on your specific deployment
+	allowedOrigins := []string{
+		"http://localhost:7001",
+		"http://localhost:17000",
+		"https://localhost:7001",
+		"https://localhost:17000",
+	}
+
+	for _, allowed := range allowedOrigins {
+		if origin == allowed {
+			return true
+		}
+	}
+
+	return false
+}
+
+// setSecureCORSHeaders sets secure CORS headers on the response
+// Only allows credentials for trusted origins, blocks all others
+func setSecureCORSHeaders(w http.ResponseWriter, r *http.Request) {
+	origin := r.Header.Get("Origin")
+
+	// Only set CORS headers if there's an Origin header in the request
+	if origin == "" {
+		return
+	}
+
+	// Check if origin is allowed
+	if isAllowedOrigin(origin) {
+		// Only allow credentials for trusted origins
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, PATCH, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
+		w.Header().Set("Access-Control-Expose-Headers", "Content-Length")
+	}
+	// If origin is not allowed, don't set any CORS headers
+	// This prevents credential-bearing cross-origin requests
+}

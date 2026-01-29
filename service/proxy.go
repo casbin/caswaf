@@ -54,6 +54,12 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 		}
 	}
 
+	// Set secure CORS headers on all reverse proxy responses
+	proxy.ModifyResponse = func(resp *http.Response) error {
+		setSecureCORSHeaders(writer, request)
+		return nil
+	}
+
 	proxy.ServeHTTP(writer, request)
 }
 
