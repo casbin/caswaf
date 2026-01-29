@@ -67,6 +67,10 @@ type Site struct {
 
 	CasdoorApplication string                  `xorm:"varchar(100)" json:"casdoorApplication"`
 	ApplicationObj     *casdoorsdk.Application `xorm:"-" json:"applicationObj"`
+
+	EnableCookieSecure   bool `json:"enableCookieSecure"`
+	EnableCookieHttpOnly bool `json:"enableCookieHttpOnly"`
+	EnableCookieSameSite bool `json:"enableCookieSameSite"`
 }
 
 func GetGlobalSites() ([]*Site, error) {

@@ -30,7 +30,7 @@ import (
 	"github.com/casbin/caswaf/util"
 )
 
-func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.Request) {
+func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.Request, site *object.Site) {
 	target, err := url.Parse(targetUrl)
 
 	if nil != err {
@@ -52,6 +52,11 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 				r.Header.Set("X-Real-Ip", clientIP)
 			}
 		}
+	}
+
+	// Add ModifyResponse to inject security flags into cookies
+	proxy.ModifyResponse = func(resp *http.Response) error {
+		return addSecureFlagsToCookies(resp, site)
 	}
 
 	proxy.ServeHTTP(writer, request)
@@ -265,7 +270,7 @@ func nextHandle(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, path)
 	} else {
 		targetUrl := joinPath(site.GetHost(), r.RequestURI)
-		forwardHandler(targetUrl, w, r)
+		forwardHandler(targetUrl, w, r, site)
 	}
 }
 
