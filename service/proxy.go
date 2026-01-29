@@ -54,6 +54,19 @@ func forwardHandler(targetUrl string, writer http.ResponseWriter, request *http.
 		}
 	}
 
+	// Add ModifyResponse to inject HSTS header if enabled
+	proxy.ModifyResponse = func(resp *http.Response) error {
+		site := getSiteByDomainWithWww(request.Host)
+		if site != nil && site.EnableHSTS {
+			hstsValue := fmt.Sprintf("max-age=%d", site.HSTSMaxAge)
+			if site.HSTSIncludeSubDomains {
+				hstsValue += "; includeSubDomains"
+			}
+			resp.Header.Set("Strict-Transport-Security", hstsValue)
+		}
+		return nil
+	}
+
 	proxy.ServeHTTP(writer, request)
 }
 
