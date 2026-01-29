@@ -115,6 +115,38 @@ func TestAddSecureFlagsToCookies(t *testing.T) {
 			enableSameSite:   true,
 			expectedContains: []string{"Secure", "HttpOnly", "SameSite=Lax"},
 		},
+		{
+			name:             "Don't confuse 'secure' in value with Secure flag",
+			inputCookies:     []string{"secureToken=abc123; Path=/"},
+			enableSecure:     true,
+			enableHttpOnly:   false,
+			enableSameSite:   false,
+			expectedContains: []string{"Secure", "secureToken=abc123"},
+		},
+		{
+			name:             "Don't confuse 'httponly' in value with HttpOnly flag",
+			inputCookies:     []string{"httpOnlySession=abc123; Path=/"},
+			enableSecure:     false,
+			enableHttpOnly:   true,
+			enableSameSite:   false,
+			expectedContains: []string{"HttpOnly", "httpOnlySession=abc123"},
+		},
+		{
+			name:             "Don't confuse 'samesite' in value with SameSite flag",
+			inputCookies:     []string{"sameSiteConfig=abc123; Path=/"},
+			enableSecure:     false,
+			enableHttpOnly:   false,
+			enableSameSite:   true,
+			expectedContains: []string{"SameSite=Lax", "sameSiteConfig=abc123"},
+		},
+		{
+			name:             "Cookie with secure in attribute name but not Secure flag",
+			inputCookies:     []string{"sessionId=123; secureAttribute=value; Path=/"},
+			enableSecure:     true,
+			enableHttpOnly:   false,
+			enableSameSite:   false,
+			expectedContains: []string{"Secure", "secureAttribute=value"},
+		},
 	}
 
 	for _, tt := range tests {
