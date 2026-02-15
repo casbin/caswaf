@@ -61,6 +61,30 @@ CasWAF uses Casdoor to manage members. So you need to create an organization and
 - **Docker Compose**: Use the provided `docker-compose.yml` for quick local setup
 - **Manual Installation**: Build and run from source
 
+### Runtime Configuration (Recommended)
+
+You can configure CasWAF to use your own Casdoor instance **without rebuilding the Docker image** by mounting a custom `config.js` file:
+
+```bash
+# Create config.custom.js with your Casdoor settings
+docker run -d -p 8080:8080 \
+  -v $(pwd)/config.custom.js:/web/build/config.js:ro \
+  -v $(pwd)/conf/app.conf:/conf/app.conf:ro \
+  casbin/caswaf:latest
+```
+
+Example `config.custom.js`:
+```javascript
+window.appConfig = {
+  serverUrl: "https://your-casdoor.com",
+  clientId: "your-client-id",
+  appName: "caswaf",
+  organizationName: "your-org",
+  redirectPath: "/callback",
+};
+```
+
+
 ### Necessary configuration
 
 #### Get the code
