@@ -67,7 +67,7 @@ You can configure CasWAF to use your own Casdoor instance **without rebuilding t
 
 ```bash
 # Create config.custom.js with your Casdoor settings
-docker run -d -p 8080:8080 \
+docker run -d -p 17000:17000 \
   -v $(pwd)/config.custom.js:/web/build/config.js:ro \
   -v $(pwd)/conf/app.conf:/conf/app.conf:ro \
   casbin/caswaf:latest
