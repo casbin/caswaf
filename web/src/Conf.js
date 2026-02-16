@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const AuthConfig = {
+// Load configuration from runtime config.js file (mounted at /web/build/config.js)
+// This allows configuration to be changed without rebuilding the Docker image
+export const AuthConfig = window.appConfig || {
+  // Fallback defaults if config.js is not loaded
   serverUrl: "https://door.casdoor.com",
-  // serverUrl: "http://localhost:7001",
   clientId: "af6b5aa958822fb9dc33",
   appName: "app-casibase",
   organizationName: "casbin",
