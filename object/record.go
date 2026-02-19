@@ -102,10 +102,40 @@ type DataCount struct {
 	Count int64  `json:"count"`
 }
 
+// unixTimestampExpr returns a SQL expression that converts a varchar timestamp
+// column to a Unix epoch integer, compatible with the configured DB driver.
+func unixTimestampExpr(col string) string {
+	switch ormer.driverName {
+	case "postgres":
+		return "EXTRACT(EPOCH FROM " + col + "::timestamp)"
+	case "mssql":
+		return "DATEDIFF(SECOND, '1970-01-01', CONVERT(datetime, " + col + "))"
+	case "sqlite":
+		return "strftime('%s', " + col + ")"
+	default: // mysql
+		return "UNIX_TIMESTAMP(" + col + ")"
+	}
+}
+
+// dateFormatExpr returns a SQL expression that formats a varchar timestamp
+// column using the given driver-appropriate format string.
+func dateFormatExpr(col, format string) string {
+	switch ormer.driverName {
+	case "postgres":
+		return "TO_CHAR(" + col + "::timestamp, '" + format + "')"
+	case "mssql":
+		return "FORMAT(CONVERT(datetime, " + col + "), '" + format + "')"
+	case "sqlite":
+		return "strftime('" + format + "', " + col + ")"
+	default: // mysql
+		return "DATE_FORMAT(" + col + ", '" + format + "')"
+	}
+}
+
 func GetMetrics(dataType string, startAt time.Time, top int) (*[]DataCount, error) {
 	var dataCounts []DataCount
 	err := ormer.Engine.Table("record").
-		Where("UNIX_TIMESTAMP(created_time) > ?", startAt.Unix()).
+		Where(unixTimestampExpr("created_time")+" > ?", startAt.Unix()).
 		Select(dataType + " as data, COUNT(*) as count").
 		GroupBy("data").
 		Desc("count").
@@ -119,9 +149,9 @@ func GetMetrics(dataType string, startAt time.Time, top int) (*[]DataCount, erro
 
 func GetMetricsOverTime(startAt time.Time, timeType string) (*[]DataCount, error) {
 	var dataCounts []DataCount
-	createdTime := "DATE_FORMAT(created_time, '" + timeType2Format(timeType) + "')"
+	createdTime := dateFormatExpr("created_time", timeType2Format(timeType))
 	err := ormer.Engine.Table("record").
-		Where("UNIX_TIMESTAMP(created_time) > ?", startAt.Unix()).
+		Where(unixTimestampExpr("created_time")+" > ?", startAt.Unix()).
 		GroupBy(createdTime).
 		Select(createdTime + " as data, COUNT(*) as count").
 		Asc("data").
@@ -132,14 +162,32 @@ func GetMetricsOverTime(startAt time.Time, timeType string) (*[]DataCount, error
 	return &dataCounts, nil
 }
 
+// timeType2Format returns a DB-appropriate strftime/date-format pattern for
+// the given time granularity. The format is chosen to match the active driver.
 func timeType2Format(timeType string) string {
+	isPostgresOrMssql := ormer.driverName == "postgres" || ormer.driverName == "mssql"
 	switch timeType {
 	case "hour":
+		if isPostgresOrMssql {
+			return "YYYY-MM-DD HH24"
+		}
+		if ormer.driverName == "sqlite" {
+			return "%Y-%m-%d %H"
+		}
 		return "%Y-%m-%d %H"
 	case "day":
+		if isPostgresOrMssql {
+			return "YYYY-MM-DD"
+		}
 		return "%Y-%m-%d"
 	case "month":
+		if isPostgresOrMssql {
+			return "YYYY-MM"
+		}
 		return "%Y-%m"
+	}
+	if isPostgresOrMssql {
+		return "YYYY-MM-DD HH24"
 	}
 	return "%Y-%m-%d %H"
 }
