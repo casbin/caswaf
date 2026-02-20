@@ -165,29 +165,46 @@ func GetMetricsOverTime(startAt time.Time, timeType string) (*[]DataCount, error
 // timeType2Format returns a DB-appropriate strftime/date-format pattern for
 // the given time granularity. The format is chosen to match the active driver.
 func timeType2Format(timeType string) string {
-	isPostgresOrMssql := ormer.driverName == "postgres" || ormer.driverName == "mssql"
+	isPostgres := ormer.driverName == "postgres"
+	isMssql := ormer.driverName == "mssql"
+
 	switch timeType {
 	case "hour":
-		if isPostgresOrMssql {
+		if isPostgres {
+			// Postgres uses to_char with its own format tokens.
 			return "YYYY-MM-DD HH24"
+		}
+		if isMssql {
+			// SQL Server FORMAT() uses .NET-style format strings.
+			return "yyyy-MM-dd HH"
 		}
 		if ormer.driverName == "sqlite" {
 			return "%Y-%m-%d %H"
 		}
 		return "%Y-%m-%d %H"
 	case "day":
-		if isPostgresOrMssql {
+		if isPostgres {
 			return "YYYY-MM-DD"
+		}
+		if isMssql {
+			return "yyyy-MM-dd"
 		}
 		return "%Y-%m-%d"
 	case "month":
-		if isPostgresOrMssql {
+		if isPostgres {
 			return "YYYY-MM"
+		}
+		if isMssql {
+			return "yyyy-MM"
 		}
 		return "%Y-%m"
 	}
-	if isPostgresOrMssql {
+
+	if isPostgres {
 		return "YYYY-MM-DD HH24"
+	}
+	if isMssql {
+		return "yyyy-MM-dd HH"
 	}
 	return "%Y-%m-%d %H"
 }
