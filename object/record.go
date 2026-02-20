@@ -107,7 +107,7 @@ type DataCount struct {
 func unixTimestampExpr(col string) string {
 	switch ormer.driverName {
 	case "postgres":
-		return "EXTRACT(EPOCH FROM " + col + "::timestamp)"
+		return "CAST(EXTRACT(EPOCH FROM " + col + "::timestamp) AS bigint)"
 	case "mssql":
 		return "DATEDIFF(SECOND, '1970-01-01', CONVERT(datetime, " + col + "))"
 	case "sqlite":
