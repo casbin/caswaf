@@ -41,6 +41,10 @@ type agentConfigView struct {
 // GetAgentConfigs lists the skills, MCP servers and instructions of every agent
 // on this host whose configuration layout Gateway knows.
 func (c *ApiController) GetAgentConfigs() {
+	if c.RequireAdmin() {
+		return
+	}
+
 	views, err := agentConfigViews(c.GetString("refresh") == "true")
 	if err != nil {
 		c.ResponseError(err.Error())

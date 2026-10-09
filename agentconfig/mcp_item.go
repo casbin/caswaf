@@ -99,12 +99,29 @@ func commandOf(entry map[string]any) string {
 	arguments, _ := entry["args"].([]any)
 	parts := make([]string, 0, len(arguments)+1)
 	parts = append(parts, command)
+	redactNext := false
 	for _, argument := range arguments {
-		if text, ok := argument.(string); ok {
-			parts = append(parts, text)
+		text, ok := argument.(string)
+		if !ok {
+			continue
 		}
+		if redactNext {
+			redactNext = false
+			parts = append(parts, "[REDACTED]")
+			continue
+		}
+
+		flag, _, hasValue := strings.Cut(text, "=")
+		if strings.HasPrefix(flag, "-") && auditutil.SensitiveKey(flag) {
+			if hasValue {
+				text = flag + "=[REDACTED]"
+			} else {
+				redactNext = true
+			}
+		}
+		parts = append(parts, text)
 	}
-	return strings.Join(parts, " ")
+	return auditutil.SanitizeString(strings.Join(parts, " "))
 }
 
 func stringField(entry map[string]any, keys ...string) string {
