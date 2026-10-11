@@ -102,7 +102,7 @@
 
 - **Is that API key what it was sold as?** A reseller can serve a cheaper model, fake a cache hit, or quietly drop a parameter it claims to support. [Authenticity](#the-killer-feature-is-the-api-behind-that-key-what-it-was-sold-as) probes every provider on its own and grades it A–F, and [grades a single endpoint](#check-one-endpoint-without-installing-anything) without installing anything.
 - **What every agent did, spent and sent.** Every prompt and tool call, the spend read from the agents' own transcripts, and, on Windows, where each agent's own processes upload data, including what never passes through any proxy.
-- **One place for all of them.** Point Claude Code, Codex, Cursor, Gemini CLI and the rest at any of 44 model vendors, say what each may do, and install, upgrade or roll back the agents themselves.
+- **One place for all of them.** Point Claude Code, Codex, Cursor, Gemini CLI and the rest at any of 44 model vendors, [fall over to another vendor](#when-a-provider-cannot-answer-fallbacks-and-model-routing) when one runs out or goes down, say what each may do, and install, upgrade or roll back the agents themselves.
 
 ## Run it
 
@@ -197,6 +197,7 @@ The password behind that account is `admin` / `123`, and it only matters if you 
 
 - **[Is the API behind that key what it was sold as?](#the-killer-feature-is-the-api-behind-that-key-what-it-was-sold-as)** — a reseller can quietly swap in a cheaper model or fake a cache hit, and none of it shows up in the traffic. Authenticity asks the upstream directly and grades it A–F.
 - **[Switch every agent's provider from one place](#send-an-agents-traffic-through-gateway)** — change an API key or base URL once, and every agent pointed at Gateway picks it up.
+- **[Keep going when a provider runs out](#when-a-provider-cannot-answer-fallbacks-and-model-routing)** — a key out of credit, a rate limit or a relay that is down moves the request on to the next provider, across vendors and APIs, and model routing rules decide which model each request is actually sent and what it steps down to.
 - **[Add a provider, an MCP server, a prompt or a skill from a link](#import-from-a-link)** — click a vendor's "add this" button on the web and Gateway opens with what the link carries, before any of it is written.
 - **[Run several instances of one agent side by side](#what-to-do-next)** — e.g. multiple Claude Desktop instances, each signed in to a different account.
 - **[Install, upgrade and roll back the agents themselves](#what-to-do-next)** — which build each agent is on against what its package manager publishes, and back to an older release when an update broke something. One click whichever way it was installed, with the command shown first, its progress on the row and its console output a click away.
@@ -287,6 +288,22 @@ An agent signed in with a ChatGPT or Claude subscription has no API key to paste
 The environment snippet for such a provider sets the base URL and nothing else — a token there would replace the sign-in the agent already has. Gateway records and routes the traffic exactly as it does for a provider with a key; it just never sees one.
 
 Codex is the exception: its ChatGPT sign-in talks to an endpoint no provider stands in for, so a Codex CLI still needs a provider with an API key.
+
+### When a provider cannot answer: fallbacks and model routing
+
+A key runs out of credit, a relay goes down, a vendor rate-limits you halfway through a session. Gateway moves the request on to the next provider instead of handing the agent the error.
+
+**Fallbacks.** On an agent's page, under the provider it is bound to, pick the other providers to fall back to, in the order they should be tried. They need not be from the same vendor or speak the same API: Claude Code bound to an Anthropic relay can fall back to DeepSeek, then Kimi, then Qwen, and Gateway translates each request for whichever one answers. A fallback that does not serve the model the agent asked for is sent the closest one it does by size, so a request for a small model such as `claude-haiku-4-5` gets that provider's small model and a request for a large one its large one, and background traffic is not billed at the flagship rate.
+
+**What counts as not answering.** A connection that fails, a timeout, and `401`, `402`, `403`, `404`, `408`, `429` or any `5xx`: a rejected key, an exhausted quota, a model that provider does not serve, a rate limit or an outage, all of them specific to that provider. A `400` the request itself caused would fail the same way everywhere, so it goes straight back to the agent. Gateway fails over only while nothing has been written back to the agent yet, so a streamed answer is never stitched together from two models, and when every provider fails the agent gets the last provider's own error rather than one Gateway made up.
+
+**Cooldown.** A provider that fails twice in a row is taken out of rotation for 15 seconds, doubling with every further failure up to 5 minutes, so a dead upstream stops costing every request a timeout. It is tried last rather than dropped, since it may be the only one left, and one answer, or an edit to the provider, puts it back. The agent's page says when its bound provider is cooling down and what its last error was.
+
+**Model routing.** Agents choose model names themselves — Claude Code asks for a small model for its background work whatever it is configured with — so **Model routing** in the sidebar decides what each name is actually sent as. A rule matches a model name, with `*` for any run of characters (`*haiku*` covers every version, next year's included), for every agent or just one, and lists up to eight steps: a model, and optionally the one provider that must answer it. The first step is where the request goes, and each step below is what it steps down to when the one above is rate-limited, out of quota or down — `claude-opus-*` might go to Opus on the Anthropic key, then `deepseek-reasoner` on DeepSeek, then `kimi-k2` on whichever provider serves it. An exact name beats a wildcard and a rule for one agent beats a general one, without numbering them by hand. Under the rule's own steps comes what Gateway would have done without it, so a rule whose providers are all gone leaves the request working. A rule decides routing, not permission: its steps are filtered through the agent's [permissions](#what-each-agent-is-allowed-to-do) first, so stepping down is never a way around them. An exact model name a rule answers for is added to the model list the agents pick from, even when no provider lists it.
+
+**Seeing what happened.** The route preview on the Model routing page shows where a model name would go, step by step and with the providers in cooldown marked, without sending a request. In **LLM Records** each request names the provider and model it was **Routed to**, the rule it was **Routed by**, and every provider it failed over from with the status it got.
+
+Requests that name no agent, on `/v1/chat/completions` or `/v1/messages`, go by model name to every enabled provider that serves it, lowest priority value first, and fail over the same way.
 
 ### Import from a link
 
