@@ -424,7 +424,7 @@ func SortAttemptsByHealth(attempts []RouteAttempt) []RouteAttempt {
 	ready := make([]RouteAttempt, 0, len(attempts))
 	suspended := []RouteAttempt{}
 	for _, attempt := range attempts {
-		if IsProviderSuspended(attempt.providerId()) {
+		if IsProviderSuspended(attempt.providerId()) || IsSubscriptionSpent(attempt.providerId()) {
 			suspended = append(suspended, attempt)
 			continue
 		}

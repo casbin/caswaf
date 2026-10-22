@@ -80,6 +80,36 @@ export interface Provider {
   notes: string;
   /** Null leaves the built-in balance endpoints to answer. */
   quota?: QuotaConfig | null;
+  /** When a subscription's short window is started on its own. */
+  warmup?: WarmupConfig | null;
+}
+
+/** Times of day a subscription is sent the smallest request, which starts its
+ *  five-hour window. Mirrors object.WarmupConfig. */
+export interface WarmupConfig {
+  enabled: boolean;
+  /** Local times, "HH:MM". */
+  times: string[];
+  /** Empty takes the model the provider last relayed. */
+  model: string;
+}
+
+/** How the last warm-up of a subscription went. */
+export interface WarmupResult {
+  time: string;
+  ok: boolean;
+  model?: string;
+  message: string;
+}
+
+/** One limit of a subscription plan: what is left of it, and when it fills.
+ *  No resetTime is a window that has not started. */
+export interface QuotaWindow {
+  /** "5h", "week", "premium" or "chat". */
+  name: string;
+  remainingPercent: number;
+  windowMinutes: number;
+  resetTime?: string;
 }
 
 /** Where a provider's balance is read from, when there is no built-in endpoint
@@ -113,6 +143,10 @@ export interface ProviderQuota {
   used: number | null;
   total: number | null;
   unit: string;
+  /** What a subscription has left of its plan limits. */
+  windows?: QuotaWindow[];
+  plan?: string;
+  warmup?: WarmupResult;
   error: string;
   time: string;
 }
@@ -123,11 +157,16 @@ export interface ProviderSignin {
   vendor: string;
   /** Where the sign-in is approved. The page opens it. */
   url: string;
+  /** The code typed on that page, for a vendor approved there rather than by
+   *  a redirect back to Gateway. */
+  userCode?: string;
   running: boolean;
   ok: boolean;
   account?: string;
   plan?: string;
   error?: string;
+  /** The models the account may ask for, for a vendor with names of its own. */
+  models?: string[];
 }
 
 export interface ProviderTestResult {
@@ -208,6 +247,9 @@ export interface Agent {
   fallbacks: string[];
   /** "gateway" routes through the local proxy, "direct" writes the upstream. */
   mode: string;
+  /** How the bound provider and its fallbacks are taken in turn: "order"
+   *  (empty), "smart", "rotate" or "usage". */
+  strategy?: string;
   providerConfig: AgentProviderConfig;
   /** Where this agent reaches its bound provider, as the server resolved it. */
   proxyBaseUrl?: string;

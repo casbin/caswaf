@@ -198,6 +198,7 @@ The password behind that account is `admin` / `123`, and it only matters if you 
 - **[Is the API behind that key what it was sold as?](#the-killer-feature-is-the-api-behind-that-key-what-it-was-sold-as)** — a reseller can quietly swap in a cheaper model or fake a cache hit, and none of it shows up in the traffic. Authenticity asks the upstream directly and grades it A–F.
 - **[Switch every agent's provider from one place](#send-an-agents-traffic-through-gateway)** — change an API key or base URL once, and every agent pointed at Gateway picks it up.
 - **[Keep going when a provider runs out](#when-a-provider-cannot-answer-fallbacks-and-model-routing)** — a key out of credit, a rate limit or a relay that is down moves the request on to the next provider, across vendors and APIs, and model routing rules decide which model each request is actually sent and what it steps down to.
+- **[Pool several subscriptions](#pool-several-subscriptions)** — hold several Claude, ChatGPT or Copilot accounts, start each conversation on the plan whose quota resets soonest, keep it there while its prompt cache lasts, see what every plan has left, and start a 5-hour window on a schedule.
 - **[Add a provider, an MCP server, a prompt or a skill from a link](#import-from-a-link)** — click a vendor's "add this" button on the web and Gateway opens with what the link carries, before any of it is written.
 - **[Run several instances of one agent side by side](#what-to-do-next)** — e.g. multiple Claude Desktop instances, each signed in to a different account.
 - **[Install, upgrade and roll back the agents themselves](#what-to-do-next)** — which build each agent is on against what its package manager publishes, and back to an older release when an update broke something. One click whichever way it was installed, with the command shown first, its progress on the row and its console output a click away.
@@ -304,6 +305,25 @@ A key runs out of credit, a relay goes down, a vendor rate-limits you halfway th
 **Seeing what happened.** The route preview on the Model routing page shows where a model name would go, step by step and with the providers in cooldown marked, without sending a request. In **LLM Records** each request names the provider and model it was **Routed to**, the rule it was **Routed by**, and every provider it failed over from with the status it got.
 
 Requests that name no agent, on `/v1/chat/completions` or `/v1/messages`, go by model name to every enabled provider that serves it, lowest priority value first, and fail over the same way.
+
+### Pool several subscriptions
+
+Gateway can hold a subscription itself rather than borrow the agent's. On **Providers** → **New Provider**, pick **Claude subscription**, **ChatGPT subscription** or **GitHub Copilot subscription** and sign in once in the browser; Copilot shows a code to type on GitHub's page. The sign-in stays in Gateway, which renews it, and the agents use the provider like any other: Claude Code can spend a ChatGPT plan, and Codex runs on a ChatGPT plan through Gateway with no API key. Copilot names its models its own way (`claude-sonnet-4.5`), so signing in fills the provider's model list with the ones the account may pick, and an agent asking for another name is sent the closest of them. Sign in with another account to add a second provider for the same plan.
+
+Bind one of them to an agent and pick the others as its fallbacks, and the agent's providers are a pool. Under the fallbacks, **Pool strategy** decides which one a request starts on:
+
+| Strategy | Starts on |
+| --- | --- |
+| In order | the bound provider, then the fallbacks in the order picked |
+| Soonest reset first | the plan whose 5-hour window resets soonest, since whatever it has left is lost at that reset; API keys come after every plan |
+| Rotate | the next provider, for each new conversation |
+| Most left first | the plan with the most left of its tightest window; API keys come after every plan |
+
+Whatever the strategy, a conversation stays on the provider that answered it until it has been idle for 15 minutes, so the prompt cache it built there is spent rather than paid for again elsewhere. Gateway knows a conversation by the session id the agent sends, which Claude Code and Codex do, and otherwise by how it began, which every later turn repeats. A plan that has run out of a window waits behind the others until that window resets, rather than for the few minutes a cooldown lasts, and the failover rules above still apply to every request.
+
+**What each plan has left** is on its card on the Providers page: the 5-hour and the weekly window of a Claude or ChatGPT plan, the premium requests of a Copilot one, each with when it resets. Gateway reads it with the sign-in itself, and keeps it current from the headers of every answer it relays. When most of a window is about to be lost to its reset - half of it or more left, with an hour to go, or a day for the weekly one - the card says so.
+
+**Warm-up.** A Claude or ChatGPT plan counts its five hours from the first request. On a subscription provider's page, **Warm-up** sends the smallest request the plan takes at the times you set, unless the window is already running: send one at 7:00 and the window resets by noon, so the afternoon starts on a full one. It asks for the model the provider last relayed, or the one you name, and **Warm up now** does the same on the spot.
 
 ### Import from a link
 

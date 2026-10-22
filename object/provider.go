@@ -355,6 +355,8 @@ type Provider struct {
 	// Quota names the vendor's balance endpoint when there is no built-in one
 	// for it. Nil leaves the built-in table in provider_quota.go to answer.
 	Quota *QuotaConfig `xorm:"mediumtext json" json:"quota"`
+	// Warmup starts a subscription's short window on a schedule.
+	Warmup *WarmupConfig `xorm:"mediumtext json" json:"warmup"`
 	// TODO(1.2): Priority routing strategy will be defined in milestone 1.2.
 	Priority int    `xorm:"int" json:"priority"`
 	Status   string `xorm:"varchar(100)" json:"status"`
@@ -486,7 +488,7 @@ func validateProvider(provider *Provider) error {
 		}
 	}
 
-	return nil
+	return normalizeWarmup(provider)
 }
 
 func validateBaseUrl(baseUrl string) error {
@@ -507,6 +509,13 @@ func validateBaseUrl(baseUrl string) error {
 // It names no version and serves the endpoint straight off the path, so the
 // /v1 a versionless base URL gets would miss it.
 const ChatGptCodexPath = "/backend-api/codex"
+
+// servesApiAtRoot reports a host whose OpenAI-compatible API names no version,
+// which is every GitHub Copilot API host.
+func servesApiAtRoot(host string) bool {
+	host = strings.ToLower(host)
+	return host == "githubcopilot.com" || strings.HasSuffix(host, ".githubcopilot.com")
+}
 
 // apiVersionSegment matches a path segment that names an API version, which is
 // how a base URL says it is already the root of the API: v1, v3, v1beta.
@@ -540,7 +549,7 @@ func BuildOpenAiUrl(baseUrl string, endpoint string) (string, error) {
 	}
 
 	path := strings.TrimSuffix(strings.TrimRight(u.Path, "/"), endpoint)
-	if !namesApiVersion(path) && !strings.HasSuffix(path, ChatGptCodexPath) {
+	if !namesApiVersion(path) && !strings.HasSuffix(path, ChatGptCodexPath) && !servesApiAtRoot(u.Hostname()) {
 		path += "/v1"
 	}
 

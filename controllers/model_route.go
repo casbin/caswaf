@@ -136,7 +136,7 @@ func (c *ApiController) PreviewModelRoute() {
 			DisplayName: attempt.Provider.DisplayName,
 			Model:       attempt.Model,
 			Route:       attempt.Route,
-			Suspended:   object.IsProviderSuspended(attempt.Provider.GetId()),
+			Suspended:   object.IsProviderSuspended(attempt.Provider.GetId()) || object.IsSubscriptionSpent(attempt.Provider.GetId()),
 		})
 	}
 	c.ResponseOk(steps)
@@ -149,7 +149,7 @@ func (c *ApiController) planPreview(agentId string, model string) ([]object.Rout
 		return object.PlanModelRoute(model)
 	}
 
-	providers, err := object.GetProvidersByAgent(agentId)
+	providers, err := object.GetAgentPool(agentId, false)
 	if err != nil {
 		return nil, err
 	}

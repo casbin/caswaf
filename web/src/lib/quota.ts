@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {QuotaConfig} from "@/types";
+import i18next from "i18next";
+
+import type {QuotaConfig, QuotaWindow} from "@/types";
 
 const currencySymbols: Record<string, string> = {USD: "$", CNY: "¥", EUR: "€", GBP: "£", JPY: "¥"};
 
@@ -84,3 +86,29 @@ export const quotaPresets: QuotaPreset[] = [
     },
   },
 ];
+
+/** What a plan limit is called on the page. */
+export function windowLabel(window: QuotaWindow) {
+  switch (window.name) {
+  case "week":
+    return i18next.t("provider:Week");
+  case "premium":
+    return i18next.t("provider:Premium requests");
+  case "chat":
+    return i18next.t("provider:Chat");
+  default:
+    return window.name;
+  }
+}
+
+/** How long, in minutes, until a window that still has most of its allowance
+ *  resets and loses it. Zero when that is not about to happen: the allowance a
+ *  plan gives for one window is not carried into the next. */
+export function minutesToUnusedReset(window: QuotaWindow, now = Date.now()) {
+  if ((window.name !== "5h" && window.name !== "week") || window.remainingPercent < 50 || !window.resetTime) {
+    return 0;
+  }
+  const minutes = Math.ceil((new Date(window.resetTime).getTime() - now) / 60000);
+  const soon = window.name === "week" ? 24 * 60 : 60;
+  return minutes > 0 && minutes <= soon ? minutes : 0;
+}

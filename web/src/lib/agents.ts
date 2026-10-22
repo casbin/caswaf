@@ -391,6 +391,7 @@ export function useAgents(enabled = true) {
         provider: routing.provider ?? agent.provider,
         fallbacks: routing.fallbacks ?? agent.fallbacks ?? [],
         mode: routing.mode ?? agent.mode ?? gatewayMode,
+        strategy: routing.strategy ?? agent.strategy ?? "",
       };
 
       setBusyKey(agentKey(agent));
@@ -433,6 +434,7 @@ export function useAgents(enabled = true) {
         provider: providerId,
         fallbacks: [],
         mode: agent.mode || gatewayMode,
+        strategy: agent.strategy ?? "",
       };
       const writes = providerId !== "" && (agent.providerConfig?.supported ?? false);
 

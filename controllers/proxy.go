@@ -98,7 +98,10 @@ type proxyRoute struct {
 	// source describes how the providers were chosen, for the error a client
 	// sees when none of them can be used.
 	source string
-	start  time.Time
+	// conversation is the conversation this request continues, scoped to how
+	// its providers were chosen, see object.ConversationKey.
+	conversation string
+	start        time.Time
 	// record accumulates what is written to the LLM record of this request. It
 	// is nil while recording is off.
 	record   *object.LlmRecord
@@ -266,6 +269,7 @@ func (c *ApiController) proxyByModel(target proxyTarget) {
 // somewhere other than the request body.
 func (c *ApiController) forwardByModel(route *proxyRoute) {
 	route.source = "model: " + route.model
+	c.setConversation(route)
 	// Every way out of a proxy entry point ends the client request, which is
 	// what a record describes, so this is the only place one is written.
 	defer c.finishLlmRecord(route)
@@ -302,6 +306,7 @@ func (c *ApiController) proxyByAgent(target proxyTarget) {
 func (c *ApiController) forwardByAgent(route *proxyRoute) {
 	agentId := c.Ctx.Input.Param(":agentId")
 	route.source = "agent: " + agentId
+	c.setConversation(route)
 	if route.record != nil {
 		route.record.Agent = agentId
 	}
@@ -321,8 +326,9 @@ func (c *ApiController) forwardByAgent(route *proxyRoute) {
 	}
 
 	// The whole chain is forwarded to, so a bound provider that is down fails
-	// over to the agent's fallbacks instead of failing the request.
-	providers, err := object.GetProvidersByAgent(agentId)
+	// over to the agent's fallbacks instead of failing the request. The agent's
+	// strategy decides which of them is tried first.
+	providers, err := object.GetAgentPool(agentId, true)
 	if err != nil {
 		if errors.Is(err, object.ErrAgentNoProvider) {
 			route.recordOutcome(http.StatusBadRequest, err.Error())
@@ -359,6 +365,14 @@ func (c *ApiController) forwardByAgent(route *proxyRoute) {
 	}
 
 	c.forwardAttempts(attempts, route)
+}
+
+// setConversation names the conversation the request continues, so it is sent
+// where its earlier turns went while that provider still holds their cache.
+func (c *ApiController) setConversation(route *proxyRoute) {
+	if key := object.ConversationKey(c.Ctx.Request.Header, route.body); key != "" {
+		route.conversation = route.source + "|" + key
+	}
 }
 
 // allowAgentRequest holds one relayed request to the agent's permissions: a
@@ -467,6 +481,7 @@ func (c *ApiController) forwardAttempts(attempts []object.RouteAttempt, route *p
 	// A provider inside its failure cooldown goes last, so a dead upstream stops
 	// costing every request the time it takes to time out.
 	usable = object.SortAttemptsByHealth(usable)
+	usable = object.PreferSticky(route.conversation, usable)
 
 	// Fail over to the next attempt as long as nothing has been written to the
 	// client yet. The last one is never retried, so the client gets the real
@@ -520,7 +535,7 @@ func (c *ApiController) forwardToProvider(attempt object.RouteAttempt, route *pr
 	// the body is put in the shape that client would have sent.
 	requestBody = object.ShapeSubscriptionBody(provider, requestBody)
 
-	upstreamUrl, err := object.BuildProviderUrl(provider.BaseUrl, upstream.Name(), route.upstreamEndpoint(upstream))
+	upstreamUrl, err := object.BuildProviderUrl(object.UpstreamBaseUrl(provider), upstream.Name(), route.upstreamEndpoint(upstream))
 	if err != nil {
 		object.ReportProviderFailure(provider.GetId(), err.Error())
 		return http.StatusBadGateway, err.Error(), false
@@ -551,6 +566,7 @@ func (c *ApiController) forwardToProvider(attempt object.RouteAttempt, route *pr
 		}
 	}
 	object.SetProviderAuth(upstreamReq.Header, provider)
+	object.SetSubscriptionRequestHeaders(upstreamReq.Header, provider, requestBody)
 	if object.UsesClientAuth(provider) {
 		c.copyClientAuthHeaders(upstreamReq.Header, upstream)
 	}
@@ -578,6 +594,10 @@ func (c *ApiController) forwardToProvider(attempt object.RouteAttempt, route *pr
 	defer upstreamResp.Body.Close()
 
 	reportProviderStatus(provider, upstreamResp.StatusCode)
+	object.ObserveSubscriptionLimits(provider, upstreamResp.StatusCode, upstreamResp.Header)
+	if isSuccessStatus(upstreamResp.StatusCode) {
+		object.RememberSticky(route.conversation, provider.GetId())
+	}
 
 	if !isLast && isRetryableStatus(upstreamResp.StatusCode) {
 		beego.Error("provider", provider.GetId(), "returned a retryable status:", upstreamResp.Status)

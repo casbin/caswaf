@@ -45,8 +45,14 @@ type ProviderQuota struct {
 	Used      *float64 `json:"used"`
 	Total     *float64 `json:"total"`
 	Unit      string   `json:"unit"`
-	Error     string   `json:"error"`
-	Time      string   `json:"time"`
+	// Windows is what a subscription has left of its plan limits, which is a
+	// share of each window rather than an amount of money.
+	Windows []*QuotaWindow `json:"windows,omitempty"`
+	Plan    string         `json:"plan,omitempty"`
+	// Warmup is how the last warm-up of a subscription went.
+	Warmup *WarmupResult `json:"warmup,omitempty"`
+	Error  string        `json:"error"`
+	Time   string        `json:"time"`
 }
 
 // QuotaConfig points the probe at a vendor's own balance endpoint, for the
@@ -295,6 +301,9 @@ func probeQuota(provider *Provider) *ProviderQuota {
 		Time:     util.GetCurrentTime(),
 	}
 
+	if UsesSubscription(provider) {
+		return subscriptionQuota(provider, quota)
+	}
 	if UsesClientAuth(provider) {
 		quota.Error = "the caller's own login is forwarded, so there is no account here to ask about"
 		return quota
@@ -458,7 +467,9 @@ func GetProviderQuotas(providers []*Provider) []*ProviderQuota {
 	result := []*ProviderQuota{}
 	for _, provider := range providers {
 		if cached, ok := providerQuotaMap[provider.GetId()]; ok {
-			result = append(result, cached.quota)
+			quota := *cached.quota
+			quota.Warmup = lastWarmup(provider.GetId())
+			result = append(result, &quota)
 		}
 	}
 	return result

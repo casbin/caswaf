@@ -54,6 +54,9 @@ type Agent struct {
 	// the local proxy, ModeDirect writes the provider's own endpoint into the
 	// agent's configuration file.
 	Mode string `xorm:"varchar(20)" json:"mode"`
+	// Strategy is how the providers are taken in turn, see OrderPool. Empty
+	// tries them as listed.
+	Strategy string `xorm:"varchar(20)" json:"strategy"`
 }
 
 func (agent *Agent) GetId() string {
@@ -95,9 +98,12 @@ func GetAgents() (map[string]*Agent, error) {
 // providers to fall over to when it cannot answer, and how the agent reaches
 // them. Every provider is resolved here so a typo fails at the form rather than
 // on the next relayed request.
-func SetAgentRouting(agentId string, providerId string, fallbacks []string, mode string) error {
+func SetAgentRouting(agentId string, providerId string, fallbacks []string, mode string, strategy string) error {
 	if agentId == "" {
 		return errors.New("the agent id is empty")
+	}
+	if err := validatePoolStrategy(strategy); err != nil {
+		return err
 	}
 	if mode == "" {
 		mode = ModeGateway
@@ -135,14 +141,15 @@ func SetAgentRouting(agentId string, providerId string, fallbacks []string, mode
 			Provider:    providerId,
 			Fallbacks:   fallbacks,
 			Mode:        mode,
+			Strategy:    strategy,
 		})
 		return err
 	}
 
 	// Cols() is what writes an empty provider: xorm skips zero values otherwise.
 	_, err = ormer.Engine.ID(core.PK{AgentOwner, agentId}).
-		Cols("provider", "fallbacks", "mode", "updated_time").
-		Update(&Agent{Provider: providerId, Fallbacks: fallbacks, Mode: mode, UpdatedTime: now})
+		Cols("provider", "fallbacks", "mode", "strategy", "updated_time").
+		Update(&Agent{Provider: providerId, Fallbacks: fallbacks, Mode: mode, Strategy: strategy, UpdatedTime: now})
 	return err
 }
 
@@ -154,9 +161,9 @@ func SetAgentProvider(agentId string, providerId string) error {
 		return err
 	}
 	if stored == nil {
-		return SetAgentRouting(agentId, providerId, nil, "")
+		return SetAgentRouting(agentId, providerId, nil, "", "")
 	}
-	return SetAgentRouting(agentId, providerId, stored.Fallbacks, stored.Mode)
+	return SetAgentRouting(agentId, providerId, stored.Fallbacks, stored.Mode, stored.Strategy)
 }
 
 // normalizeFallbacks drops empty entries, duplicates and the primary provider,
@@ -221,6 +228,20 @@ func GetProvidersByAgent(agentId string) ([]*Provider, error) {
 func errNoProvider(agentId string) error {
 	return fmt.Errorf("%w: %s. It is set to its own built-in model, so bind a provider, or restore its configuration so it stops calling Gateway",
 		ErrAgentNoProvider, agentId)
+}
+
+// GetAgentPool is the chain in the order the agent's strategy tries it for the
+// request at hand.
+func GetAgentPool(agentId string, advance bool) ([]*Provider, error) {
+	providers, err := GetProvidersByAgent(agentId)
+	if err != nil {
+		return nil, err
+	}
+	agent, err := GetAgent(agentId)
+	if err != nil || agent == nil {
+		return providers, err
+	}
+	return OrderPool(agentId, agent.Strategy, providers, advance), nil
 }
 
 // GetProviderByAgent resolves the first provider of an agent's chain.

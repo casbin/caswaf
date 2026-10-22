@@ -23,6 +23,7 @@ import {AgentIcon} from "@/components/AgentIcon";
 import {ProviderIcon} from "@/components/ProviderIcon";
 import {ConfirmDialog} from "@/components/shared/confirm-dialog";
 import {Loading} from "@/components/shared/loading";
+import {SimpleSelect} from "@/components/shared/simple-select";
 import {MessageAlert} from "@/components/ui/alert";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
@@ -235,6 +236,8 @@ export function ProviderCard({
   const stranded =
     agent.provider === "" && (providerConfig.current ?? "").includes("/v1/agents/");
 
+  const strategy = agent.strategy || "order";
+
   const toggleFallback = (id: string) => {
     onRouting({
       fallbacks: fallbacks.includes(id)
@@ -329,6 +332,28 @@ export function ProviderCard({
                 </div>
               )}
             </div>
+
+            {/* With fallbacks the providers are a pool, and which of them a
+                request starts on is a choice of its own. */}
+            {fallbacks.length > 0 ? (
+              <div className="space-y-2">
+                <p className="text-sm font-medium">{i18next.t("agent:Pool strategy")}</p>
+                <SimpleSelect
+                  className="max-w-xs"
+                  value={strategy}
+                  disabled={busy}
+                  onChange={value => onRouting({strategy: value})}
+                  options={[
+                    {label: i18next.t("agent:Pool order"), value: "order"},
+                    {label: i18next.t("agent:Pool smart"), value: "smart"},
+                    {label: i18next.t("agent:Pool rotate"), value: "rotate"},
+                    {label: i18next.t("agent:Pool usage"), value: "usage"},
+                  ]}
+                />
+                <p className="text-sm text-muted-foreground">{i18next.t(`agent:Pool ${strategy} hint`)}</p>
+                <p className="text-sm text-muted-foreground">{i18next.t("agent:Pool sticky hint")}</p>
+              </div>
+            ) : null}
 
             <label className="flex items-start gap-2 text-sm">
               <Switch

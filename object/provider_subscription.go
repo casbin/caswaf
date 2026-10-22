@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/apache/casbin-gateway/agent"
+	"github.com/apache/casbin-gateway/agentusage"
 	"github.com/apache/casbin-gateway/proxy"
 	"github.com/xorm-io/core"
 )
@@ -36,6 +37,7 @@ import (
 const (
 	SubscriptionOpenAi    = "openai"
 	SubscriptionAnthropic = "anthropic"
+	SubscriptionCopilot   = "copilot"
 )
 
 // What a subscription's requests have to look like to be served: the vendor
@@ -84,6 +86,26 @@ type SubscriptionVendor struct {
 	// shape rewrites a request body the vendor's endpoint would otherwise
 	// refuse. Nil where nothing has to be changed.
 	shape func([]byte) []byte
+
+	// deviceCodeUrl marks a vendor signed in to with a code typed on its site
+	// rather than with a redirect back here.
+	deviceCodeUrl string
+	// renew turns the long-lived grant into a token requests are made with, for
+	// a vendor that does not renew through the OAuth refresh grant.
+	renew func(*ProviderSubscription) (*ProviderSubscription, error)
+	// headers adds what depends on the request itself, beside the sign-in.
+	headers func(http.Header, []byte)
+	// usage asks what the plan behind a sign-in has left, and limits reads the
+	// same out of the headers of an answer. Either is nil where the vendor
+	// reports nothing.
+	usage  func(*ProviderSubscription) ([]*QuotaWindow, string, error)
+	limits func(http.Header) ([]*QuotaWindow, string)
+	// warmModel is what a warm-up asks for when the provider has relayed no
+	// request yet to take the model from.
+	warmModel string
+	// warms marks a plan whose short window starts at the first request, which
+	// is the only kind a warm-up does anything for.
+	warms bool
 }
 
 var subscriptionVendors = []*SubscriptionVendor{
@@ -114,6 +136,15 @@ var subscriptionVendors = []*SubscriptionVendor{
 				header.Set("Originator", codexOriginator)
 			}
 		},
+		usage: func(subscription *ProviderSubscription) ([]*QuotaWindow, string, error) {
+			usage, err := agentusage.CodexToken(subscription.AccessToken, subscription.AccountId)
+			if err != nil {
+				return nil, "", err
+			}
+			return usageWindows(usage, "", ""), usage.Plan, nil
+		},
+		limits: codexLimits,
+		warms:  true,
 	},
 	{
 		Id:       SubscriptionAnthropic,
@@ -142,6 +173,37 @@ var subscriptionVendors = []*SubscriptionVendor{
 			header.Set("User-Agent", claudeUserAgent)
 		},
 		shape: withClaudePreamble,
+		usage: func(subscription *ProviderSubscription) ([]*QuotaWindow, string, error) {
+			usage, err := agentusage.Claude(subscription.AccessToken)
+			if err != nil {
+				return nil, "", err
+			}
+			return usageWindows(usage, WindowShort, WindowWeek), "", nil
+		},
+		limits:    claudeLimits,
+		warmModel: "claude-haiku-4-5",
+		warms:     true,
+	},
+	{
+		Id:       SubscriptionCopilot,
+		Label:    "GitHub Copilot",
+		BaseUrl:  copilotBaseUrl,
+		Protocol: ProtocolOpenAi,
+
+		clientId:      copilotClientId,
+		deviceCodeUrl: "https://github.com/login/device/code",
+		tokenUrl:      "https://github.com/login/oauth/access_token",
+		scope:         "read:user",
+		renew:         renewCopilot,
+		apply:         applyCopilot,
+		headers:       copilotRequestHeaders,
+		usage: func(subscription *ProviderSubscription) ([]*QuotaWindow, string, error) {
+			usage, err := agentusage.Copilot(subscription.RefreshToken)
+			if err != nil {
+				return nil, "", err
+			}
+			return usageWindows(usage, WindowPremium, WindowChat), usage.Plan, nil
+		},
 	},
 }
 
@@ -175,6 +237,9 @@ type ProviderSubscription struct {
 	Account   string `json:"account"`
 	Plan      string `json:"plan"`
 	ExpiresAt string `json:"expiresAt"`
+	// Endpoint is where this account's requests go, for a vendor that hands
+	// each account an API host of its own. Empty uses the provider's base URL.
+	Endpoint string `json:"endpoint,omitempty"`
 }
 
 func (subscription *ProviderSubscription) expiry() time.Time {
@@ -260,7 +325,12 @@ func EnsureSubscription(provider *Provider) error {
 	if err != nil {
 		return err
 	}
-	granted, err := refreshSubscription(vendor, subscription)
+	var granted *ProviderSubscription
+	if vendor.renew != nil {
+		granted, err = vendor.renew(subscription)
+	} else {
+		granted, err = refreshSubscription(vendor, subscription)
+	}
 	if err != nil {
 		return err
 	}
@@ -298,6 +368,23 @@ func SetSubscriptionAuth(header http.Header, provider *Provider) {
 		return
 	}
 	vendor.apply(header, subscription)
+}
+
+// SetSubscriptionRequestHeaders adds what a subscription endpoint reads off the
+// request itself rather than off the sign-in.
+func SetSubscriptionRequestHeaders(header http.Header, provider *Provider, body []byte) {
+	if vendor := vendorOfProvider(provider); vendor != nil && vendor.headers != nil {
+		vendor.headers(header, body)
+	}
+}
+
+// UpstreamBaseUrl is where a provider's requests go: the base URL, or the API
+// host the vendor handed the account behind a held sign-in.
+func UpstreamBaseUrl(provider *Provider) string {
+	if subscription := subscriptionOf(provider); subscription != nil && subscription.Endpoint != "" {
+		return subscription.Endpoint
+	}
+	return provider.BaseUrl
 }
 
 // SubscriptionQuery is what a subscription endpoint wants on the URL, empty for
@@ -408,12 +495,18 @@ type SubscriptionLogin struct {
 	Id     string `json:"id"`
 	Vendor string `json:"vendor"`
 	// Url is where the sign-in is approved. The page opens it.
-	Url     string `json:"url"`
-	Running bool   `json:"running"`
-	Ok      bool   `json:"ok"`
-	Account string `json:"account,omitempty"`
-	Plan    string `json:"plan,omitempty"`
-	Error   string `json:"error,omitempty"`
+	Url string `json:"url"`
+	// UserCode is what is typed on the vendor's page, for a sign-in that is
+	// approved there rather than redirected back here.
+	UserCode string `json:"userCode,omitempty"`
+	Running  bool   `json:"running"`
+	Ok       bool   `json:"ok"`
+	Account  string `json:"account,omitempty"`
+	Plan     string `json:"plan,omitempty"`
+	Error    string `json:"error,omitempty"`
+	// Models is what the account may ask for, for a vendor whose model names
+	// are its own and not the ones an agent asks for.
+	Models []string `json:"models,omitempty"`
 
 	// granted is what the finished sign-in brought back, taken out of here by
 	// the save that stores it on a provider. It never reaches the browser.
@@ -440,6 +533,9 @@ func StartSubscriptionLogin(vendorId string) (*SubscriptionLogin, error) {
 	vendor, err := subscriptionVendorOf(vendorId)
 	if err != nil {
 		return nil, err
+	}
+	if vendor.deviceCodeUrl != "" {
+		return startDeviceLogin(vendor)
 	}
 
 	id, err := randomString()
@@ -552,8 +648,15 @@ func cancelRunningLogins(vendorId string) {
 		}
 		session.Unlock()
 		if running {
-			_ = session.server.Close()
+			session.close()
 		}
+	}
+}
+
+// close stops listening for the browser, for a sign-in that listens at all.
+func (session *loginSession) close() {
+	if session.server != nil {
+		_ = session.server.Close()
 	}
 }
 
@@ -615,9 +718,7 @@ func (session *loginSession) finish(granted *ProviderSubscription, err error) {
 		session.Plan = granted.Plan
 	}
 	session.Unlock()
-	go func() {
-		_ = session.server.Close()
-	}()
+	go session.close()
 }
 
 func finishSubscriptionLogin(session *loginSession, vendor *SubscriptionVendor, query url.Values, writer http.ResponseWriter) {

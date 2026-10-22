@@ -22,7 +22,7 @@ import * as Setting from "@/Setting";
 import {ProviderIcon, ProviderIconField} from "@/components/ProviderIcon";
 import {ProviderLoginField} from "@/components/ProviderLoginField";
 import {ProviderModelsField} from "@/components/ProviderModelsField";
-import {ProviderQuotaSection} from "@/components/ProviderQuota";
+import {ProviderQuotaSection, ProviderWarmupSection} from "@/components/ProviderQuota";
 import {ProviderTestField, useProviderTest} from "@/components/ProviderTestField";
 import {EnvSnippet} from "@/components/EnvSnippet";
 import {Field} from "@/components/shared/form-dialog";
@@ -45,6 +45,7 @@ import {
   localShell,
   usesClientAuth,
   usesSubscription,
+  warmsUp,
   wireApiEndpoint,
 } from "@/lib/providers";
 import type {Provider, QuotaConfig} from "@/types";
@@ -70,7 +71,9 @@ function buildOpenAiUrl(baseUrl: string, endpoint: string) {
   if (path.endsWith(endpoint)) {
     path = path.slice(0, path.length - endpoint.length);
   }
-  if (!namesApiVersion(path)) {
+  const host = url.hostname.toLowerCase();
+  const atRoot = host === "githubcopilot.com" || host.endsWith(".githubcopilot.com");
+  if (!namesApiVersion(path) && !path.endsWith("/backend-api/codex") && !atRoot) {
     path += "/v1";
   }
 
@@ -256,6 +259,7 @@ export default function ProviderEditPage() {
                     loginId: session.id,
                     subscriptionAccount: session.account ?? "",
                     subscriptionPlan: session.plan ?? "",
+                    models: current.models.length > 0 ? current.models : (session.models ?? []),
                   }
                   : current,
               )
@@ -334,6 +338,10 @@ export default function ProviderEditPage() {
         provider={provider}
         onChange={(quota: QuotaConfig | null) => setField("quota", quota)}
       />
+
+      {warmsUp(provider) ? (
+        <ProviderWarmupSection provider={provider} saved onChange={warmup => setField("warmup", warmup)} />
+      ) : null}
 
       <Section title={i18next.t("provider:Usage")} description={i18next.t("provider:Usage hint")} columns={1}>
         <EnvSnippet

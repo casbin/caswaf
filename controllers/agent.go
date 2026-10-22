@@ -48,6 +48,7 @@ type discoveredAgent struct {
 	Provider  string   `json:"provider"`
 	Fallbacks []string `json:"fallbacks"`
 	Mode      string   `json:"mode"`
+	Strategy  string   `json:"strategy"`
 	// ProviderConfig is the state of the agent's own configuration file, which
 	// is what the config orchestrator writes.
 	ProviderConfig agentprovider.Status `json:"providerConfig"`
@@ -129,6 +130,7 @@ func (c *ApiController) GetAgents() {
 		if stored, ok := agents[installation.AgentId]; ok {
 			item.Provider = stored.Provider
 			item.Mode = stored.Mode
+			item.Strategy = stored.Strategy
 			if stored.Fallbacks != nil {
 				item.Fallbacks = stored.Fallbacks
 			}
@@ -180,6 +182,7 @@ func (c *ApiController) UpdateAgentRouting() {
 		Provider  string   `json:"provider"`
 		Fallbacks []string `json:"fallbacks"`
 		Mode      string   `json:"mode"`
+		Strategy  string   `json:"strategy"`
 	}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &form); err != nil {
 		c.ResponseError(err.Error())
@@ -190,7 +193,7 @@ func (c *ApiController) UpdateAgentRouting() {
 		return
 	}
 
-	if err := saveAgentRouting(form.AgentId, form.Provider, form.Fallbacks, form.Mode); err != nil {
+	if err := saveAgentRouting(form.AgentId, form.Provider, form.Fallbacks, form.Mode, form.Strategy); err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
@@ -201,12 +204,12 @@ func (c *ApiController) UpdateAgentRouting() {
 // configuration of every installation Gateway can write. Both the routing form
 // and the tray's one-click switch end here, so an agent reached from either
 // place is left in the same state.
-func saveAgentRouting(agentId string, providerId string, fallbacks []string, mode string) error {
+func saveAgentRouting(agentId string, providerId string, fallbacks []string, mode string, strategy string) error {
 	if err := checkAgentProtocol(agentId, mode, append([]string{providerId}, fallbacks...)); err != nil {
 		return err
 	}
 
-	if err := object.SetAgentRouting(agentId, providerId, fallbacks, mode); err != nil {
+	if err := object.SetAgentRouting(agentId, providerId, fallbacks, mode, strategy); err != nil {
 		return err
 	}
 

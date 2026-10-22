@@ -35,6 +35,25 @@ func (c *ApiController) SignInProvider() {
 	c.ResponseOk(session)
 }
 
+// WarmUpProvider starts the short window of a subscription provider now, rather
+// than at the next time its schedule names.
+func (c *ApiController) WarmUpProvider() {
+	if c.RequireAdmin() {
+		return
+	}
+
+	provider, err := object.GetProvider(c.Input().Get("id"))
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	if provider == nil {
+		c.ResponseError("the provider does not exist: " + c.Input().Get("id"))
+		return
+	}
+	c.ResponseOk(object.WarmUpProvider(provider))
+}
+
 // GetProviderSignin reports how a sign-in that was started is getting on. The
 // page polls it: approving one takes as long as whoever is at the browser.
 func (c *ApiController) GetProviderSignin() {

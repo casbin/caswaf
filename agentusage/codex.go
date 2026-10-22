@@ -49,14 +49,15 @@ type Window struct {
 	ResetTime        string  `json:"resetTime,omitempty"`
 }
 
-// Usage is what one Codex account has left. Primary is the short window - five
-// hours on the plans today - and Secondary the weekly one.
+// Usage is what one account has left. Primary is the short window - five hours
+// on the Codex and Claude plans today - and Secondary the weekly one.
 type Usage struct {
 	Primary   *Window `json:"primary,omitempty"`
 	Secondary *Window `json:"secondary,omitempty"`
 	// ResetCredits is how many rate limit resets the account still holds. Each
 	// one empties a window before its own time.
-	ResetCredits int `json:"resetCredits"`
+	ResetCredits int    `json:"resetCredits"`
+	Plan         string `json:"plan,omitempty"`
 }
 
 // codexWindow is one window as the endpoint reports it: what has been spent
@@ -83,17 +84,21 @@ func Codex(credential string) (*Usage, error) {
 	if auth.Tokens.AccessToken == "" {
 		return nil, errors.New("this account holds no ChatGPT sign-in, so it has no plan limits to report")
 	}
+	return CodexToken(auth.Tokens.AccessToken, auth.Tokens.AccountId)
+}
 
+// CodexToken is the same reading for a ChatGPT access token held anywhere.
+func CodexToken(accessToken string, accountId string) (*Usage, error) {
 	request, err := http.NewRequest(http.MethodGet, codexUsageUrl, nil)
 	if err != nil {
 		return nil, err
 	}
-	request.Header.Set("Authorization", "Bearer "+auth.Tokens.AccessToken)
+	request.Header.Set("Authorization", "Bearer "+accessToken)
 	request.Header.Set("Accept", "application/json")
 	request.Header.Set("Originator", codexOriginator)
 	request.Header.Set("User-Agent", codexOriginator)
-	if auth.Tokens.AccountId != "" {
-		request.Header.Set("Chatgpt-Account-Id", auth.Tokens.AccountId)
+	if accountId != "" {
+		request.Header.Set("Chatgpt-Account-Id", accountId)
 	}
 
 	response, err := usageClient.Do(request)
@@ -111,6 +116,7 @@ func Codex(credential string) (*Usage, error) {
 	}
 
 	var answer struct {
+		PlanType  string `json:"plan_type"`
 		RateLimit struct {
 			Primary   *codexWindow `json:"primary_window"`
 			Secondary *codexWindow `json:"secondary_window"`
@@ -130,6 +136,7 @@ func Codex(credential string) (*Usage, error) {
 		Primary:      codexWindowOf(answer.RateLimit.Primary),
 		Secondary:    codexWindowOf(answer.RateLimit.Secondary),
 		ResetCredits: answer.ResetCredits.AvailableCount,
+		Plan:         answer.PlanType,
 	}, nil
 }
 
@@ -138,11 +145,16 @@ func codexWindowOf(window *codexWindow) *Window {
 		return nil
 	}
 
-	// The moment beats the countdown, which the local clock can skew.
+	// A window nothing has been spent in has not started: the reset it reports
+	// is only where it would end if it started now, so none is given.
+	idle := window.UsedPercent == 0 && window.WindowSeconds > 0 && window.ResetAfter >= window.WindowSeconds
 	reset := ""
-	if window.ResetAt > 0 {
+	switch {
+	case idle:
+	case window.ResetAt > 0:
+		// The moment beats the countdown, which the local clock can skew.
 		reset = time.Unix(window.ResetAt, 0).UTC().Format(time.RFC3339)
-	} else if window.ResetAfter > 0 {
+	case window.ResetAfter > 0:
 		reset = time.Now().Add(time.Duration(window.ResetAfter) * time.Second).UTC().Format(time.RFC3339)
 	}
 

@@ -594,7 +594,7 @@ func importAgents(snapshot *Snapshot, mode string, dryRun bool, report *ImportRe
 		// A routing whose provider is not on this machine is refused by
 		// SetAgentRouting, which is what the report says rather than the import
 		// failing over one agent.
-		if err := SetAgentRouting(agent.Name, agent.Provider, agent.Fallbacks, agent.Mode); err != nil {
+		if err := SetAgentRouting(agent.Name, agent.Provider, agent.Fallbacks, agent.Mode, agent.Strategy); err != nil {
 			report.record(SectionAgents, agent.Name, ChangeFail, err.Error())
 			continue
 		}
@@ -621,7 +621,7 @@ func importAgents(snapshot *Snapshot, mode string, dryRun bool, report *ImportRe
 			report.record(SectionAgents, name, ChangeDelete, "")
 			continue
 		}
-		if err := SetAgentRouting(name, "", nil, ""); err != nil {
+		if err := SetAgentRouting(name, "", nil, "", ""); err != nil {
 			report.record(SectionAgents, name, ChangeFail, err.Error())
 			continue
 		}

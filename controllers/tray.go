@@ -122,6 +122,7 @@ func (c *ApiController) SetAgentProvider() {
 
 	fallbacks := []string{}
 	mode := object.ModeGateway
+	strategy := ""
 	routing, err := object.GetAgent(form.AgentId)
 	if err != nil {
 		c.ResponseError(err.Error())
@@ -129,12 +130,13 @@ func (c *ApiController) SetAgentProvider() {
 	}
 	if routing != nil {
 		fallbacks = routing.Fallbacks
+		strategy = routing.Strategy
 		if routing.Mode != "" {
 			mode = routing.Mode
 		}
 	}
 
-	if err := saveAgentRouting(form.AgentId, form.Provider, fallbacks, mode); err != nil {
+	if err := saveAgentRouting(form.AgentId, form.Provider, fallbacks, mode, strategy); err != nil {
 		c.ResponseError(err.Error())
 		return
 	}

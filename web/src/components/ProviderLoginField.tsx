@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import * as React from "react";
-import {CircleCheck, ExternalLink, LogIn} from "lucide-react";
+import {CircleCheck, Copy, ExternalLink, LogIn} from "lucide-react";
 import i18next from "i18next";
 
 import * as ProviderBackend from "@/backend/ProviderBackend";
@@ -125,6 +125,23 @@ export function ProviderLoginField({
             </Badge>
           )}
         </div>
+        {/* A vendor that approves a sign-in on its own site asks for a code
+            typed there, which is the one thing this page has to show. */}
+        {waiting && session?.userCode ? (
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-muted-foreground">{i18next.t("provider:Enter this code on that page")}</span>
+            <code className="rounded border px-2 py-0.5 font-mono text-sm tracking-widest">{session.userCode}</code>
+            <Button
+              type="button"
+              size="xs"
+              variant="ghost"
+              onClick={() => void navigator.clipboard?.writeText(session.userCode ?? "")}
+            >
+              <Copy />
+              {i18next.t("general:Copy")}
+            </Button>
+          </div>
+        ) : null}
         {waiting && session ? (
           <p className="text-muted-foreground text-xs">
             {i18next.t("provider:Finish the sign-in in the browser")}{" "}

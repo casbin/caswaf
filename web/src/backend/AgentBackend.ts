@@ -262,6 +262,8 @@ export interface AgentRouting {
   provider: string;
   fallbacks: string[];
   mode: string;
+  /** How the providers are taken in turn. Empty tries them as listed. */
+  strategy?: string;
 }
 
 export function updateAgentRouting(agentId: string, routing: AgentRouting) {

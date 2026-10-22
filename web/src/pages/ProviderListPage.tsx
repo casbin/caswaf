@@ -367,6 +367,7 @@ export default function ProviderListPage({account}: {account: Account}) {
       provider: providerIdOf(provider),
       fallbacks: [],
       mode: agent.mode || "gateway",
+      strategy: agent.strategy ?? "",
     })
       .then(res => {
         if (res.status === "ok") {
@@ -634,6 +635,7 @@ export default function ProviderListPage({account}: {account: Account}) {
                     loginId: session.id,
                     subscriptionAccount: session.account ?? "",
                     subscriptionPlan: session.plan ?? "",
+                    models: prev.models.length > 0 ? prev.models : (session.models ?? []),
                   }))
                 }
               />

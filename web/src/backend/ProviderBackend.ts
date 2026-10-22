@@ -21,6 +21,7 @@ import type {
   ProviderQuota,
   ProviderSignin,
   ProviderTestResult,
+  WarmupResult,
 } from "@/types";
 
 export function getProviders(
@@ -79,6 +80,12 @@ export function testProvider(provider: Provider) {
  *  which the save of the provider redeems. */
 export function signInProvider(vendor: string) {
   return request<ProviderSignin>(`/api/sign-in-provider${query({vendor: vendor})}`, "POST");
+}
+
+/** Starts a subscription's short window now, rather than at its next scheduled
+ *  warm-up. */
+export function warmUpProvider(id: string) {
+  return request<WarmupResult>(`/api/warm-up-provider${query({id: id})}`, "POST");
 }
 
 /** How a sign-in that was started is getting on. Approving one takes as long as

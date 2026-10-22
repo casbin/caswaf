@@ -77,6 +77,12 @@ export function usesClientAuth(provider: {authMode?: string} | undefined) {
   return provider?.authMode === authClient;
 }
 
+/** Whether a subscription's plan has a short window that starts at the first
+ *  request, which is what a warm-up is for. A Copilot plan counts by month. */
+export function warmsUp(provider: {authMode?: string; subscriptionVendor?: string}) {
+  return usesSubscription(provider) && ["anthropic", "openai"].includes(provider.subscriptionVendor ?? "");
+}
+
 /** Mirrors object.UsesSubscription: a sign-in Gateway holds and renews itself. */
 export function usesSubscription(provider: {authMode?: string} | undefined) {
   return provider?.authMode === authSubscription;
@@ -577,10 +583,14 @@ export interface ProviderSource {
 
 export const claudeSource = "claude";
 export const chatgptSource = "chatgpt";
+export const copilotSource = "copilot";
 export const customSource = "custom";
 
 /** Where a ChatGPT subscription's Codex requests go, which is not the API. */
 export const chatgptCodexBaseUrl = "https://chatgpt.com/backend-api/codex";
+
+/** Where a Copilot plan's requests go, when the account names no host of its own. */
+export const copilotBaseUrl = "https://api.githubcopilot.com";
 
 /**
  * The sign-ins come first: they are the only sources that need nothing filled
@@ -611,6 +621,21 @@ export const providerSources: ProviderSource[] = [
       // the API, and that endpoint serves the Responses format alone.
       protocol: "responses",
       baseUrl: chatgptCodexBaseUrl,
+      models: [],
+      apiKey: "",
+      authMode: authSubscription,
+    },
+  },
+  {
+    key: copilotSource,
+    label: "",
+    vendor: "copilot",
+    // The API host has no icon of its own; the plan is GitHub's.
+    website: "https://github.com",
+    provider: {
+      type: "openai",
+      icon: "github.com",
+      baseUrl: copilotBaseUrl,
       models: [],
       apiKey: "",
       authMode: authSubscription,

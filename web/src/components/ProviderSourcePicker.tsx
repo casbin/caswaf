@@ -24,6 +24,7 @@ import {
   chatgptSource,
   customSource,
   claudeSource,
+  copilotSource,
   vendorCategories,
   type ProviderSource,
   type VendorCategory,
@@ -41,6 +42,9 @@ export function sourceTitle(source: ProviderSource) {
   if (source.key === chatgptSource) {
     return i18next.t("provider:ChatGPT subscription");
   }
+  if (source.key === copilotSource) {
+    return i18next.t("provider:GitHub Copilot subscription");
+  }
   if (source.key === customSource) {
     return i18next.t("provider:Custom vendor");
   }
@@ -53,6 +57,9 @@ function sourceDetail(source: ProviderSource) {
   }
   if (source.key === chatgptSource) {
     return i18next.t("provider:ChatGPT subscription detail");
+  }
+  if (source.key === copilotSource) {
+    return i18next.t("provider:GitHub Copilot subscription detail");
   }
   if (source.key === customSource) {
     return i18next.t("provider:Custom vendor detail");
